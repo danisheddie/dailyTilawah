@@ -31,16 +31,24 @@ export async function getPage(page, opts = {}) {
     }
   }
 
-  const url = `${BASE}/page/${page}/editions/${editions.join(',')}`
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`Request failed (${res.status})`)
+  // The page endpoint serves a single edition per request (unlike surah/ayah,
+  // it has no /editions/ multiplexing), so fetch each edition in parallel and
+  // zip the ayahs together by index.
+  const editionsData = await Promise.all(
+    editions.map(async (edition) => {
+      const url = `${BASE}/page/${page}/${edition}`
+      const res = await fetch(url)
+      if (!res.ok) throw new Error(`Request failed (${res.status})`)
 
-  const json = await res.json()
-  if (json.code !== 200 || !Array.isArray(json.data)) {
-    throw new Error('Unexpected response from the Quran service.')
-  }
+      const json = await res.json()
+      if (json.code !== 200 || !json.data || !Array.isArray(json.data.ayahs)) {
+        throw new Error('Unexpected response from the Quran service.')
+      }
+      return json.data
+    })
+  )
 
-  const result = normalise(json.data, page)
+  const result = normalise(editionsData, page)
   try {
     sessionStorage.setItem(key, JSON.stringify(result))
   } catch {
@@ -49,8 +57,8 @@ export async function getPage(page, opts = {}) {
   return result
 }
 
-// The editions endpoint returns one object per edition, each carrying the
-// same ayahs in the same order. Zip them together by index.
+// Each per-edition page response carries the same ayahs in the same order.
+// Zip them together by index.
 function normalise(editionsData, page) {
   const byIdentifier = {}
   editionsData.forEach((ed) => {
