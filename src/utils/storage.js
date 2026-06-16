@@ -5,6 +5,7 @@ import { todayISO, isYesterday, isToday } from './dateUtils'
 
 const KEYS = {
   onboarded: 'tilawah:onboarded',
+  name: 'tilawah:userName',
   goal: 'tilawah:userGoal',
   streak: 'tilawah:streak',
   lastCompletedDate: 'tilawah:lastCompletedDate',
@@ -56,9 +57,22 @@ export function isOnboarded() {
   return read(KEYS.onboarded, false) === true
 }
 
-export function completeOnboarding(goalId) {
+export function completeOnboarding(goalId, name) {
   setGoal(goalId)
+  setName(name)
   write(KEYS.onboarded, true)
+}
+
+// --- name ------------------------------------------------------------------
+
+export function getName() {
+  const name = read(KEYS.name, '')
+  return typeof name === 'string' ? name : ''
+}
+
+export function setName(name) {
+  const clean = typeof name === 'string' ? name.trim().slice(0, 40) : ''
+  write(KEYS.name, clean)
 }
 
 // --- goal ------------------------------------------------------------------

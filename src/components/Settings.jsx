@@ -11,6 +11,8 @@ import {
   getStreak,
   getTotalPagesRead,
   resetProgress,
+  getName,
+  setName,
 } from '../utils/storage'
 
 function Toggle({ label, description, checked, onChange }) {
@@ -45,6 +47,7 @@ export default function Settings() {
   const navigate = useNavigate()
   const [goalId, setGoalId] = useState(() => getGoal().id)
   const [settings, setSettings] = useState(() => getSettings())
+  const [name, setNameState] = useState(() => getName())
   const [confirmReset, setConfirmReset] = useState(false)
 
   const streak = getStreak()
@@ -90,6 +93,22 @@ export default function Settings() {
           <p className="text-2xl font-bold text-teal">{totalPages}</p>
           <p className="mt-1 text-xs text-muted">pages read (lifetime)</p>
         </div>
+      </section>
+
+      {/* Name */}
+      <section className="mt-10">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+          Your name
+        </h2>
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setNameState(e.target.value)}
+          onBlur={() => setName(name)}
+          placeholder="Your name"
+          maxLength={40}
+          className="mt-3 w-full rounded-2xl border border-teal/15 bg-transparent px-5 py-3 text-base text-teal outline-none transition placeholder:text-muted/60 focus:border-teal"
+        />
       </section>
 
       {/* Goal */}

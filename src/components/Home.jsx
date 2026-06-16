@@ -2,7 +2,7 @@
 // clear action to start (or continue) today's reading.
 
 import { useNavigate } from 'react-router-dom'
-import { getProgressSummary } from '../utils/storage'
+import { getProgressSummary, getName } from '../utils/storage'
 import { formatGregorian, formatHijri } from '../utils/dateUtils'
 import StreakBadge from './StreakBadge'
 
@@ -19,6 +19,7 @@ export default function Home() {
   const navigate = useNavigate()
   const summary = getProgressSummary()
   const { goal, todayProgress, completedToday, streak, lastPage } = summary
+  const name = getName()
 
   const pct = Math.min(100, Math.round((todayProgress / goal.pages) * 100))
   const started = lastPage > 1 || todayProgress > 0
@@ -41,6 +42,15 @@ export default function Home() {
           <GearIcon />
         </button>
       </header>
+
+      {name && (
+        <div className="mt-8 text-center">
+          <p className="text-xs uppercase tracking-wide text-muted">
+            Assalamu&apos;alaikum
+          </p>
+          <p className="mt-1 text-2xl font-semibold text-teal">{name}</p>
+        </div>
+      )}
 
       <div className="mt-12 flex flex-col items-center text-center">
         <StreakBadge streak={streak} size="lg" />

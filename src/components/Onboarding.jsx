@@ -7,11 +7,12 @@ import { GOALS, completeOnboarding } from '../utils/storage'
 
 export default function Onboarding({ onDone }) {
   const navigate = useNavigate()
-  const [step, setStep] = useState(0) // 0 welcome, 1 goal, 2 bismillah
+  const [step, setStep] = useState(0) // 0 welcome, 1 name, 2 goal, 3 bismillah
+  const [name, setName] = useState('')
   const [goalId, setGoalId] = useState('one')
 
   function finish() {
-    completeOnboarding(goalId)
+    completeOnboarding(goalId, name)
     onDone?.()
     navigate('/', { replace: true })
   }
@@ -40,6 +41,36 @@ export default function Onboarding({ onDone }) {
       {step === 1 && (
         <div className="w-full animate-fade-in">
           <h2 className="text-2xl font-semibold text-teal">
+            What should we call you?
+          </h2>
+          <p className="mt-2 text-sm text-muted">
+            We'll use it to keep your journey personal.
+          </p>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && name.trim()) setStep(2)
+            }}
+            placeholder="Your name"
+            autoFocus
+            maxLength={40}
+            className="mt-8 w-full rounded-2xl border border-teal/15 bg-transparent px-5 py-4 text-center text-lg text-teal outline-none transition placeholder:text-muted/60 focus:border-teal"
+          />
+          <button
+            className="btn-primary mt-8 w-full disabled:opacity-40"
+            disabled={!name.trim()}
+            onClick={() => setStep(2)}
+          >
+            Continue
+          </button>
+        </div>
+      )}
+
+      {step === 2 && (
+        <div className="w-full animate-fade-in">
+          <h2 className="text-2xl font-semibold text-teal">
             Set your daily goal
           </h2>
           <p className="mt-2 text-sm text-muted">
@@ -60,13 +91,13 @@ export default function Onboarding({ onDone }) {
               </button>
             ))}
           </div>
-          <button className="btn-primary mt-8 w-full" onClick={() => setStep(2)}>
+          <button className="btn-primary mt-8 w-full" onClick={() => setStep(3)}>
             Continue
           </button>
         </div>
       )}
 
-      {step === 2 && (
+      {step === 3 && (
         <div className="animate-scale-in">
           <p
             className="font-arabic text-3xl leading-loose text-teal sm:text-4xl"

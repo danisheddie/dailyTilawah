@@ -175,6 +175,15 @@ export default function Reader() {
                     </p>
                   </div>
                 )}
+                {ayah.showBasmalah && (
+                  <p
+                    className="mb-4 mt-2 text-center font-arabic text-2xl leading-loose text-teal sm:text-3xl"
+                    dir="rtl"
+                    lang="ar"
+                  >
+                    بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+                  </p>
+                )}
                 <AyahCard
                   ayah={ayah}
                   showTranslation={settings.showTranslation}
