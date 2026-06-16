@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Reminders from './Reminders'
+import SyncSettings from './SyncSettings'
 import {
   GOALS,
   getGoal,
@@ -163,6 +164,9 @@ export default function Settings() {
 
       {/* Prayer-time reminders */}
       <Reminders />
+
+      {/* Back up & sync */}
+      <SyncSettings />
 
       {/* Reset */}
       <section className="mt-12">

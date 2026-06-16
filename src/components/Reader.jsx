@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { getPage, TOTAL_PAGES } from '../utils/api'
 import { getLastPage, getSettings, recordPageRead } from '../utils/storage'
 import { reportRead } from '../utils/sync'
+import { schedulePush } from '../utils/cloudSync'
 import AyahCard from './AyahCard'
 
 function Spinner() {
@@ -105,6 +106,7 @@ export default function Reader() {
   function finishPage() {
     const result = recordPageRead(page)
     reportRead() // suppress today's remaining prayer-time reminders
+    schedulePush() // back up progress to the cloud if sync is on
     stopAudio()
     if (result.justCompleted) {
       setCompletion(result)

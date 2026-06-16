@@ -109,6 +109,37 @@ async function handleTest(request, env) {
   }
 }
 
+// --- cloud sync (optional account by sync code) ----------------------------
+function normalizeCode(code) {
+  return String(code || '')
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '')
+}
+function acctKey(code) {
+  return `acct:${normalizeCode(code)}`
+}
+
+async function handleSyncPull(request, env) {
+  const body = await readBody(request)
+  const code = normalizeCode(body && body.code)
+  if (code.length < 8) return json({ error: 'invalid code' }, 400)
+  const doc = JSON.parse((await env.TILAWAH_KV.get(acctKey(code))) || 'null')
+  if (!doc) return json({ error: 'not found' }, 404)
+  return json({ data: doc.data, updatedAt: doc.updatedAt })
+}
+
+async function handleSyncPush(request, env) {
+  const body = await readBody(request)
+  const code = normalizeCode(body && body.code)
+  if (code.length < 8) return json({ error: 'invalid code' }, 400)
+  if (!body.data || typeof body.data !== 'object') return json({ error: 'no data' }, 400)
+  await env.TILAWAH_KV.put(
+    acctKey(code),
+    JSON.stringify({ data: body.data, updatedAt: Date.now() })
+  )
+  return json({ ok: true })
+}
+
 // --- scheduler -------------------------------------------------------------
 async function runReminders(env, now = new Date()) {
   const vapid = vapidFrom(env)
@@ -188,6 +219,10 @@ export default {
     if (request.method === 'POST' && url.pathname === '/unsubscribe')
       return handleUnsubscribe(request, env)
     if (request.method === 'POST' && url.pathname === '/test') return handleTest(request, env)
+    if (request.method === 'POST' && url.pathname === '/sync/pull')
+      return handleSyncPull(request, env)
+    if (request.method === 'POST' && url.pathname === '/sync/push')
+      return handleSyncPush(request, env)
 
     return json({ error: 'not found' }, 404)
   },

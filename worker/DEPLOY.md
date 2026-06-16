@@ -79,7 +79,18 @@ You should get a notification within a few seconds. To watch the scheduler:
 npx wrangler tail
 ```
 
-## How it works
+## Cloud sync (included — no extra setup)
+The same Worker also powers optional "Back up & sync" (Settings → Back up &
+sync). Once `WORKER_URL` is set in `src/config.js`, it works automatically —
+no VAPID keys involved, and it shares the same KV namespace:
+- `POST /sync/push` — `{ code, data }` stores a snapshot under `acct:<code>`.
+- `POST /sync/pull` — `{ code }` returns the stored snapshot (404 if unknown).
+
+The sync **code is the credential** (anyone with it can read/write that
+record), so it's generated with ~60 bits of entropy. Reading data only —
+prayer reminders and sync are independent and can be used separately.
+
+## How reminders work
 - `POST /subscribe` — the app upserts `{subscription, location, method, madhab,
   timeZone}` keyed by a per-device `clientId`.
 - `POST /read` — the app reports the day's reading is done; reminders for the
