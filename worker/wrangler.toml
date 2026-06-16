@@ -1,0 +1,20 @@
+name = "tilawah-reminders"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+
+# Run the reminder scheduler every minute.
+[triggers]
+crons = ["* * * * *"]
+
+# Public, non-secret config. VAPID_PUBLIC_KEY and VAPID_SUBJECT are safe to
+# commit; the private key is set via `wrangler secret put VAPID_PRIVATE_JWK`.
+[vars]
+VAPID_PUBLIC_KEY = "REPLACE_WITH_VAPID_PUBLIC_KEY"
+VAPID_SUBJECT = "mailto:you@example.com"
+
+# KV namespace for subscribers. Create it with:
+#   wrangler kv namespace create TILAWAH_KV
+# then paste the printed id below.
+[[kv_namespaces]]
+binding = "TILAWAH_KV"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
