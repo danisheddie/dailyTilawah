@@ -2,8 +2,9 @@
 // clear action to start (or continue) today's reading.
 
 import { useNavigate } from 'react-router-dom'
-import { getProgressSummary, getName } from '../utils/storage'
+import { getProgressSummary, getName, getReminders } from '../utils/storage'
 import { formatGregorian, formatHijri } from '../utils/dateUtils'
+import { nextPrayer, formatTime } from '../utils/prayer'
 import StreakBadge from './StreakBadge'
 
 function GearIcon() {
@@ -21,6 +22,16 @@ export default function Home() {
   const { goal, todayProgress, completedToday, streak, lastPage } = summary
   const name = getName()
 
+  const { location, method, madhab } = getReminders()
+  let upcoming = null
+  if (location) {
+    try {
+      upcoming = nextPrayer({ ...location, method, madhab })
+    } catch {
+      upcoming = null
+    }
+  }
+
   const pct = Math.min(100, Math.round((todayProgress / goal.pages) * 100))
   const started = lastPage > 1 || todayProgress > 0
 
@@ -33,6 +44,11 @@ export default function Home() {
         <div>
           <p className="text-sm font-medium text-teal">{formatHijri()}</p>
           <p className="mt-0.5 text-xs text-muted">{formatGregorian()}</p>
+          {upcoming && (
+            <p className="mt-1 text-xs text-gold">
+              Next: {upcoming.name} · {formatTime(upcoming.time)}
+            </p>
+          )}
         </div>
         <button
           onClick={() => navigate('/settings')}

@@ -15,6 +15,8 @@ const KEYS = {
   todayProgress: 'tilawah:todayProgress',
   progressDate: 'tilawah:progressDate',
   settings: 'tilawah:settings',
+  reminders: 'tilawah:reminders',
+  clientId: 'tilawah:clientId',
 }
 
 // The reading goals the user can choose from. `pages` is the daily target
@@ -30,6 +32,15 @@ export const DEFAULT_SETTINGS = {
   showTranslation: true,
   showTransliteration: false,
   showAudio: false,
+}
+
+// Prayer-time reminder preferences. `location` is { latitude, longitude,
+// label } once the user grants geolocation; null until then.
+export const DEFAULT_REMINDERS = {
+  enabled: false,
+  method: 'MuslimWorldLeague',
+  madhab: 'shafi',
+  location: null,
 }
 
 // --- low level helpers -----------------------------------------------------
@@ -97,6 +108,32 @@ export function setSetting(key, value) {
   const next = { ...getSettings(), [key]: value }
   write(KEYS.settings, next)
   return next
+}
+
+// --- reminders -------------------------------------------------------------
+
+export function getReminders() {
+  return { ...DEFAULT_REMINDERS, ...read(KEYS.reminders, {}) }
+}
+
+export function setReminders(partial) {
+  const next = { ...getReminders(), ...partial }
+  write(KEYS.reminders, next)
+  return next
+}
+
+// A stable per-device id so the backend can key a subscriber's location and
+// read-state. Generated once, then persisted.
+export function getClientId() {
+  let id = read(KEYS.clientId, null)
+  if (!id) {
+    id =
+      typeof crypto !== 'undefined' && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `c_${Date.now()}_${Math.random().toString(36).slice(2)}`
+    write(KEYS.clientId, id)
+  }
+  return id
 }
 
 // --- reading position ------------------------------------------------------

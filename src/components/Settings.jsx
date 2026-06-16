@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import Reminders from './Reminders'
 import {
   GOALS,
   getGoal,
@@ -159,6 +160,9 @@ export default function Settings() {
           />
         </div>
       </section>
+
+      {/* Prayer-time reminders */}
+      <Reminders />
 
       {/* Reset */}
       <section className="mt-12">
