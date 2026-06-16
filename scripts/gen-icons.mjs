@@ -1,15 +1,20 @@
-// Generates the PWA icon set (no image deps): a teal tile with a gold
-// crescent + star, supersampled 4x for smooth edges. Run: npm run icons
+// Generates the PWA icon set (no image deps): a minimalist open-book mark on a
+// deep-teal tile, supersampled for smooth edges. Run: npm run icons
+// Pass a variant name (e.g. `node scripts/gen-icons.mjs preview`) to render
+// comparison tiles into public/icons/_preview instead of the final set.
 import { deflateSync } from 'node:zlib'
 import { writeFileSync, mkdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 
-const OUT = resolve(dirname(fileURLToPath(import.meta.url)), '../public/icons')
-mkdirSync(OUT, { recursive: true })
+const ROOT = dirname(fileURLToPath(import.meta.url))
+const OUT = resolve(ROOT, '../public/icons')
 
-const TEAL = [27, 79, 114]
-const GOLD = [201, 168, 76]
+// Palette
+const TEAL_TOP = [33, 95, 134]
+const TEAL_BOT = [18, 54, 81]
+const GOLD = [216, 184, 100]
+const GOLD_DK = [183, 150, 74]
 const WHITE = [255, 255, 255]
 const CLEAR = [0, 0, 0, 0]
 
@@ -31,8 +36,7 @@ function crc32(buf) {
 function chunk(type, data) {
   const len = Buffer.alloc(4)
   len.writeUInt32BE(data.length, 0)
-  const typeBuf = Buffer.from(type, 'ascii')
-  const body = Buffer.concat([typeBuf, data])
+  const body = Buffer.concat([Buffer.from(type, 'ascii'), data])
   const crc = Buffer.alloc(4)
   crc.writeUInt32BE(crc32(body), 0)
   return Buffer.concat([len, body, crc])
@@ -42,11 +46,11 @@ function encodePNG(width, height, rgba) {
   const ihdr = Buffer.alloc(13)
   ihdr.writeUInt32BE(width, 0)
   ihdr.writeUInt32BE(height, 4)
-  ihdr[8] = 8 // bit depth
-  ihdr[9] = 6 // RGBA
+  ihdr[8] = 8
+  ihdr[9] = 6
   const raw = Buffer.alloc((width * 4 + 1) * height)
   for (let y = 0; y < height; y++) {
-    raw[y * (width * 4 + 1)] = 0 // filter: none
+    raw[y * (width * 4 + 1)] = 0
     rgba.copy(raw, y * (width * 4 + 1) + 1, y * width * 4, (y + 1) * width * 4)
   }
   return Buffer.concat([
@@ -57,24 +61,22 @@ function encodePNG(width, height, rgba) {
   ])
 }
 
-// --- geometry --------------------------------------------------------------
-function insideRoundedRect(x, y, size, cr) {
-  const minX = cr
-  const maxX = size - cr
-  const minY = cr
-  const maxY = size - cr
-  const dx = Math.max(minX - x, 0, x - maxX)
-  const dy = Math.max(minY - y, 0, y - maxY)
-  return dx * dx + dy * dy <= cr * cr
+// --- geometry helpers (all in normalised 0..1 space) -----------------------
+function lerp(a, b, t) {
+  return a + (b - a) * t
 }
-function starVertices(cx, cy, outer, inner) {
-  const pts = []
-  for (let i = 0; i < 10; i++) {
-    const r = i % 2 === 0 ? outer : inner
-    const a = -Math.PI / 2 + (i * Math.PI) / 5
-    pts.push([cx + r * Math.cos(a), cy + r * Math.sin(a)])
+function mix(c1, c2, t) {
+  return [lerp(c1[0], c2[0], t), lerp(c1[1], c2[1], t), lerp(c1[2], c2[2], t)]
+}
+function quad(p0, c, p1, steps, out) {
+  for (let i = 0; i < steps; i++) {
+    const t = i / steps
+    const u = 1 - t
+    out.push([
+      u * u * p0[0] + 2 * u * t * c[0] + t * t * p1[0],
+      u * u * p0[1] + 2 * u * t * c[1] + t * t * p1[1],
+    ])
   }
-  return pts
 }
 function inPolygon(x, y, pts) {
   let inside = false
@@ -85,80 +87,139 @@ function inPolygon(x, y, pts) {
   }
   return inside
 }
+function insideRoundedRect(x, y, cr) {
+  const dx = Math.max(cr - x, 0, x - (1 - cr))
+  const dy = Math.max(cr - y, 0, y - (1 - cr))
+  return dx * dx + dy * dy <= cr * cr
+}
 
-function colorAt(x, y, o) {
-  // footprint
-  let base
-  if (o.rounded) {
-    if (!insideRoundedRect(x, y, o.size, o.cr)) return CLEAR
+// Build the right half-page outline; the left page is its mirror. The page
+// rides high at the central spine and slopes down to the outer fore-edge,
+// giving the classic open-book tent silhouette. cy is the book's centre.
+function buildPage(cy) {
+  const spineTop = [0.5, cy - 0.2] // ridge, highest point
+  const outerTop = [0.9, cy - 0.085]
+  const outerBot = [0.875, cy + 0.115]
+  const spineBot = [0.5, cy + 0.05] // spine sits higher than the outer edge
+  const pts = []
+  pts.push(spineTop)
+  quad(spineTop, [0.69, cy - 0.215], outerTop, 24, pts) // convex top (page crown)
+  quad(outerTop, [0.92, cy + 0.015], outerBot, 16, pts) // rounded fore-edge
+  quad(outerBot, [0.7, cy + 0.075], spineBot, 24, pts) // sweep back to the spine
+  pts.push(spineBot)
+  return pts
+}
+function mirror(pts) {
+  return pts.map(([x, y]) => [1 - x, y])
+}
+
+function colorAt(px, py, o) {
+  if (!insideRoundedRect(px, py, o.cr)) return CLEAR
+  let col = o.bg ? mix(TEAL_TOP, TEAL_BOT, py) : null
+
+  // Scale the foreground art about the centre (keeps it inside mask safe zones).
+  const nx = 0.5 + (px - 0.5) / o.scale
+  const ny = 0.5 + (py - 0.5) / o.scale
+  const cy = o.bookCY
+
+  // Crescent above the book (optional).
+  if (o.crescent) {
+    const ccx = 0.5
+    const ccy = o.bookCY - 0.305
+    const R = 0.092
+    const inOuter = (nx - ccx) ** 2 + (ny - ccy) ** 2 <= R * R
+    const inCut = (nx - (ccx + R * 0.42)) ** 2 + (ny - (ccy - R * 0.12)) ** 2 <= (R * 0.86) ** 2
+    if (inOuter && !inCut) col = o.art
   }
-  base = o.bg ? [o.bg[0], o.bg[1], o.bg[2], 255] : CLEAR
 
-  const cx = o.size * 0.455
-  const cy = o.size * 0.5
-  const R = o.size * 0.3 * o.scale
-  // crescent = outer disc minus an offset cutout disc
-  const inOuter = (x - cx) ** 2 + (y - cy) ** 2 <= R * R
-  const cutx = cx + R * 0.5
-  const cuty = cy - R * 0.16
-  const inCut = (x - cutx) ** 2 + (y - cuty) ** 2 <= (R * 0.84) ** 2
-  if (inOuter && !inCut) return [o.art[0], o.art[1], o.art[2], 255]
-
-  // star in the crescent's mouth
-  if (o.star) {
-    const star = starVertices(cx + R * 0.92, cy - R * 0.34, R * 0.32, R * 0.13)
-    if (inPolygon(x, y, star)) return [o.art[0], o.art[1], o.art[2], 255]
+  // Open book.
+  const inBook = inPolygon(nx, ny, o.right) || inPolygon(nx, ny, o.left)
+  if (inBook) {
+    col = o.art
+    // spine gap
+    if (Math.abs(nx - 0.5) < 0.01 && ny > cy - 0.2 && ny < cy + 0.05) {
+      col = o.bg ? mix(TEAL_TOP, TEAL_BOT, py) : CLEAR
+    }
+    // page text lines
+    if (o.lines) {
+      for (let li = 0; li < 3; li++) {
+        const ly = cy - 0.07 + li * 0.07
+        if (Math.abs(ny - ly) < 0.0145) {
+          const onLeft = nx > 0.155 && nx < 0.44
+          const onRight = nx > 0.56 && nx < 0.845
+          if (onLeft || onRight) col = GOLD_DK
+        }
+      }
+    }
   }
-  return base
+
+  return col ? [col[0], col[1], col[2], 255] : CLEAR
 }
 
 function render(size, o) {
-  const SS = 4 // supersample factor
+  const SS = 4
+  const cr = o.cr
   const rgba = Buffer.alloc(size * size * 4)
-  const opts = { ...o, size }
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
       let r = 0, g = 0, b = 0, a = 0
       for (let sy = 0; sy < SS; sy++) {
         for (let sx = 0; sx < SS; sx++) {
-          const [cr, cg, cb, ca] = colorAt(
-            x + (sx + 0.5) / SS,
-            y + (sy + 0.5) / SS,
-            opts
-          )
-          const af = (ca ?? 255) / 255
-          r += cr * af
-          g += cg * af
-          b += cb * af
+          const c = colorAt((x + (sx + 0.5) / SS) / size, (y + (sy + 0.5) / SS) / size, o)
+          const af = (c[3] ?? 255) / 255
+          r += c[0] * af
+          g += c[1] * af
+          b += c[2] * af
           a += af
         }
       }
-      const n = SS * SS
       const idx = (y * size + x) * 4
-      const af = a / n
-      // un-premultiply for straight-alpha PNG
-      rgba[idx] = af ? Math.round(r / a) : 0
-      rgba[idx + 1] = af ? Math.round(g / a) : 0
-      rgba[idx + 2] = af ? Math.round(b / a) : 0
-      rgba[idx + 3] = Math.round(af * 255)
+      rgba[idx] = a ? Math.round(r / a) : 0
+      rgba[idx + 1] = a ? Math.round(g / a) : 0
+      rgba[idx + 2] = a ? Math.round(b / a) : 0
+      rgba[idx + 3] = Math.round((a / (SS * SS)) * 255)
     }
   }
   return encodePNG(size, size, rgba)
 }
 
-const tiles = [
-  // app icons: teal rounded tile, gold crescent + star
-  { file: 'icon-192.png', size: 192, o: { bg: TEAL, art: GOLD, rounded: true, cr: 192 * 0.2, scale: 1, star: true } },
-  { file: 'icon-512.png', size: 512, o: { bg: TEAL, art: GOLD, rounded: true, cr: 512 * 0.2, scale: 1, star: true } },
-  // maskable: full-bleed teal, art kept inside the safe zone (smaller)
-  { file: 'icon-maskable-512.png', size: 512, o: { bg: TEAL, art: GOLD, rounded: false, scale: 0.72, star: true } },
-  // apple touch: full-bleed teal (iOS rounds it itself)
-  { file: 'apple-touch-icon.png', size: 180, o: { bg: TEAL, art: GOLD, rounded: false, scale: 1, star: true } },
-  // notification badge: white silhouette on transparent
-  { file: 'badge-72.png', size: 72, o: { bg: null, art: WHITE, rounded: false, scale: 1.2, star: false } },
-]
+// Compose the per-render options (precompute page polygons).
+function opts({ bg = true, art = GOLD, crescent = false, lines = true, bookCY = 0.5, cr = 0.2, scale = 1 }) {
+  const right = buildPage(bookCY)
+  return { bg, art, crescent, lines, bookCY, cr, scale, right, left: mirror(right) }
+}
 
-for (const t of tiles) {
-  writeFileSync(resolve(OUT, t.file), render(t.size, t.o))
-  console.log('wrote', t.file)
+const mode = process.argv[2]
+
+if (mode === 'preview') {
+  const dir = resolve(OUT, '_preview')
+  mkdirSync(dir, { recursive: true })
+  const variants = {
+    'A-clean': opts({ bookCY: 0.5, lines: false }),
+    'B-lines': opts({ bookCY: 0.5, lines: true }),
+    'C-crescent': opts({ bookCY: 0.56, crescent: true, lines: false }),
+    'D-crescent-lines': opts({ bookCY: 0.56, crescent: true, lines: true }),
+  }
+  for (const [name, o] of Object.entries(variants)) {
+    writeFileSync(resolve(dir, `${name}.png`), render(256, o))
+    console.log('wrote preview', name)
+  }
+} else {
+  mkdirSync(OUT, { recursive: true })
+  // Book + crescent on a deep-teal tile; no internal lines (cleaner).
+  const main = (cr, scale = 1) => opts({ bookCY: 0.56, crescent: true, lines: false, cr, scale })
+  const tiles = [
+    { file: 'icon-192.png', size: 192, o: main(0.2) },
+    { file: 'icon-512.png', size: 512, o: main(0.2) },
+    // maskable: full-bleed square tile (cr 0), art scaled into the safe zone
+    { file: 'icon-maskable-512.png', size: 512, o: main(0, 0.78) },
+    // apple-touch: full-bleed square; iOS applies its own rounded mask
+    { file: 'apple-touch-icon.png', size: 180, o: main(0, 1) },
+    // notification badge: simple white book silhouette on transparent
+    { file: 'badge-72.png', size: 72, o: opts({ bg: false, art: WHITE, crescent: false, lines: false, bookCY: 0.5, cr: 0.5 }) },
+  ]
+  for (const t of tiles) {
+    writeFileSync(resolve(OUT, t.file), render(t.size, t.o))
+    console.log('wrote', t.file)
+  }
 }
