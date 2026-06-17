@@ -9,7 +9,7 @@
 //                     'https://tilawah-reminders.<your-subdomain>.workers.dev'
 // VAPID_PUBLIC_KEY  — the base64url VAPID public key printed by the deploy step.
 
-export const WORKER_URL = ''
+export const WORKER_URL = 'https://tilawah-reminders.danisheddie1405.workers.dev'
 export const VAPID_PUBLIC_KEY = ''
 
 // GOOGLE_CLIENT_ID — the OAuth 2.0 Web Client ID from Google Cloud Console,
