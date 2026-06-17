@@ -13,6 +13,7 @@ import {
 } from '../utils/push'
 import { syncSubscription, disableOnServer } from '../utils/sync'
 import { remindersConfigured } from '../config'
+import { useLang } from '../utils/i18n.jsx'
 
 function getPosition() {
   return new Promise((resolve, reject) => {
@@ -29,19 +30,17 @@ function getPosition() {
   })
 }
 
-function messageFor(err) {
-  if (err?.message === 'unsupported')
-    return 'This browser can’t show reminders. On iPhone, add Tilawah to your Home Screen first, then open it from there.'
-  if (err?.message === 'denied')
-    return 'Notifications are blocked. Allow them for this site, then try again.'
+function messageFor(err, t) {
+  if (err?.message === 'unsupported') return t('reminders.errUnsupported')
+  if (err?.message === 'denied') return t('reminders.errDenied')
   if (err?.message === 'no-geo' || err?.code === 1)
-    return 'Location permission is needed to calculate prayer times for where you are.'
-  if (err?.code === 2 || err?.code === 3)
-    return 'Couldn’t get your location. Please try again.'
-  return err?.message || 'Something went wrong. Please try again.'
+    return t('reminders.errLocationNeeded')
+  if (err?.code === 2 || err?.code === 3) return t('reminders.errLocationFail')
+  return t('reminders.errGeneric')
 }
 
 export default function Reminders() {
+  const { t } = useLang()
   const [r, setR] = useState(() => getReminders())
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
@@ -75,7 +74,7 @@ export default function Reminders() {
       persist({ enabled: true, location })
       await syncSubscription(subscription)
     } catch (e) {
-      setError(messageFor(e))
+      setError(messageFor(e, t))
     } finally {
       setBusy(false)
     }
@@ -100,7 +99,7 @@ export default function Reminders() {
       persist({ location })
       await resync()
     } catch (e) {
-      setError(messageFor(e))
+      setError(messageFor(e, t))
     } finally {
       setBusy(false)
     }
@@ -129,16 +128,16 @@ export default function Reminders() {
   return (
     <section className="mt-10">
       <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-        Prayer-time reminders
+        {t('reminders.title')}
       </h2>
       <p className="mt-2 text-xs leading-relaxed text-muted">
-        A gentle nudge at each prayer time — only on days you haven’t read yet.
+        {t('reminders.sub')}
       </p>
 
       {/* Enable toggle */}
       <div className="mt-4 flex items-center justify-between gap-4">
         <span className="text-sm font-medium text-teal">
-          {r.enabled ? 'Reminders are on' : 'Turn on reminders'}
+          {r.enabled ? t('reminders.on') : t('reminders.turnOn')}
         </span>
         <button
           type="button"
@@ -161,16 +160,12 @@ export default function Reminders() {
       {/* Status notes */}
       {!configured && (
         <p className="mt-3 rounded-xl bg-gold/10 px-3 py-2 text-xs text-muted">
-          The reminder service isn’t connected yet, so notifications can’t be
-          delivered. You can still set your location and preview today’s prayer
-          times below.
+          {t('reminders.notConnected')}
         </p>
       )}
       {configured && !supported && (
         <p className="mt-3 rounded-xl bg-gold/10 px-3 py-2 text-xs text-muted">
-          Reminders need the installed app. On iPhone: tap Share → “Add to Home
-          Screen”, then open Tilawah from your Home Screen and enable reminders
-          there.
+          {t('reminders.needInstalled')}
         </p>
       )}
       {error && (
@@ -182,21 +177,21 @@ export default function Reminders() {
       {/* Location */}
       <div className="mt-5 flex items-center justify-between gap-3">
         <div className="text-sm">
-          <p className="font-medium text-teal">Location</p>
+          <p className="font-medium text-teal">{t('reminders.location')}</p>
           <p className="text-xs text-muted">
             {r.location
               ? `${r.location.latitude}, ${r.location.longitude}`
-              : 'Not set'}
+              : t('reminders.notSet')}
           </p>
         </div>
         <button className="btn-ghost px-4 py-2 text-sm" disabled={busy} onClick={useMyLocation}>
-          {r.location ? 'Update' : 'Use my location'}
+          {r.location ? t('reminders.update') : t('reminders.useLocation')}
         </button>
       </div>
 
       {/* Calculation method */}
       <label className="mt-5 block">
-        <span className="text-sm font-medium text-teal">Calculation method</span>
+        <span className="text-sm font-medium text-teal">{t('reminders.method')}</span>
         <select
           value={r.method}
           onChange={(e) => changeMethod(e.target.value)}
@@ -213,11 +208,11 @@ export default function Reminders() {
 
       {/* Asr madhab */}
       <div className="mt-5">
-        <span className="text-sm font-medium text-teal">Asr time</span>
+        <span className="text-sm font-medium text-teal">{t('reminders.asr')}</span>
         <div className="mt-2 grid grid-cols-2 gap-3">
           {[
-            { id: 'shafi', label: 'Standard' },
-            { id: 'hanafi', label: 'Hanafi' },
+            { id: 'shafi', label: t('reminders.standard') },
+            { id: 'hanafi', label: t('reminders.hanafi') },
           ].map((opt) => (
             <button
               key={opt.id}
@@ -239,7 +234,7 @@ export default function Reminders() {
       {times && (
         <div className="mt-6 rounded-2xl bg-teal/5 p-4">
           <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">
-            Today’s times
+            {t('reminders.todaysTimes')}
           </p>
           <ul className="divide-y divide-teal/5">
             {PRAYERS.map((p) => (

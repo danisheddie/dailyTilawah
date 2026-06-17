@@ -4,8 +4,10 @@
 
 import { useState } from 'react'
 import { SURAH_NAMES, SURAH_AYAHS, getAyahPage } from '../utils/api'
+import { useLang } from '../utils/i18n.jsx'
 
 export default function StartingPoint({ onApplied }) {
+  const { t } = useLang()
   const [surah, setSurah] = useState(1)
   const [ayah, setAyah] = useState(1)
   const [busy, setBusy] = useState(false)
@@ -37,7 +39,7 @@ export default function StartingPoint({ onApplied }) {
 
   function startFromBeginning() {
     onApplied?.(1)
-    setDone({ page: 1, label: 'the beginning' })
+    setDone({ page: 1, label: t('start.beginning') })
   }
 
   return (
@@ -63,18 +65,18 @@ export default function StartingPoint({ onApplied }) {
             setAyah(Number(e.target.value))
             setDone(null)
           }}
-          aria-label="Ayah number"
+          aria-label={t('start.ayahLabel')}
           className="w-20 rounded-2xl border border-teal/15 bg-transparent px-3 py-3 text-center text-sm text-teal outline-none transition focus:border-teal"
         />
       </div>
-      <p className="mt-1.5 text-xs text-muted">Ayah 1–{maxAyah}</p>
+      <p className="mt-1.5 text-xs text-muted">{t('start.ayahRange', { max: maxAyah })}</p>
 
       <button
         className="btn-primary mt-4 w-full"
         onClick={apply}
         disabled={busy}
       >
-        {busy ? 'Finding the page…' : 'Set as my starting point'}
+        {busy ? t('start.finding') : t('start.set')}
       </button>
 
       <button
@@ -82,17 +84,15 @@ export default function StartingPoint({ onApplied }) {
         onClick={startFromBeginning}
         disabled={busy}
       >
-        Or start from the beginning
+        {t('start.orBeginning')}
       </button>
 
       {error && (
-        <p className="mt-3 text-center text-sm text-red-500">
-          Couldn’t look that up. Check your connection and try again.
-        </p>
+        <p className="mt-3 text-center text-sm text-red-500">{t('start.fail')}</p>
       )}
       {done && (
         <p className="mt-3 text-center text-sm text-teal">
-          Set to {done.label} — page {done.page}.
+          {t('start.setTo', { label: done.label, page: done.page })}
         </p>
       )}
     </div>

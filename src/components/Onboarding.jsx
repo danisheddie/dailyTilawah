@@ -12,9 +12,11 @@ import {
   setLastPage,
 } from '../utils/storage'
 import StartingPoint from './StartingPoint'
+import { useLang } from '../utils/i18n.jsx'
 
 export default function Onboarding({ onDone }) {
   const navigate = useNavigate()
+  const { t } = useLang()
   // 0 welcome, 1 name, 2 goal, 3 starting point, 4 bismillah
   const [step, setStep] = useState(0)
   const [name, setName] = useState('')
@@ -39,13 +41,12 @@ export default function Onboarding({ onDone }) {
           <h1 className="mt-3 text-4xl font-bold tracking-tight text-teal">
             Tilawah
           </h1>
-          <p className="mt-4 text-lg text-muted">One page a day. Every day.</p>
+          <p className="mt-4 text-lg text-muted">{t('common.appTagline')}</p>
           <p className="mx-auto mt-8 max-w-xs text-sm leading-relaxed text-muted">
-            A quiet space to build istiqomah with the Qur'an — no noise, no
-            distraction. Just you and the words of Allah.
+            {t('onboarding.welcomeBody')}
           </p>
           <button className="btn-primary mt-10 w-full" onClick={() => setStep(1)}>
-            Begin
+            {t('onboarding.begin')}
           </button>
         </div>
       )}
@@ -53,11 +54,9 @@ export default function Onboarding({ onDone }) {
       {step === 1 && (
         <div className="w-full animate-fade-in">
           <h2 className="text-2xl font-semibold text-teal">
-            What should we call you?
+            {t('onboarding.nameTitle')}
           </h2>
-          <p className="mt-2 text-sm text-muted">
-            We'll use it to keep your journey personal.
-          </p>
+          <p className="mt-2 text-sm text-muted">{t('onboarding.nameSub')}</p>
           <input
             type="text"
             value={name}
@@ -65,7 +64,7 @@ export default function Onboarding({ onDone }) {
             onKeyDown={(e) => {
               if (e.key === 'Enter' && name.trim()) setStep(2)
             }}
-            placeholder="Your name"
+            placeholder={t('onboarding.namePlaceholder')}
             autoFocus
             maxLength={40}
             className="mt-8 w-full rounded-2xl border border-teal/15 bg-transparent px-5 py-4 text-center text-lg text-teal outline-none transition placeholder:text-muted/60 focus:border-teal"
@@ -75,7 +74,7 @@ export default function Onboarding({ onDone }) {
             disabled={!name.trim()}
             onClick={() => setStep(2)}
           >
-            Continue
+            {t('common.continue')}
           </button>
         </div>
       )}
@@ -83,11 +82,9 @@ export default function Onboarding({ onDone }) {
       {step === 2 && (
         <div className="w-full animate-fade-in">
           <h2 className="text-2xl font-semibold text-teal">
-            Set your daily goal
+            {t('onboarding.goalTitle')}
           </h2>
-          <p className="mt-2 text-sm text-muted">
-            Small and steady. You can change this anytime.
-          </p>
+          <p className="mt-2 text-sm text-muted">{t('onboarding.goalSub')}</p>
           <div className="mt-8 flex flex-col gap-3">
             {GOALS.map((g) => (
               <button
@@ -99,7 +96,7 @@ export default function Onboarding({ onDone }) {
                     : 'border-teal/15 text-teal active:scale-[0.99]'
                 }`}
               >
-                {g.label}
+                {t('goal.' + g.id)}
               </button>
             ))}
             <button
@@ -110,7 +107,7 @@ export default function Onboarding({ onDone }) {
                   : 'border-teal/15 text-teal active:scale-[0.99]'
               }`}
             >
-              Custom
+              {t('goal.custom')}
             </button>
             {goalId === 'custom' && (
               <div className="flex items-center gap-3 px-1">
@@ -124,12 +121,12 @@ export default function Onboarding({ onDone }) {
                   onBlur={(e) => setCustomPages(clampGoalPages(e.target.value))}
                   className="w-24 rounded-2xl border border-teal/15 bg-transparent px-4 py-3 text-center text-base text-teal outline-none transition focus:border-teal"
                 />
-                <span className="text-sm text-muted">pages per day</span>
+                <span className="text-sm text-muted">{t('goal.pagesPerDay')}</span>
               </div>
             )}
           </div>
           <button className="btn-primary mt-8 w-full" onClick={() => setStep(3)}>
-            Continue
+            {t('common.continue')}
           </button>
         </div>
       )}
@@ -137,17 +134,16 @@ export default function Onboarding({ onDone }) {
       {step === 3 && (
         <div className="w-full animate-fade-in text-left">
           <h2 className="text-center text-2xl font-semibold text-teal">
-            Where would you like to start?
+            {t('onboarding.startTitle')}
           </h2>
           <p className="mx-auto mt-2 max-w-xs text-center text-sm text-muted">
-            New to the Qur&apos;an or picking up where you already are — your
-            choice. You can change this anytime.
+            {t('onboarding.startSub')}
           </p>
           <div className="mt-8">
             <StartingPoint onApplied={(page) => setStartPage(page)} />
           </div>
           <button className="btn-ghost mt-6 w-full" onClick={() => setStep(4)}>
-            Continue
+            {t('common.continue')}
           </button>
         </div>
       )}
@@ -162,10 +158,10 @@ export default function Onboarding({ onDone }) {
             بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
           </p>
           <p className="mt-4 text-sm text-muted">
-            In the name of Allah, the Most Gracious, the Most Merciful.
+            {t('onboarding.bismillahMeaning')}
           </p>
           <button className="btn-primary mt-12 w-full" onClick={finish}>
-            Enter
+            {t('onboarding.enter')}
           </button>
         </div>
       )}

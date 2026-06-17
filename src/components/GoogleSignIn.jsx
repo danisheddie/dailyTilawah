@@ -10,6 +10,7 @@ import {
   isGoogleSignedIn,
   getGoogleProfile,
 } from '../utils/cloudSync'
+import { useLang } from '../utils/i18n.jsx'
 
 // Load the GIS script once, shared across mounts.
 let gisPromise = null
@@ -29,6 +30,7 @@ function loadGis() {
 }
 
 export default function GoogleSignIn() {
+  const { t } = useLang()
   const btnRef = useRef(null)
   const [signedIn, setSignedIn] = useState(() => isGoogleSignedIn())
   const [profile, setProfile] = useState(() => getGoogleProfile())
@@ -51,7 +53,7 @@ export default function GoogleSignIn() {
               setProfile(p)
               setSignedIn(true)
             } catch (e) {
-              setError(e.message || 'Sign-in failed.')
+              setError(e.message || t('google.signInFail'))
             } finally {
               setBusy(false)
             }
@@ -66,7 +68,7 @@ export default function GoogleSignIn() {
           })
         }
       })
-      .catch(() => setError('Could not load Google sign-in.'))
+      .catch(() => setError(t('google.loadFail')))
     return () => {
       cancelled = true
     }
@@ -107,15 +109,13 @@ export default function GoogleSignIn() {
             )}
           </div>
         </div>
-        <p className="mt-3 text-xs text-teal">
-          Syncing across your devices via Google. ✓
-        </p>
+        <p className="mt-3 text-xs text-teal">{t('google.synced')}</p>
         <button
           className="mt-3 w-full rounded-2xl border border-teal/15 px-4 py-2 text-sm text-muted disabled:opacity-40"
           disabled={busy}
           onClick={signOut}
         >
-          Sign out
+          {t('google.signOut')}
         </button>
       </div>
     )
@@ -123,12 +123,11 @@ export default function GoogleSignIn() {
 
   return (
     <div className="mt-4">
-      <p className="text-xs text-muted">
-        Sign in once on each device and your progress stays in sync
-        automatically.
-      </p>
+      <p className="text-xs text-muted">{t('google.hint')}</p>
       <div ref={btnRef} className="mt-3 flex justify-center" />
-      {busy && <p className="mt-2 text-center text-xs text-muted">Signing in…</p>}
+      {busy && (
+        <p className="mt-2 text-center text-xs text-muted">{t('google.signingIn')}</p>
+      )}
       {error && (
         <p className="mt-2 rounded-xl bg-red-50 px-3 py-2 text-xs text-red-600">
           {error}

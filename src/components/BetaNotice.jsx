@@ -3,8 +3,10 @@
 
 import { useState } from 'react'
 import { isBetaDismissed, dismissBeta } from '../utils/storage'
+import { useLang } from '../utils/i18n.jsx'
 
 export default function BetaNotice() {
+  const { t } = useLang()
   const [hidden, setHidden] = useState(() => isBetaDismissed())
   if (hidden) return null
 
@@ -12,10 +14,8 @@ export default function BetaNotice() {
     <div className="mt-4 rounded-2xl border border-gold/30 bg-gold/10 px-4 py-3">
       <div className="flex items-start justify-between gap-3">
         <p className="text-xs leading-relaxed text-teal/90">
-          <span className="font-semibold">You’re testing an early version.</span>{' '}
-          Jazākallāhu khayran for helping shape Tilawah. Everything here works —
-          read, build your streak, and use it however you like. If anything feels
-          off, your feedback makes it better.
+          <span className="font-semibold">{t('beta.title')}</span>{' '}
+          {t('beta.body')}
         </p>
         <button
           onClick={() => {

@@ -11,18 +11,21 @@ import { reportRead } from '../utils/sync'
 import { schedulePush } from '../utils/cloudSync'
 import AyahCard from './AyahCard'
 import MushafPage from './MushafPage'
+import { useLang } from '../utils/i18n.jsx'
 
 function Spinner() {
+  const { t } = useLang()
   return (
     <div className="flex flex-col items-center gap-4 py-24 text-muted">
       <div className="h-8 w-8 animate-spin rounded-full border-2 border-teal/20 border-t-teal" />
-      <p className="text-sm">Loading…</p>
+      <p className="text-sm">{t('reader.loading')}</p>
     </div>
   )
 }
 
 export default function Reader() {
   const navigate = useNavigate()
+  const { t } = useLang()
   const [settings, setSettings] = useState(() => getSettings())
   const mode = settings.readingView === 'list' ? 'list' : 'mushaf'
 
@@ -150,7 +153,7 @@ export default function Reader() {
           </svg>
         </button>
         <div className="text-center">
-          <p className="text-sm font-semibold text-teal">Page {page}</p>
+          <p className="text-sm font-semibold text-teal">{t('reader.page', { page })}</p>
           {data?.surahs?.length > 0 && (
             <p className="text-xs text-muted">
               {data.surahs.map((s) => s.englishName).join(' · ')}
@@ -166,11 +169,9 @@ export default function Reader() {
 
         {!loading && error && (
           <div className="flex flex-col items-center gap-5 py-24 text-center">
-            <p className="max-w-xs text-muted">
-              Unable to load. Please check your connection.
-            </p>
+            <p className="max-w-xs text-muted">{t('reader.unable')}</p>
             <button className="btn-ghost" onClick={() => load(page)}>
-              Try again
+              {t('reader.tryAgain')}
             </button>
           </div>
         )}
@@ -221,17 +222,17 @@ export default function Reader() {
         <div className="fixed inset-x-0 bottom-0 mx-auto max-w-2xl border-t border-teal/10 bg-paper/95 px-5 py-3 backdrop-blur">
           <div className="flex items-center gap-3">
             <button className="btn-ghost px-4" onClick={goToPrev} disabled={page <= 1}>
-              Prev
+              {t('reader.prev')}
             </button>
             <button className="btn-primary grow" onClick={finishPage}>
-              Mark page as read
+              {t('reader.markRead')}
             </button>
             <button
               className="btn-ghost px-4"
               onClick={goToNext}
               disabled={page >= TOTAL_PAGES}
             >
-              Next
+              {t('reader.next')}
             </button>
           </div>
         </div>
@@ -247,14 +248,16 @@ export default function Reader() {
             <p className="font-quran text-3xl leading-loose text-teal sm:text-4xl" dir="rtl" lang="ar">
               جَزَاكَ اللَّهُ خَيْرًا
             </p>
-            <p className="mt-3 text-base text-muted">May Allah reward you.</p>
-            <p className="mt-1 text-sm text-gold">{completion.streak}-day streak</p>
+            <p className="mt-3 text-base text-muted">{t('reader.rewardYou')}</p>
+            <p className="mt-1 text-sm text-gold">
+              {t('reader.streak', { n: completion.streak })}
+            </p>
             <div className="mt-10 flex flex-col gap-3">
               <button className="btn-primary" onClick={goToNext}>
-                Read another page
+                {t('reader.readAnother')}
               </button>
               <button className="btn-ghost" onClick={() => navigate('/')}>
-                Done for today
+                {t('reader.doneToday')}
               </button>
             </div>
           </div>

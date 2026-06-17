@@ -13,8 +13,10 @@ import {
   syncNow,
 } from '../utils/cloudSync'
 import GoogleSignIn from './GoogleSignIn'
+import { useLang } from '../utils/i18n.jsx'
 
 export default function SyncSettings() {
+  const { t } = useLang()
   const [code, setCode] = useState(() => getSyncCode())
   const [entry, setEntry] = useState('')
   const [busy, setBusy] = useState(false)
@@ -30,9 +32,9 @@ export default function SyncSettings() {
     try {
       const c = await createAccount()
       setCode(c)
-      setNote('Sync code created. Save it somewhere safe.')
+      setNote(t('sync.created'))
     } catch (e) {
-      setError(e.message || 'Could not create a sync code.')
+      setError(e.message || t('sync.createFail'))
     } finally {
       setBusy(false)
     }
@@ -46,9 +48,9 @@ export default function SyncSettings() {
       await linkAccount(entry)
       setCode(getSyncCode())
       setEntry('')
-      setNote('Restored and synced. Your progress is now backed up.')
+      setNote(t('sync.restored'))
     } catch (e) {
-      setError(e.message || 'Could not link that code.')
+      setError(e.message || t('sync.linkFail'))
     } finally {
       setBusy(false)
     }
@@ -60,9 +62,9 @@ export default function SyncSettings() {
     setBusy(true)
     try {
       await syncNow()
-      setNote('Synced.')
+      setNote(t('sync.synced'))
     } catch {
-      setError('Sync failed. Check your connection and try again.')
+      setError(t('sync.syncFail'))
     } finally {
       setBusy(false)
     }
@@ -71,13 +73,13 @@ export default function SyncSettings() {
   function unlink() {
     clearSyncCode()
     setCode(null)
-    setNote('This device is no longer syncing. Your data stays on it.')
+    setNote(t('sync.stopped'))
   }
 
   async function copy() {
     try {
       await navigator.clipboard.writeText(code)
-      setNote('Code copied to clipboard.')
+      setNote(t('sync.copied'))
     } catch {
       /* ignore */
     }
@@ -86,17 +88,13 @@ export default function SyncSettings() {
   return (
     <section className="mt-10">
       <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-        Back up &amp; sync
+        {t('sync.title')}
       </h2>
-      <p className="mt-2 text-xs leading-relaxed text-muted">
-        Optional. Keep your progress backed up and in sync across devices —
-        sign in with Google, or use a private sync code. The app works fully
-        without this.
-      </p>
+      <p className="mt-2 text-xs leading-relaxed text-muted">{t('sync.intro')}</p>
 
       {!configured && (
         <p className="mt-3 rounded-xl bg-gold/10 px-3 py-2 text-xs text-muted">
-          Sync isn’t connected yet. It activates once the sync service is set up.
+          {t('sync.notConnected')}
         </p>
       )}
 
@@ -106,7 +104,7 @@ export default function SyncSettings() {
       {googleConfigured() && (
         <div className="mt-6 flex items-center gap-3 text-xs text-muted">
           <span className="h-px grow bg-teal/10" />
-          or use a sync code
+          {t('sync.orUseCode')}
           <span className="h-px grow bg-teal/10" />
         </div>
       )}
@@ -120,27 +118,24 @@ export default function SyncSettings() {
 
       {code ? (
         <div className="mt-4">
-          <p className="text-xs text-muted">Your sync code</p>
+          <p className="text-xs text-muted">{t('sync.yourCode')}</p>
           <div className="mt-1 flex items-center justify-between gap-3 rounded-2xl border border-teal/15 px-4 py-3">
             <span className="font-mono text-base tracking-wider text-teal">{code}</span>
             <button className="text-xs font-medium text-gold" onClick={copy}>
-              Copy
+              {t('sync.copy')}
             </button>
           </div>
-          <p className="mt-2 text-xs text-muted">
-            Enter this code on another device (or in the app) to restore your
-            progress. Keep it private — anyone with it can read your data.
-          </p>
+          <p className="mt-2 text-xs text-muted">{t('sync.codeHint')}</p>
           <div className="mt-4 flex gap-3">
             <button className="btn-ghost flex-1 px-4 py-2 text-sm" disabled={busy} onClick={refresh}>
-              Sync now
+              {t('sync.syncNow')}
             </button>
             <button
               className="flex-1 rounded-2xl border border-teal/15 px-4 py-2 text-sm text-muted"
               disabled={busy}
               onClick={unlink}
             >
-              Stop syncing
+              {t('sync.stop')}
             </button>
           </div>
         </div>
@@ -151,11 +146,11 @@ export default function SyncSettings() {
             disabled={busy || !configured}
             onClick={create}
           >
-            Create a sync code
+            {t('sync.createCode')}
           </button>
 
           <div>
-            <label className="text-xs text-muted">Already have a code?</label>
+            <label className="text-xs text-muted">{t('sync.haveCode')}</label>
             <div className="mt-1 flex gap-3">
               <input
                 value={entry}
@@ -169,7 +164,7 @@ export default function SyncSettings() {
                 disabled={busy || !configured || entry.trim().length < 8}
                 onClick={link}
               >
-                Restore
+                {t('sync.restore')}
               </button>
             </div>
           </div>

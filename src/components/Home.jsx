@@ -8,6 +8,7 @@ import { nextPrayer, formatTime } from '../utils/prayer'
 import StreakBadge from './StreakBadge'
 import DailyReflection from './DailyReflection'
 import BetaNotice from './BetaNotice'
+import { useLang } from '../utils/i18n.jsx'
 
 function GearIcon() {
   return (
@@ -20,6 +21,7 @@ function GearIcon() {
 
 export default function Home() {
   const navigate = useNavigate()
+  const { t } = useLang()
   const summary = getProgressSummary()
   const { goal, todayProgress, completedToday, streak, lastPage } = summary
   const name = getName()
@@ -48,7 +50,7 @@ export default function Home() {
           <p className="mt-0.5 text-xs text-muted">{formatGregorian()}</p>
           {upcoming && (
             <p className="mt-1 text-xs text-gold">
-              Next: {upcoming.name} · {formatTime(upcoming.time)}
+              {t('home.next', { name: upcoming.name, time: formatTime(upcoming.time) })}
             </p>
           )}
         </div>
@@ -66,7 +68,7 @@ export default function Home() {
       {name && (
         <div className="mt-8 text-center">
           <p className="text-xs uppercase tracking-wide text-muted">
-            Assalamu&apos;alaikum
+            {t('home.salam')}
           </p>
           <p className="mt-1 text-2xl font-semibold text-teal">{name}</p>
         </div>
@@ -76,10 +78,10 @@ export default function Home() {
         <StreakBadge streak={streak} size="lg" />
         <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted">
           {completedToday
-            ? "Today's reading is complete. May Allah accept it."
+            ? t('home.complete')
             : streak > 0
-              ? 'Keep your streak alive — your page is waiting.'
-              : 'Begin today. One page is enough.'}
+              ? t('home.keepStreak')
+              : t('home.beginToday')}
         </p>
       </div>
 
@@ -87,10 +89,10 @@ export default function Home() {
 
       <div className="mt-auto pt-12">
         <div className="mb-3 flex items-center justify-between text-sm">
-          <span className="font-medium text-teal">Today's goal</span>
+          <span className="font-medium text-teal">{t('home.todayGoal')}</span>
           <span className="text-muted">
             {fmt(Math.min(todayProgress, goal.pages))} / {fmt(goal.pages)}{' '}
-            {goal.pages === 1 ? 'page' : 'pages'}
+            {goal.pages === 1 ? t('common.page') : t('common.pages')}
           </span>
         </div>
         <div className="h-2 w-full overflow-hidden rounded-full bg-teal/10">
@@ -104,15 +106,13 @@ export default function Home() {
           className="btn-primary mt-8 w-full"
           onClick={() => navigate('/read')}
         >
-          {completedToday
-            ? 'Continue Reading'
-            : started
-              ? 'Continue Reading'
-              : "Start Today's Reading"}
+          {completedToday || started
+            ? t('home.continueReading')
+            : t('home.startToday')}
         </button>
         {started && (
           <p className="mt-3 text-center text-xs text-muted">
-            Resuming on page {lastPage} of 604
+            {t('home.resuming', { page: lastPage })}
           </p>
         )}
       </div>

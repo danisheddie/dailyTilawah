@@ -3,8 +3,10 @@
 
 import { getDailyReflection } from '../data/reflections'
 import { getSettings } from '../utils/storage'
+import { useLang } from '../utils/i18n.jsx'
 
 export default function DailyReflection({ className = '' }) {
+  const { t } = useLang()
   const r = getDailyReflection(getSettings().reflectionMode)
   if (!r) return null
 
@@ -13,7 +15,7 @@ export default function DailyReflection({ className = '' }) {
       className={`rounded-3xl border border-teal/10 bg-teal/[0.04] px-6 py-6 text-center ${className}`}
     >
       <span className="text-[11px] uppercase tracking-[0.18em] text-gold">
-        {r.type === "Qur'an" ? 'Verse of the day' : 'Hadith of the day'}
+        {r.type === "Qur'an" ? t('reflection.verse') : t('reflection.hadith')}
       </span>
 
       {r.arabic && (

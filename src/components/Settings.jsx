@@ -6,6 +6,7 @@ import Reminders from './Reminders'
 import SyncSettings from './SyncSettings'
 import StartingPoint from './StartingPoint'
 import { RECITERS, TRANSLATIONS } from '../utils/api'
+import { useLang, LANGUAGES } from '../utils/i18n.jsx'
 import {
   GOALS,
   MIN_CUSTOM_GOAL,
@@ -54,6 +55,7 @@ function Toggle({ label, description, checked, onChange }) {
 
 export default function Settings() {
   const navigate = useNavigate()
+  const { t, lang, setLang } = useLang()
   const initialGoal = getGoal()
   const [goalId, setGoalId] = useState(() => initialGoal.id)
   const [customPages, setCustomPages] = useState(() =>
@@ -100,32 +102,55 @@ export default function Settings() {
             <path d="M15 18l-6-6 6-6" />
           </svg>
         </button>
-        <h1 className="text-xl font-semibold text-teal">Settings</h1>
+        <h1 className="text-xl font-semibold text-teal">{t('settings.title')}</h1>
       </header>
 
       {/* Stats */}
       <section className="mt-8 grid grid-cols-2 gap-3">
         <div className="rounded-2xl bg-teal/5 px-4 py-5 text-center">
           <p className="text-2xl font-bold text-teal">{streak}</p>
-          <p className="mt-1 text-xs text-muted">day streak</p>
+          <p className="mt-1 text-xs text-muted">{t('settings.dayStreak')}</p>
         </div>
         <div className="rounded-2xl bg-gold/10 px-4 py-5 text-center">
           <p className="text-2xl font-bold text-teal">{totalPages}</p>
-          <p className="mt-1 text-xs text-muted">pages read (lifetime)</p>
+          <p className="mt-1 text-xs text-muted">{t('settings.lifetime')}</p>
+        </div>
+      </section>
+
+      {/* App language */}
+      <section className="mt-10">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+          {t('settings.appLanguage')}
+        </h2>
+        <p className="mt-1 text-xs text-muted">{t('settings.appLanguageSub')}</p>
+        <div className="mt-3 grid grid-cols-3 gap-3">
+          {LANGUAGES.map((l) => (
+            <button
+              key={l.id}
+              onClick={() => setLang(l.id)}
+              className={`rounded-2xl border px-2 py-3 text-sm font-medium transition ${
+                lang === l.id
+                  ? 'border-teal bg-teal text-paper'
+                  : 'border-teal/15 text-teal active:scale-[0.99]'
+              }`}
+            >
+              {l.name}
+            </button>
+          ))}
         </div>
       </section>
 
       {/* Name */}
       <section className="mt-10">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-          Your name
+          {t('settings.yourName')}
         </h2>
         <input
           type="text"
           value={name}
           onChange={(e) => setNameState(e.target.value)}
           onBlur={() => setName(name)}
-          placeholder="Your name"
+          placeholder={t('onboarding.namePlaceholder')}
           maxLength={40}
           className="mt-3 w-full rounded-2xl border border-teal/15 bg-transparent px-5 py-3 text-base text-teal outline-none transition placeholder:text-muted/60 focus:border-teal"
         />
@@ -134,7 +159,7 @@ export default function Settings() {
       {/* Goal */}
       <section className="mt-10">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-          Daily goal
+          {t('settings.dailyGoal')}
         </h2>
         <div className="mt-3 grid grid-cols-2 gap-3">
           {GOALS.map((g) => (
@@ -147,7 +172,7 @@ export default function Settings() {
                   : 'border-teal/15 text-teal active:scale-[0.99]'
               }`}
             >
-              {g.label}
+              {t('goal.' + g.id)}
             </button>
           ))}
           <button
@@ -158,7 +183,7 @@ export default function Settings() {
                 : 'border-teal/15 text-teal active:scale-[0.99]'
             }`}
           >
-            Custom
+            {t('goal.custom')}
           </button>
         </div>
 
@@ -174,7 +199,7 @@ export default function Settings() {
               onBlur={(e) => changeCustomPages(clampGoalPages(e.target.value))}
               className="w-24 rounded-2xl border border-teal/15 bg-transparent px-4 py-3 text-center text-sm text-teal outline-none transition focus:border-teal"
             />
-            <span className="text-sm text-muted">pages per day</span>
+            <span className="text-sm text-muted">{t('goal.pagesPerDay')}</span>
           </div>
         )}
       </section>
@@ -182,12 +207,12 @@ export default function Settings() {
       {/* Reading view */}
       <section className="mt-10">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-          Reading view
+          {t('settings.readingView')}
         </h2>
         <div className="mt-3 grid grid-cols-2 gap-3">
           {[
-            { id: 'mushaf', label: 'Mushaf page', sub: 'Exact Madani print' },
-            { id: 'list', label: 'Translation', sub: 'Ayah list + meaning' },
+            { id: 'mushaf', label: t('settings.mushafPage'), sub: t('settings.mushafSub') },
+            { id: 'list', label: t('settings.translationView'), sub: t('settings.translationViewSub') },
           ].map((v) => (
             <button
               key={v.id}
@@ -214,45 +239,43 @@ export default function Settings() {
       {/* Reading aids (apply to the Translation view) */}
       <section className="mt-10">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-          Reading aids
+          {t('settings.readingAids')}
         </h2>
-        <p className="mt-1 text-xs text-muted">
-          Used in the Translation view.
-        </p>
+        <p className="mt-1 text-xs text-muted">{t('settings.readingAidsSub')}</p>
         <div className="mt-1 divide-y divide-teal/5">
           <Toggle
-            label="Show translation"
-            description="Meaning below each ayah"
+            label={t('settings.showTranslation')}
+            description={t('settings.showTranslationDesc')}
             checked={settings.showTranslation}
             onChange={(v) => toggle('showTranslation', v)}
           />
           {settings.showTranslation && (
             <div className="py-4">
               <label className="block text-sm font-medium text-teal">
-                Translation
+                {t('settings.translation')}
               </label>
               <select
                 value={settings.translationEdition}
                 onChange={(e) => toggle('translationEdition', e.target.value)}
                 className="mt-2 w-full rounded-2xl border border-teal/15 bg-transparent px-4 py-3 text-sm text-teal outline-none transition focus:border-teal"
               >
-                {TRANSLATIONS.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.name}
+                {TRANSLATIONS.map((tr) => (
+                  <option key={tr.id} value={tr.id}>
+                    {tr.name}
                   </option>
                 ))}
               </select>
             </div>
           )}
           <Toggle
-            label="Show transliteration"
-            description="Latin pronunciation in italics"
+            label={t('settings.showTransliteration')}
+            description={t('settings.showTransliterationDesc')}
             checked={settings.showTransliteration}
             onChange={(v) => toggle('showTransliteration', v)}
           />
           <Toggle
-            label="Show audio controls"
-            description="Play recitation for each ayah"
+            label={t('settings.showAudio')}
+            description={t('settings.showAudioDesc')}
             checked={settings.showAudio}
             onChange={(v) => toggle('showAudio', v)}
           />
@@ -261,7 +284,7 @@ export default function Settings() {
         {settings.showAudio && (
           <div className="mt-3">
             <label className="block text-sm font-medium text-teal">
-              Reciter
+              {t('settings.reciter')}
             </label>
             <select
               value={settings.reciter}
@@ -281,17 +304,15 @@ export default function Settings() {
       {/* Daily reflection */}
       <section className="mt-10">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-          Daily reflection
+          {t('settings.dailyReflection')}
         </h2>
-        <p className="mt-1 text-xs text-muted">
-          The verse/hadith shown on the home screen each day.
-        </p>
+        <p className="mt-1 text-xs text-muted">{t('settings.reflectionSub')}</p>
         <div className="mt-3 grid grid-cols-2 gap-3">
           {[
-            { id: 'both', label: 'Both' },
-            { id: 'quran', label: 'Qur’an only' },
-            { id: 'hadith', label: 'Hadith only' },
-            { id: 'off', label: 'Off' },
+            { id: 'both', label: t('settings.both') },
+            { id: 'quran', label: t('settings.quranOnly') },
+            { id: 'hadith', label: t('settings.hadithOnly') },
+            { id: 'off', label: t('settings.off') },
           ].map((o) => (
             <button
               key={o.id}
@@ -311,11 +332,10 @@ export default function Settings() {
       {/* Reading position */}
       <section className="mt-10">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-          Reading position
+          {t('settings.readingPosition')}
         </h2>
         <p className="mt-1 text-xs text-muted">
-          Already partway through the Qur&apos;an? Pick where your reading
-          should resume. Currently resuming on page {resumePage} of 604.
+          {t('settings.readingPositionSub', { page: resumePage })}
         </p>
         <div className="mt-4">
           <StartingPoint
@@ -340,26 +360,23 @@ export default function Settings() {
             className="w-full rounded-2xl border border-red-200 px-5 py-3 text-sm font-medium text-red-500 transition active:scale-[0.99]"
             onClick={() => setConfirmReset(true)}
           >
-            Reset progress
+            {t('settings.resetProgress')}
           </button>
         ) : (
           <div className="rounded-2xl border border-red-200 bg-red-50 p-5 text-center">
-            <p className="text-sm text-red-600">
-              This clears your streak, position, and lifetime totals. This
-              cannot be undone.
-            </p>
+            <p className="text-sm text-red-600">{t('settings.resetConfirm')}</p>
             <div className="mt-4 flex gap-3">
               <button
                 className="btn-ghost grow"
                 onClick={() => setConfirmReset(false)}
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 className="grow rounded-2xl bg-red-500 px-5 py-3 text-sm font-semibold text-white transition active:scale-[0.98]"
                 onClick={doReset}
               >
-                Reset
+                {t('settings.reset')}
               </button>
             </div>
           </div>
@@ -367,10 +384,10 @@ export default function Settings() {
       </section>
 
       <p className="mt-10 text-center text-xs text-muted">
-        Tilawah · One page a day. Every day.
+        Tilawah · {t('common.appTagline')}
       </p>
       <p className="mt-1 text-center text-[11px] text-muted/80">
-        Beta · thank you for testing. Use it freely — your feedback shapes it.
+        {t('settings.betaFooter')}
       </p>
     </div>
   )

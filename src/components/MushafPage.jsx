@@ -5,6 +5,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { mushafFontUrl } from '../utils/api'
+import { useLang } from '../utils/i18n.jsx'
 
 const BASE = 40 // px size used only for measuring natural line widths
 const LINE_HEIGHT = 1.7
@@ -28,6 +29,7 @@ async function ensurePageFont(page) {
 }
 
 export default function MushafPage({ page, lines, onSwitch }) {
+  const { t } = useLang()
   const [family, setFamily] = useState(null)
   const [failed, setFailed] = useState(false)
   const [fontSize, setFontSize] = useState(null)
@@ -83,13 +85,10 @@ export default function MushafPage({ page, lines, onSwitch }) {
   if (failed) {
     return (
       <div className="flex flex-col items-center gap-5 py-24 text-center">
-        <p className="max-w-xs text-sm text-muted">
-          Couldn’t load the mushaf font for this page. The Translation view works
-          without these fonts.
-        </p>
+        <p className="max-w-xs text-sm text-muted">{t('reader.fontFail')}</p>
         {onSwitch && (
           <button className="btn-ghost" onClick={onSwitch}>
-            Use Translation view
+            {t('reader.useTranslation')}
           </button>
         )}
       </div>
@@ -100,7 +99,7 @@ export default function MushafPage({ page, lines, onSwitch }) {
     return (
       <div className="flex flex-col items-center gap-4 py-24 text-muted">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-teal/20 border-t-teal" />
-        <p className="text-sm">Preparing the mushaf…</p>
+        <p className="text-sm">{t('reader.preparing')}</p>
       </div>
     )
   }

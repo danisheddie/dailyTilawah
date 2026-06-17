@@ -13,6 +13,7 @@ export const TRANSLATIONS = [
   { id: 'en.asad', name: 'English — Muhammad Asad' },
   { id: 'en.sahih', name: 'English — Saheeh International' },
   { id: 'ms.basmeih', name: 'Malay — Abdullah Basmeih' },
+  { id: 'id.indonesian', name: 'Indonesian — Kementerian Agama RI' },
 ]
 
 // Selectable reciters. Each is an alquran.cloud verse-by-verse audio edition
