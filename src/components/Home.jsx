@@ -6,6 +6,7 @@ import { getProgressSummary, getName, getReminders } from '../utils/storage'
 import { formatGregorian, formatHijri } from '../utils/dateUtils'
 import { nextPrayer, formatTime } from '../utils/prayer'
 import StreakBadge from './StreakBadge'
+import DailyReflection from './DailyReflection'
 
 function GearIcon() {
   return (
@@ -78,6 +79,8 @@ export default function Home() {
               : 'Begin today. One page is enough.'}
         </p>
       </div>
+
+      <DailyReflection className="mt-10" />
 
       <div className="mt-auto pt-12">
         <div className="mb-3 flex items-center justify-between text-sm">
