@@ -322,7 +322,7 @@ export default function Settings() {
         Tilawah · One page a day. Every day.
       </p>
       <p className="mt-1 text-center text-[11px] text-muted/80">
-        Beta · thank you for testing 🤍 Use it freely — your feedback shapes it.
+        Beta · thank you for testing. Use it freely — your feedback shapes it.
       </p>
     </div>
   )

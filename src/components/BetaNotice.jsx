@@ -12,7 +12,7 @@ export default function BetaNotice() {
     <div className="mt-4 rounded-2xl border border-gold/30 bg-gold/10 px-4 py-3">
       <div className="flex items-start justify-between gap-3">
         <p className="text-xs leading-relaxed text-teal/90">
-          <span className="font-semibold">You’re testing an early version 🤍</span>{' '}
+          <span className="font-semibold">You’re testing an early version.</span>{' '}
           Jazākallāhu khayran for helping shape Tilawah. Everything here works —
           read, build your streak, and use it however you like. If anything feels
           off, your feedback makes it better.
