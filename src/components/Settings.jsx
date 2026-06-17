@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Reminders from './Reminders'
 import SyncSettings from './SyncSettings'
+import StartingPoint from './StartingPoint'
 import { RECITERS } from '../utils/api'
 import {
   GOALS,
@@ -16,6 +17,8 @@ import {
   resetProgress,
   getName,
   setName,
+  getLastPage,
+  setLastPage,
 } from '../utils/storage'
 
 function Toggle({ label, description, checked, onChange }) {
@@ -51,6 +54,7 @@ export default function Settings() {
   const [goalId, setGoalId] = useState(() => getGoal().id)
   const [settings, setSettings] = useState(() => getSettings())
   const [name, setNameState] = useState(() => getName())
+  const [resumePage, setResumePage] = useState(() => getLastPage())
   const [confirmReset, setConfirmReset] = useState(false)
 
   const streak = getStreak()
@@ -215,6 +219,25 @@ export default function Settings() {
             </select>
           </div>
         )}
+      </section>
+
+      {/* Reading position */}
+      <section className="mt-10">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+          Reading position
+        </h2>
+        <p className="mt-1 text-xs text-muted">
+          Already partway through the Qur&apos;an? Pick where your reading
+          should resume. Currently resuming on page {resumePage} of 604.
+        </p>
+        <div className="mt-4">
+          <StartingPoint
+            onApplied={(page) => {
+              setLastPage(page)
+              setResumePage(page)
+            }}
+          />
+        </div>
       </section>
 
       {/* Prayer-time reminders */}

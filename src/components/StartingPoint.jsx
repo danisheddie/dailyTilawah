@@ -1,0 +1,100 @@
+// Lets the user set where their daily reading resumes — pick a surah and
+// ayah (resolved to its mushaf page), or start from the very beginning.
+// Used both during onboarding and in Settings.
+
+import { useState } from 'react'
+import { SURAH_NAMES, SURAH_AYAHS, getAyahPage } from '../utils/api'
+
+export default function StartingPoint({ onApplied }) {
+  const [surah, setSurah] = useState(1)
+  const [ayah, setAyah] = useState(1)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState(false)
+  const [done, setDone] = useState(null) // null | { page, label }
+
+  const maxAyah = SURAH_AYAHS[surah - 1] || 286
+
+  function chooseSurah(n) {
+    setSurah(n)
+    setAyah(1)
+    setDone(null)
+  }
+
+  async function apply() {
+    setBusy(true)
+    setError(false)
+    try {
+      const a = Math.min(Math.max(1, ayah || 1), maxAyah)
+      const page = await getAyahPage(surah, a)
+      onApplied?.(page)
+      setDone({ page, label: `${SURAH_NAMES[surah - 1]} ${surah}:${a}` })
+    } catch {
+      setError(true)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  function startFromBeginning() {
+    onApplied?.(1)
+    setDone({ page: 1, label: 'the beginning' })
+  }
+
+  return (
+    <div>
+      <div className="flex gap-3">
+        <select
+          value={surah}
+          onChange={(e) => chooseSurah(Number(e.target.value))}
+          className="grow rounded-2xl border border-teal/15 bg-transparent px-4 py-3 text-sm text-teal outline-none transition focus:border-teal"
+        >
+          {SURAH_NAMES.map((name, i) => (
+            <option key={i} value={i + 1}>
+              {i + 1}. {name}
+            </option>
+          ))}
+        </select>
+        <input
+          type="number"
+          min={1}
+          max={maxAyah}
+          value={ayah}
+          onChange={(e) => {
+            setAyah(Number(e.target.value))
+            setDone(null)
+          }}
+          aria-label="Ayah number"
+          className="w-20 rounded-2xl border border-teal/15 bg-transparent px-3 py-3 text-center text-sm text-teal outline-none transition focus:border-teal"
+        />
+      </div>
+      <p className="mt-1.5 text-xs text-muted">Ayah 1–{maxAyah}</p>
+
+      <button
+        className="btn-primary mt-4 w-full"
+        onClick={apply}
+        disabled={busy}
+      >
+        {busy ? 'Finding the page…' : 'Set as my starting point'}
+      </button>
+
+      <button
+        className="mt-3 w-full text-center text-sm text-muted underline-offset-2 hover:underline"
+        onClick={startFromBeginning}
+        disabled={busy}
+      >
+        Or start from the beginning
+      </button>
+
+      {error && (
+        <p className="mt-3 text-center text-sm text-red-500">
+          Couldn’t look that up. Check your connection and try again.
+        </p>
+      )}
+      {done && (
+        <p className="mt-3 text-center text-sm text-teal">
+          Set to {done.label} — page {done.page}.
+        </p>
+      )}
+    </div>
+  )
+}

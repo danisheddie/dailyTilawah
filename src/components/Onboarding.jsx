@@ -3,16 +3,20 @@
 
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { GOALS, completeOnboarding } from '../utils/storage'
+import { GOALS, completeOnboarding, setLastPage } from '../utils/storage'
+import StartingPoint from './StartingPoint'
 
 export default function Onboarding({ onDone }) {
   const navigate = useNavigate()
-  const [step, setStep] = useState(0) // 0 welcome, 1 name, 2 goal, 3 bismillah
+  // 0 welcome, 1 name, 2 goal, 3 starting point, 4 bismillah
+  const [step, setStep] = useState(0)
   const [name, setName] = useState('')
   const [goalId, setGoalId] = useState('one')
+  const [startPage, setStartPage] = useState(1)
 
   function finish() {
     completeOnboarding(goalId, name)
+    setLastPage(startPage)
     onDone?.()
     navigate('/', { replace: true })
   }
@@ -98,6 +102,24 @@ export default function Onboarding({ onDone }) {
       )}
 
       {step === 3 && (
+        <div className="w-full animate-fade-in text-left">
+          <h2 className="text-center text-2xl font-semibold text-teal">
+            Where would you like to start?
+          </h2>
+          <p className="mx-auto mt-2 max-w-xs text-center text-sm text-muted">
+            New to the Qur&apos;an or picking up where you already are — your
+            choice. You can change this anytime.
+          </p>
+          <div className="mt-8">
+            <StartingPoint onApplied={(page) => setStartPage(page)} />
+          </div>
+          <button className="btn-ghost mt-6 w-full" onClick={() => setStep(4)}>
+            Continue
+          </button>
+        </div>
+      )}
+
+      {step === 4 && (
         <div className="animate-scale-in">
           <p
             className="font-arabic text-3xl leading-loose text-teal sm:text-4xl"
