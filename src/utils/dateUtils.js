@@ -36,7 +36,9 @@ export function formatHijri(date = new Date()) {
       month: 'long',
       year: 'numeric',
     }).format(date)
-    return `${formatted} AH`
+    // Some runtimes already include the era ("AH") in the formatted year;
+    // only add it when it's missing, to avoid "1448 AH AH".
+    return /\bAH\b/.test(formatted) ? formatted : `${formatted} AH`
   } catch {
     return ''
   }
