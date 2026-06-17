@@ -8,8 +8,7 @@
 
 import { todayISO } from '../utils/dateUtils'
 
-export const REFLECTIONS = [
-  // --- Qur'an ---------------------------------------------------------------
+const QURAN = [
   {
     type: "Qur'an",
     arabic: 'فَٱذْكُرُونِىٓ أَذْكُرْكُمْ',
@@ -75,7 +74,9 @@ export const REFLECTIONS = [
     text: 'Indeed, Allah loves those who rely upon Him.',
     source: "Qur'an 3:159",
   },
-  // --- Hadith ---------------------------------------------------------------
+]
+
+const HADITH = [
   {
     type: 'Hadith',
     text: 'Actions are but by intentions, and every person will have only what they intended.',
@@ -147,6 +148,19 @@ export const REFLECTIONS = [
     source: 'Jami` at-Tirmidhi 2910 (hasan sahih)',
   },
 ]
+
+// Interleave verses and hadith so consecutive days alternate between the two.
+function interleave(a, b) {
+  const out = []
+  const n = Math.max(a.length, b.length)
+  for (let i = 0; i < n; i++) {
+    if (i < a.length) out.push(a[i])
+    if (i < b.length) out.push(b[i])
+  }
+  return out
+}
+
+export const REFLECTIONS = interleave(QURAN, HADITH)
 
 // Stable per-day index: days since the Unix epoch, computed from the local
 // calendar date so it changes at local midnight.
