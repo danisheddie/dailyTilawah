@@ -16,7 +16,7 @@ export const VAPID_PUBLIC_KEY = ''
 // used for "Sign in with Google". Leave empty to hide the Google option (the
 // sync-code flow still works). The same value must be set as GOOGLE_CLIENT_ID
 // on the Worker so it can verify the tokens. See worker/DEPLOY.md.
-export const GOOGLE_CLIENT_ID = ''
+export const GOOGLE_CLIENT_ID = '515296416644-so2t69g3kdn222gfq2dc18v651qbidkq.apps.googleusercontent.com'
 
 export const remindersConfigured = () =>
   Boolean(WORKER_URL) && Boolean(VAPID_PUBLIC_KEY)
