@@ -1,9 +1,15 @@
-// Renders an exact Madani mushaf page: the QCF v2 per-page font is loaded at
-// runtime, then each of the page's lines is laid out justified (RTL) so the
-// result is line-for-line faithful to the printed mushaf.
+// Renders an exact Madani mushaf page. The QCF v2 per-page font is loaded at
+// runtime, then a single font size is computed so the whole page fits the
+// screen — width (the densest line fills the column) and height (all lines fit
+// without scrolling) — and each line is justified edge-to-edge like the print.
 
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { mushafFontUrl } from '../utils/api'
+
+const BASE = 40 // px size used only for measuring natural line widths
+const LINE_HEIGHT = 1.7
+const MIN_FS = 12
+const MAX_FS = 34
 
 // Load (once) the QCF v2 font for a page and resolve when it's ready.
 async function ensurePageFont(page) {
@@ -20,11 +26,17 @@ async function ensurePageFont(page) {
 export default function MushafPage({ page, lines, onSwitch }) {
   const [family, setFamily] = useState(null)
   const [failed, setFailed] = useState(false)
+  const [fontSize, setFontSize] = useState(null)
 
+  const containerRef = useRef(null)
+  const lineRefs = useRef([])
+
+  // Load the page font.
   useEffect(() => {
     let active = true
     setFamily(null)
     setFailed(false)
+    setFontSize(null)
     ensurePageFont(page)
       .then((f) => active && setFamily(f))
       .catch(() => active && setFailed(true))
@@ -33,12 +45,42 @@ export default function MushafPage({ page, lines, onSwitch }) {
     }
   }, [page])
 
+  // While in measuring mode (fontSize === null) the lines are laid out at BASE
+  // size with words packed left, so their natural widths can be read. Pick one
+  // size that fits the column width and the available height.
+  useLayoutEffect(() => {
+    if (!family || fontSize != null) return
+    const container = containerRef.current
+    if (!container) return
+    const width = container.clientWidth
+    let maxLine = 0
+    for (const el of lineRefs.current) {
+      if (el) maxLine = Math.max(maxLine, el.scrollWidth)
+    }
+    if (!maxLine || !width) return
+    // Width fit: the densest line fills the column (small margin for safety).
+    const byWidth = ((width * 0.97) / maxLine) * BASE
+    // Height fit: all lines sit between the header and the action bar.
+    const availH = window.innerHeight - 170
+    const byHeight = availH / (lines.length * LINE_HEIGHT)
+    setFontSize(Math.max(MIN_FS, Math.min(MAX_FS, byWidth, byHeight)))
+  }, [family, lines, page, fontSize])
+
+  // On resize/rotation, drop back into measuring mode to recompute the fit.
+  useEffect(() => {
+    function onResize() {
+      setFontSize(null)
+    }
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
   if (failed) {
     return (
       <div className="flex flex-col items-center gap-5 py-24 text-center">
         <p className="max-w-xs text-sm text-muted">
           Couldn’t load the mushaf font for this page. The Translation view works
-          offline of these fonts.
+          without these fonts.
         </p>
         {onSwitch && (
           <button className="btn-ghost" onClick={onSwitch}>
@@ -58,18 +100,24 @@ export default function MushafPage({ page, lines, onSwitch }) {
     )
   }
 
+  const measuring = fontSize == null
+
   return (
-    <div className="mx-auto max-w-xl px-1 py-2" dir="rtl" lang="ar">
-      {lines.map((line) => (
+    <div ref={containerRef} className="mx-auto w-full max-w-xl" dir="rtl" lang="ar">
+      {lines.map((line, idx) => (
         <div
           key={line.lineNumber}
-          className="flex justify-between text-teal"
+          ref={(el) => (lineRefs.current[idx] = el)}
+          className="flex text-teal"
           style={{
             fontFamily: family,
-            fontSize: 'clamp(22px, 7.2vw, 30px)',
-            lineHeight: 2.35,
-            // Justify each line edge-to-edge like the printed page.
-            textAlignLast: 'justify',
+            fontSize: `${measuring ? BASE : fontSize}px`,
+            lineHeight: LINE_HEIGHT,
+            // Measure with words packed (natural width); render justified.
+            justifyContent: measuring ? 'flex-start' : 'space-between',
+            flexWrap: 'nowrap',
+            whiteSpace: 'nowrap',
+            visibility: measuring ? 'hidden' : 'visible',
           }}
         >
           {line.words.map((w, i) => (

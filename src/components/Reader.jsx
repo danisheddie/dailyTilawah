@@ -153,7 +153,7 @@ export default function Reader() {
       </header>
 
       {/* Body */}
-      <main className="px-5 pb-32 pt-4">
+      <main className={mode === 'mushaf' ? 'px-2 pb-28 pt-2' : 'px-5 pb-32 pt-4'}>
         {loading && <Spinner />}
 
         {!loading && error && (
