@@ -35,7 +35,30 @@ export const RECITERS = [
 export const TOTAL_PAGES = 604
 
 function cacheKey(page, editions) {
-  return `tilawah:page:${page}:${editions.join(',')}`
+  // v2: now also carries quran.com's official Uthmani text for display.
+  return `tilawah:page2:${page}:${editions.join(',')}`
+}
+
+// The official King Fahd "Uthmani" text (quran.com), keyed by "surah:ayah".
+// This is the text the KFGQPC Uthmanic Hafs font is designed for, so tajwīd
+// marks render exactly as the printed Madani mushaf. Returns null on failure
+// (the reader then falls back to the alquran.cloud Arabic text).
+async function fetchUthmaniMap(page) {
+  try {
+    const url = `${QURAN_API}/verses/by_page/${page}?fields=text_uthmani&per_page=300`
+    const res = await fetch(url)
+    if (!res.ok) return null
+    const json = await res.json()
+    const verses = json?.verses
+    if (!Array.isArray(verses)) return null
+    const map = {}
+    for (const v of verses) {
+      if (v.verse_key && v.text_uthmani) map[v.verse_key] = v.text_uthmani
+    }
+    return map
+  } catch {
+    return null
+  }
 }
 
 // Fetch a single mushaf page, optionally with translation/transliteration.
@@ -67,22 +90,26 @@ export async function getPage(page, opts = {}) {
 
   // The page endpoint serves a single edition per request (unlike surah/ayah,
   // it has no /editions/ multiplexing), so fetch each edition in parallel and
-  // zip the ayahs together by index.
-  const editionsData = await Promise.all(
-    editions.map(async (edition) => {
-      const url = `${BASE}/page/${page}/${edition}`
-      const res = await fetch(url)
-      if (!res.ok) throw new Error(`Request failed (${res.status})`)
+  // zip the ayahs together by index. In parallel, fetch the official Uthmani
+  // text from quran.com for display.
+  const [editionsData, uthmaniMap] = await Promise.all([
+    Promise.all(
+      editions.map(async (edition) => {
+        const url = `${BASE}/page/${page}/${edition}`
+        const res = await fetch(url)
+        if (!res.ok) throw new Error(`Request failed (${res.status})`)
 
-      const json = await res.json()
-      if (json.code !== 200 || !json.data || !Array.isArray(json.data.ayahs)) {
-        throw new Error('Unexpected response from the Quran service.')
-      }
-      return json.data
-    })
-  )
+        const json = await res.json()
+        if (json.code !== 200 || !json.data || !Array.isArray(json.data.ayahs)) {
+          throw new Error('Unexpected response from the Quran service.')
+        }
+        return json.data
+      })
+    ),
+    fetchUthmaniMap(page),
+  ])
 
-  const result = normalise(editionsData, page, arabicEdition, translationEdition)
+  const result = normalise(editionsData, page, arabicEdition, translationEdition, uthmaniMap)
   try {
     sessionStorage.setItem(key, JSON.stringify(result))
   } catch {
@@ -110,7 +137,13 @@ function splitBasmalah(text, surahNumber, numberInSurah) {
 
 // Each per-edition page response carries the same ayahs in the same order.
 // Zip them together by index.
-function normalise(editionsData, page, arabicEdition = ARABIC, translationEdition = TRANSLATION) {
+function normalise(
+  editionsData,
+  page,
+  arabicEdition = ARABIC,
+  translationEdition = TRANSLATION,
+  uthmaniMap = null
+) {
   const byIdentifier = {}
   editionsData.forEach((ed) => {
     byIdentifier[ed.edition.identifier] = ed.ayahs
@@ -122,14 +155,22 @@ function normalise(editionsData, page, arabicEdition = ARABIC, translationEditio
 
   const ayahs = arabicAyahs.map((a, i) => {
     const surahNumber = a.surah?.number
-    const { text, showBasmalah } = splitBasmalah(a.text, surahNumber, a.numberInSurah)
+    // The basmalah is shown as its own centered line above the first ayah of
+    // every surah except Al-Faatiha (ayah 1 is the basmalah) and At-Tawba.
+    const showBasmalah =
+      a.numberInSurah === 1 && surahNumber !== 1 && surahNumber !== 9
+    // Prefer the official quran.com Uthmani text (matches the KFGQPC font); it
+    // already excludes the leading basmalah. Otherwise fall back to the
+    // alquran.cloud text, splitting off any inline basmalah.
+    const official = uthmaniMap?.[`${surahNumber}:${a.numberInSurah}`]
+    const arabic = official || splitBasmalah(a.text, surahNumber, a.numberInSurah).text
     return {
       number: a.number,
       numberInSurah: a.numberInSurah,
       surahNumber,
       surahName: a.surah?.name,
       surahEnglishName: a.surah?.englishName,
-      arabic: text,
+      arabic,
       showBasmalah,
       audio: a.audio || a.audioSecondary?.[0] || null,
       translation: translationAyahs[i]?.text || null,
