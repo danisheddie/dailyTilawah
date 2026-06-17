@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import Reminders from './Reminders'
 import SyncSettings from './SyncSettings'
 import StartingPoint from './StartingPoint'
-import { RECITERS } from '../utils/api'
+import { RECITERS, TRANSLATIONS } from '../utils/api'
 import {
   GOALS,
   MIN_CUSTOM_GOAL,
@@ -222,10 +222,28 @@ export default function Settings() {
         <div className="mt-1 divide-y divide-teal/5">
           <Toggle
             label="Show translation"
-            description="English meaning below each ayah"
+            description="Meaning below each ayah"
             checked={settings.showTranslation}
             onChange={(v) => toggle('showTranslation', v)}
           />
+          {settings.showTranslation && (
+            <div className="py-4">
+              <label className="block text-sm font-medium text-teal">
+                Translation
+              </label>
+              <select
+                value={settings.translationEdition}
+                onChange={(e) => toggle('translationEdition', e.target.value)}
+                className="mt-2 w-full rounded-2xl border border-teal/15 bg-transparent px-4 py-3 text-sm text-teal outline-none transition focus:border-teal"
+              >
+                {TRANSLATIONS.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           <Toggle
             label="Show transliteration"
             description="Latin pronunciation in italics"

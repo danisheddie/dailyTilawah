@@ -51,6 +51,7 @@ export const DEFAULT_SETTINGS = {
   //            via QCF v2 glyph fonts (needs the per-page fonts to load).
   readingView: 'list',
   showTranslation: true,
+  translationEdition: 'en.asad',
   showTransliteration: false,
   showAudio: false,
   reciter: 'ar.alafasy',

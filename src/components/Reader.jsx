@@ -48,6 +48,7 @@ export default function Reader() {
             ? await getMushafPage(p)
             : await getPage(p, {
                 translation: settings.showTranslation,
+                translationEdition: settings.translationEdition,
                 transliteration: settings.showTransliteration,
                 reciter: settings.reciter,
               })
@@ -58,7 +59,13 @@ export default function Reader() {
         setLoading(false)
       }
     },
-    [mode, settings.showTranslation, settings.showTransliteration, settings.reciter]
+    [
+      mode,
+      settings.showTranslation,
+      settings.translationEdition,
+      settings.showTransliteration,
+      settings.reciter,
+    ]
   )
 
   useEffect(() => {

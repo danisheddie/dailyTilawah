@@ -8,6 +8,13 @@ const ARABIC = 'ar.alafasy' // default Arabic text + audio edition
 const TRANSLATION = 'en.asad'
 const TRANSLITERATION = 'en.transliteration'
 
+// Selectable translations (alquran.cloud text editions).
+export const TRANSLATIONS = [
+  { id: 'en.asad', name: 'English — Muhammad Asad' },
+  { id: 'en.sahih', name: 'English — Saheeh International' },
+  { id: 'ms.basmeih', name: 'Malay — Abdullah Basmeih' },
+]
+
 // Selectable reciters. Each is an alquran.cloud verse-by-verse audio edition
 // that also carries the Uthmani Arabic text, so one request gives both.
 export const RECITERS = [
@@ -39,7 +46,12 @@ export async function getPage(page, opts = {}) {
       ? opts.reciter
       : ARABIC
   const editions = [arabicEdition]
-  if (opts.translation) editions.push(TRANSLATION)
+  const translationEdition =
+    opts.translationEdition &&
+    TRANSLATIONS.some((t) => t.id === opts.translationEdition)
+      ? opts.translationEdition
+      : TRANSLATION
+  if (opts.translation) editions.push(translationEdition)
   if (opts.transliteration) editions.push(TRANSLITERATION)
 
   const key = cacheKey(page, editions)
@@ -69,7 +81,7 @@ export async function getPage(page, opts = {}) {
     })
   )
 
-  const result = normalise(editionsData, page, arabicEdition)
+  const result = normalise(editionsData, page, arabicEdition, translationEdition)
   try {
     sessionStorage.setItem(key, JSON.stringify(result))
   } catch {
@@ -97,14 +109,14 @@ function splitBasmalah(text, surahNumber, numberInSurah) {
 
 // Each per-edition page response carries the same ayahs in the same order.
 // Zip them together by index.
-function normalise(editionsData, page, arabicEdition = ARABIC) {
+function normalise(editionsData, page, arabicEdition = ARABIC, translationEdition = TRANSLATION) {
   const byIdentifier = {}
   editionsData.forEach((ed) => {
     byIdentifier[ed.edition.identifier] = ed.ayahs
   })
 
   const arabicAyahs = byIdentifier[arabicEdition] || []
-  const translationAyahs = byIdentifier[TRANSLATION] || []
+  const translationAyahs = byIdentifier[translationEdition] || []
   const transliterationAyahs = byIdentifier[TRANSLITERATION] || []
 
   const ayahs = arabicAyahs.map((a, i) => {
