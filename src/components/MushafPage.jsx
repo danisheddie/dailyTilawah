@@ -10,6 +10,10 @@ const BASE = 40 // px size used only for measuring natural line widths
 const LINE_HEIGHT = 1.7
 const MIN_FS = 12
 const MAX_FS = 34
+const GAP = '0.32em' // baseline spacing between words on a line
+// Lines whose natural width reaches this fraction of the column are justified
+// edge-to-edge; shorter ones (e.g. the last line of a passage) are centered.
+const JUSTIFY_THRESHOLD = 0.7
 
 // Load (once) the QCF v2 font for a page and resolve when it's ready.
 async function ensurePageFont(page) {
@@ -27,6 +31,7 @@ export default function MushafPage({ page, lines, onSwitch }) {
   const [family, setFamily] = useState(null)
   const [failed, setFailed] = useState(false)
   const [fontSize, setFontSize] = useState(null)
+  const [layout, setLayout] = useState(null) // { naturals:number[], width }
 
   const containerRef = useRef(null)
   const lineRefs = useRef([])
@@ -37,6 +42,7 @@ export default function MushafPage({ page, lines, onSwitch }) {
     setFamily(null)
     setFailed(false)
     setFontSize(null)
+    setLayout(null)
     ensurePageFont(page)
       .then((f) => active && setFamily(f))
       .catch(() => active && setFailed(true))
@@ -53,16 +59,15 @@ export default function MushafPage({ page, lines, onSwitch }) {
     const container = containerRef.current
     if (!container) return
     const width = container.clientWidth
-    let maxLine = 0
-    for (const el of lineRefs.current) {
-      if (el) maxLine = Math.max(maxLine, el.scrollWidth)
-    }
+    const naturals = lineRefs.current.map((el) => (el ? el.scrollWidth : 0))
+    const maxLine = Math.max(0, ...naturals)
     if (!maxLine || !width) return
     // Width fit: the densest line fills the column (small margin for safety).
     const byWidth = ((width * 0.97) / maxLine) * BASE
     // Height fit: all lines sit between the header and the action bar.
     const availH = window.innerHeight - 170
     const byHeight = availH / (lines.length * LINE_HEIGHT)
+    setLayout({ naturals, width })
     setFontSize(Math.max(MIN_FS, Math.min(MAX_FS, byWidth, byHeight)))
   }, [family, lines, page, fontSize])
 
@@ -104,29 +109,41 @@ export default function MushafPage({ page, lines, onSwitch }) {
 
   return (
     <div ref={containerRef} className="mx-auto w-full max-w-xl" dir="rtl" lang="ar">
-      {lines.map((line, idx) => (
-        <div
-          key={line.lineNumber}
-          ref={(el) => (lineRefs.current[idx] = el)}
-          className="flex text-teal"
-          style={{
-            fontFamily: family,
-            fontSize: `${measuring ? BASE : fontSize}px`,
-            lineHeight: LINE_HEIGHT,
-            // Measure with words packed (natural width); render justified.
-            justifyContent: measuring ? 'flex-start' : 'space-between',
-            flexWrap: 'nowrap',
-            whiteSpace: 'nowrap',
-            visibility: measuring ? 'hidden' : 'visible',
-          }}
-        >
-          {line.words.map((w, i) => (
-            <span key={i} className={w.end ? 'text-gold' : undefined}>
-              {w.code}
-            </span>
-          ))}
-        </div>
-      ))}
+      {lines.map((line, idx) => {
+        // Decide whether this line fills the column (justify) or is short
+        // (center, like the last line of a passage in the printed mushaf).
+        const natural = layout?.naturals[idx] || 0
+        const finalWidth = natural * (fontSize / BASE)
+        const fills = layout && finalWidth >= JUSTIFY_THRESHOLD * layout.width
+        const justify = measuring
+          ? 'flex-start'
+          : fills
+            ? 'space-between'
+            : 'center'
+        return (
+          <div
+            key={line.lineNumber}
+            ref={(el) => (lineRefs.current[idx] = el)}
+            className="flex text-teal"
+            style={{
+              fontFamily: family,
+              fontSize: `${measuring ? BASE : fontSize}px`,
+              lineHeight: LINE_HEIGHT,
+              gap: GAP,
+              justifyContent: justify,
+              flexWrap: 'nowrap',
+              whiteSpace: 'nowrap',
+              visibility: measuring ? 'hidden' : 'visible',
+            }}
+          >
+            {line.words.map((w, i) => (
+              <span key={i} className={w.end ? 'text-gold' : undefined}>
+                {w.code}
+              </span>
+            ))}
+          </div>
+        )
+      })}
     </div>
   )
 }
