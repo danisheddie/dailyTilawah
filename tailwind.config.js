@@ -11,6 +11,13 @@ export default {
       },
       fontFamily: {
         arabic: ['Amiri', 'serif'],
+        // Qur'anic text: official Madani mushaf face, then graceful fallbacks.
+        quran: [
+          '"KFGQPC Uthmanic Script HAFS"',
+          '"Amiri Quran"',
+          'Amiri',
+          'serif',
+        ],
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       keyframes: {

@@ -34,7 +34,7 @@ export default function AyahCard({
         <p
           dir="rtl"
           lang="ar"
-          className="grow font-arabic text-3xl leading-[2.4] text-teal sm:text-4xl"
+          className="grow font-quran text-3xl leading-[2.4] text-teal sm:text-4xl"
         >
           {ayah.arabic}{' '}
           <span className="text-gold text-2xl align-middle">

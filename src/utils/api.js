@@ -117,3 +117,95 @@ function normalise(editionsData, page) {
 
   return { page, surahs, ayahs }
 }
+
+// --- exact Madani mushaf (QCF v2 page glyphs) ------------------------------
+// quran.com's word-by-word data carries per-word PUA glyph codes (`code_v2`)
+// that render as the printed Madani mushaf when shown in the matching per-page
+// font. We group words into the page's 15 lines for a faithful layout.
+
+const QURAN_API = 'https://api.quran.com/api/v4'
+
+// Per-page QCF v2 font file. Centralised so it's a one-line change if the CDN
+// path differs. The @font-face family is assigned by MushafPage as `qcf2p<n>`.
+export function mushafFontUrl(page) {
+  return `https://cdn.jsdelivr.net/gh/quran/quran.com-frontend-next/public/fonts/quran/hafs/v2/woff2/p${page}.woff2`
+}
+
+export async function getMushafPage(page) {
+  const key = `tilawah:mushaf:${page}`
+  const cached = sessionStorage.getItem(key)
+  if (cached) {
+    try {
+      return JSON.parse(cached)
+    } catch {
+      /* refetch */
+    }
+  }
+
+  const url =
+    `${QURAN_API}/verses/by_page/${page}` +
+    `?words=true&per_page=300&fields=chapter_id` +
+    `&word_fields=code_v2,line_number,page_number,char_type_name`
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`Request failed (${res.status})`)
+  const json = await res.json()
+  const verses = json?.verses
+  if (!Array.isArray(verses) || verses.length === 0) {
+    throw new Error('Unexpected response from the Quran service.')
+  }
+
+  // Flatten words, then group by their line number (1..15) preserving order.
+  const lineMap = new Map()
+  const chapterIds = new Set()
+  for (const v of verses) {
+    if (v.chapter_id) chapterIds.add(v.chapter_id)
+    for (const w of v.words || []) {
+      const ln = w.line_number || 0
+      if (!lineMap.has(ln)) lineMap.set(ln, [])
+      lineMap.get(ln).push({
+        code: w.code_v2 || w.text || '',
+        end: w.char_type_name === 'end',
+      })
+    }
+  }
+  const lines = [...lineMap.keys()]
+    .sort((a, b) => a - b)
+    .map((ln) => ({ lineNumber: ln, words: lineMap.get(ln) }))
+
+  const surahs = [...chapterIds].sort((a, b) => a - b).map((id) => ({
+    number: id,
+    englishName: SURAH_NAMES[id - 1] || `Surah ${id}`,
+  }))
+
+  const result = { page, lines, surahs }
+  try {
+    sessionStorage.setItem(key, JSON.stringify(result))
+  } catch {
+    /* non-fatal */
+  }
+  return result
+}
+
+// English (transliterated) surah names, indexed 0 → Surah 1, for page headers.
+const SURAH_NAMES = [
+  'Al-Faatiha', 'Al-Baqara', 'Aal-i-Imraan', 'An-Nisaa', 'Al-Maaida',
+  "Al-An'aam", "Al-A'raaf", 'Al-Anfaal', 'At-Tawba', 'Yunus', 'Hud', 'Yusuf',
+  "Ar-Ra'd", 'Ibrahim', 'Al-Hijr', 'An-Nahl', 'Al-Israa', 'Al-Kahf', 'Maryam',
+  'Taa-Haa', 'Al-Anbiyaa', 'Al-Hajj', "Al-Mu'minoon", 'An-Noor', 'Al-Furqaan',
+  "Ash-Shu'araa", 'An-Naml', 'Al-Qasas', 'Al-Ankaboot', 'Ar-Room', 'Luqman',
+  'As-Sajda', 'Al-Ahzaab', 'Saba', 'Faatir', 'Yaseen', 'As-Saaffaat', 'Saad',
+  'Az-Zumar', 'Ghafir', 'Fussilat', 'Ash-Shura', 'Az-Zukhruf', 'Ad-Dukhaan',
+  'Al-Jaathiya', 'Al-Ahqaf', 'Muhammad', 'Al-Fath', 'Al-Hujuraat', 'Qaaf',
+  'Adh-Dhaariyat', 'At-Toor', 'An-Najm', 'Al-Qamar', 'Ar-Rahmaan',
+  'Al-Waaqia', 'Al-Hadid', 'Al-Mujaadila', 'Al-Hashr', 'Al-Mumtahana',
+  'As-Saff', "Al-Jumu'a", 'Al-Munaafiqoon', 'At-Taghaabun', 'At-Talaaq',
+  'At-Tahrim', 'Al-Mulk', 'Al-Qalam', 'Al-Haaqqa', "Al-Ma'aarij", 'Nooh',
+  'Al-Jinn', 'Al-Muzzammil', 'Al-Muddaththir', 'Al-Qiyaama', 'Al-Insaan',
+  'Al-Mursalaat', 'An-Naba', "An-Naazi'aat", 'Abasa', 'At-Takwir',
+  'Al-Infitaar', 'Al-Mutaffifin', 'Al-Inshiqaaq', 'Al-Burooj', 'At-Taariq',
+  "Al-A'laa", 'Al-Ghaashiya', 'Al-Fajr', 'Al-Balad', 'Ash-Shams', 'Al-Lail',
+  'Ad-Dhuhaa', 'Ash-Sharh', 'At-Tin', 'Al-Alaq', 'Al-Qadr', 'Al-Bayyina',
+  'Az-Zalzala', 'Al-Aadiyaat', 'Al-Qaari’a', 'At-Takaathur', "Al-'Asr",
+  'Al-Humaza', 'Al-Fil', 'Quraish', "Al-Maa'un", 'Al-Kawthar', 'Al-Kaafiroon',
+  'An-Nasr', 'Al-Masad', 'Al-Ikhlaas', 'Al-Falaq', 'An-Naas',
+]

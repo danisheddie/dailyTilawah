@@ -135,11 +135,46 @@ export default function Settings() {
         </div>
       </section>
 
-      {/* Reading aids */}
+      {/* Reading view */}
+      <section className="mt-10">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+          Reading view
+        </h2>
+        <div className="mt-3 grid grid-cols-2 gap-3">
+          {[
+            { id: 'mushaf', label: 'Mushaf page', sub: 'Exact Madani print' },
+            { id: 'list', label: 'Translation', sub: 'Ayah list + meaning' },
+          ].map((v) => (
+            <button
+              key={v.id}
+              onClick={() => toggle('readingView', v.id)}
+              className={`rounded-2xl border px-4 py-3 text-left transition ${
+                settings.readingView === v.id
+                  ? 'border-teal bg-teal text-paper'
+                  : 'border-teal/15 text-teal active:scale-[0.99]'
+              }`}
+            >
+              <span className="block text-sm font-medium">{v.label}</span>
+              <span
+                className={`mt-0.5 block text-xs ${
+                  settings.readingView === v.id ? 'text-paper/70' : 'text-muted'
+                }`}
+              >
+                {v.sub}
+              </span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* Reading aids (apply to the Translation view) */}
       <section className="mt-10">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
           Reading aids
         </h2>
+        <p className="mt-1 text-xs text-muted">
+          Used in the Translation view.
+        </p>
         <div className="mt-1 divide-y divide-teal/5">
           <Toggle
             label="Show translation"

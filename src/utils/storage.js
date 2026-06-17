@@ -29,6 +29,10 @@ export const GOALS = [
 ]
 
 export const DEFAULT_SETTINGS = {
+  // 'list'   = ayah list in the KFGQPC Uthmanic font (exact mushaf font +
+  //            tashkīl, always renders); 'mushaf' = exact Madani page layout
+  //            via QCF v2 glyph fonts (needs the per-page fonts to load).
+  readingView: 'list',
   showTranslation: true,
   showTransliteration: false,
   showAudio: false,

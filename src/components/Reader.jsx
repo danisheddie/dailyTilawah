@@ -1,13 +1,16 @@
-// Reading screen: fetches a mushaf page, renders it like a digital mushaf,
-// handles optional audio with auto-advance, and records progress on finish.
+// Reading screen. Two engines, chosen in Settings:
+//  - 'mushaf': exact Madani mushaf page (QCF v2 glyph fonts)
+//  - 'list':   ayah list with translation/transliteration/audio aids
+// Records progress on finish either way.
 
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getPage, TOTAL_PAGES } from '../utils/api'
-import { getLastPage, getSettings, recordPageRead } from '../utils/storage'
+import { getPage, getMushafPage, TOTAL_PAGES } from '../utils/api'
+import { getLastPage, getSettings, setSetting, recordPageRead } from '../utils/storage'
 import { reportRead } from '../utils/sync'
 import { schedulePush } from '../utils/cloudSync'
 import AyahCard from './AyahCard'
+import MushafPage from './MushafPage'
 
 function Spinner() {
   return (
@@ -20,7 +23,8 @@ function Spinner() {
 
 export default function Reader() {
   const navigate = useNavigate()
-  const settings = getSettings()
+  const [settings, setSettings] = useState(() => getSettings())
+  const mode = settings.readingView === 'list' ? 'list' : 'mushaf'
 
   const [page, setPage] = useState(() => getLastPage())
   const [data, setData] = useState(null)
@@ -39,10 +43,13 @@ export default function Reader() {
       setError(false)
       stopAudio()
       try {
-        const result = await getPage(p, {
-          translation: settings.showTranslation,
-          transliteration: settings.showTransliteration,
-        })
+        const result =
+          mode === 'mushaf'
+            ? await getMushafPage(p)
+            : await getPage(p, {
+                translation: settings.showTranslation,
+                transliteration: settings.showTransliteration,
+              })
         setData(result)
       } catch {
         setError(true)
@@ -50,16 +57,16 @@ export default function Reader() {
         setLoading(false)
       }
     },
-    [settings.showTranslation, settings.showTransliteration]
+    [mode, settings.showTranslation, settings.showTransliteration]
   )
 
   useEffect(() => {
     load(page)
     scrollRef.current?.scrollTo({ top: 0 })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page])
+  }, [page, mode])
 
-  // --- audio ---------------------------------------------------------------
+  // --- audio (list view only) ----------------------------------------------
   function stopAudio() {
     if (audioRef.current) {
       audioRef.current.pause()
@@ -80,27 +87,25 @@ export default function Reader() {
     const audio = new Audio(ayah.audio)
     audioRef.current = audio
     audio.onended = () => {
-      // Auto-advance to the next ayah that has audio.
-      if (index + 1 < ayahs.length) {
-        playIndex(index + 1)
-      } else {
-        stopAudio()
-      }
+      if (index + 1 < ayahs.length) playIndex(index + 1)
+      else stopAudio()
     }
     audio.play().catch(() => stopAudio())
     setPlayingIndex(index)
   }
 
   function togglePlay(index) {
-    if (playingIndex === index) {
-      stopAudio()
-    } else {
-      playIndex(index)
-    }
+    if (playingIndex === index) stopAudio()
+    else playIndex(index)
   }
 
-  // Clean up audio when leaving the screen.
   useEffect(() => () => stopAudio(), [])
+
+  // --- view switching ------------------------------------------------------
+  function switchToList() {
+    const next = setSetting('readingView', 'list')
+    setSettings(next)
+  }
 
   // --- finishing a page ----------------------------------------------------
   function finishPage() {
@@ -108,11 +113,8 @@ export default function Reader() {
     reportRead() // suppress today's remaining prayer-time reminders
     schedulePush() // back up progress to the cloud if sync is on
     stopAudio()
-    if (result.justCompleted) {
-      setCompletion(result)
-    } else {
-      goToNext()
-    }
+    if (result.justCompleted) setCompletion(result)
+    else goToNext()
   }
 
   function goToNext() {
@@ -165,13 +167,17 @@ export default function Reader() {
           </div>
         )}
 
-        {!loading && !error && data && (
+        {!loading && !error && data && mode === 'mushaf' && (
+          <MushafPage page={page} lines={data.lines} onSwitch={switchToList} />
+        )}
+
+        {!loading && !error && data && mode === 'list' && (
           <>
             {data.ayahs.map((ayah, i) => (
               <div key={ayah.number}>
                 {ayah.numberInSurah === 1 && (
                   <div className="mb-2 mt-6 first:mt-0 rounded-2xl bg-teal/5 px-4 py-3 text-center">
-                    <p className="font-arabic text-2xl text-teal" dir="rtl" lang="ar">
+                    <p className="font-quran text-2xl text-teal" dir="rtl" lang="ar">
                       {ayah.surahName}
                     </p>
                     <p className="mt-0.5 text-xs uppercase tracking-wide text-muted">
@@ -181,7 +187,7 @@ export default function Reader() {
                 )}
                 {ayah.showBasmalah && (
                   <p
-                    className="mb-4 mt-2 text-center font-arabic text-2xl leading-loose text-teal sm:text-3xl"
+                    className="mb-4 mt-2 text-center font-quran text-2xl leading-loose text-teal sm:text-3xl"
                     dir="rtl"
                     lang="ar"
                   >
@@ -206,11 +212,7 @@ export default function Reader() {
       {!loading && !error && data && (
         <div className="fixed inset-x-0 bottom-0 mx-auto max-w-2xl border-t border-teal/10 bg-paper/95 px-5 py-3 backdrop-blur">
           <div className="flex items-center gap-3">
-            <button
-              className="btn-ghost px-4"
-              onClick={goToPrev}
-              disabled={page <= 1}
-            >
+            <button className="btn-ghost px-4" onClick={goToPrev} disabled={page <= 1}>
               Prev
             </button>
             <button className="btn-primary grow" onClick={finishPage}>
@@ -234,21 +236,16 @@ export default function Reader() {
             <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-gold/15 text-3xl">
               ✦
             </div>
-            <p className="font-arabic text-3xl leading-loose text-teal sm:text-4xl" dir="rtl" lang="ar">
+            <p className="font-quran text-3xl leading-loose text-teal sm:text-4xl" dir="rtl" lang="ar">
               جَزَاكَ اللَّهُ خَيْرًا
             </p>
             <p className="mt-3 text-base text-muted">May Allah reward you.</p>
-            <p className="mt-1 text-sm text-gold">
-              {completion.streak}-day streak
-            </p>
+            <p className="mt-1 text-sm text-gold">{completion.streak}-day streak</p>
             <div className="mt-10 flex flex-col gap-3">
               <button className="btn-primary" onClick={goToNext}>
                 Read another page
               </button>
-              <button
-                className="btn-ghost"
-                onClick={() => navigate('/')}
-              >
+              <button className="btn-ghost" onClick={() => navigate('/')}>
                 Done for today
               </button>
             </div>
