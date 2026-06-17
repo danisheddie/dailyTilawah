@@ -4,9 +4,25 @@
 const BASE = 'https://api.alquran.cloud/v1'
 
 // Edition identifiers used by the app.
-const ARABIC = 'ar.alafasy' // Arabic text + Mishary Alafasy audio
+const ARABIC = 'ar.alafasy' // default Arabic text + audio edition
 const TRANSLATION = 'en.asad'
 const TRANSLITERATION = 'en.transliteration'
+
+// Selectable reciters. Each is an alquran.cloud verse-by-verse audio edition
+// that also carries the Uthmani Arabic text, so one request gives both.
+export const RECITERS = [
+  { id: 'ar.alafasy', name: 'Mishary Rashid Alafasy' },
+  { id: 'ar.abdulbasitmurattal', name: 'Abdul Basit (Murattal)' },
+  { id: 'ar.husary', name: 'Mahmoud Khalil Al-Husary' },
+  { id: 'ar.minshawi', name: 'Mohamed El-Minshawi' },
+  { id: 'ar.abdurrahmaansudais', name: 'Abdurrahman As-Sudais' },
+  { id: 'ar.shaatree', name: 'Abu Bakr Ash-Shaatree' },
+  { id: 'ar.muhammadayyoub', name: 'Muhammad Ayyoub' },
+  { id: 'ar.mahermuaiqly', name: 'Maher Al Muaiqly' },
+  { id: 'ar.hudhaify', name: 'Ali Al-Hudhaify' },
+  { id: 'ar.ahmedajamy', name: 'Ahmed Al-Ajamy' },
+  { id: 'ar.hanirifai', name: 'Hani Ar-Rifai' },
+]
 
 export const TOTAL_PAGES = 604
 
@@ -17,7 +33,12 @@ function cacheKey(page, editions) {
 // Fetch a single mushaf page, optionally with translation/transliteration.
 // Returns { page, surahs, ayahs } where each ayah is fully normalised.
 export async function getPage(page, opts = {}) {
-  const editions = [ARABIC]
+  // The chosen reciter edition supplies both the Arabic text and the audio.
+  const arabicEdition =
+    opts.reciter && RECITERS.some((r) => r.id === opts.reciter)
+      ? opts.reciter
+      : ARABIC
+  const editions = [arabicEdition]
   if (opts.translation) editions.push(TRANSLATION)
   if (opts.transliteration) editions.push(TRANSLITERATION)
 
@@ -48,7 +69,7 @@ export async function getPage(page, opts = {}) {
     })
   )
 
-  const result = normalise(editionsData, page)
+  const result = normalise(editionsData, page, arabicEdition)
   try {
     sessionStorage.setItem(key, JSON.stringify(result))
   } catch {
@@ -76,13 +97,13 @@ function splitBasmalah(text, surahNumber, numberInSurah) {
 
 // Each per-edition page response carries the same ayahs in the same order.
 // Zip them together by index.
-function normalise(editionsData, page) {
+function normalise(editionsData, page, arabicEdition = ARABIC) {
   const byIdentifier = {}
   editionsData.forEach((ed) => {
     byIdentifier[ed.edition.identifier] = ed.ayahs
   })
 
-  const arabicAyahs = byIdentifier[ARABIC] || []
+  const arabicAyahs = byIdentifier[arabicEdition] || []
   const translationAyahs = byIdentifier[TRANSLATION] || []
   const transliterationAyahs = byIdentifier[TRANSLITERATION] || []
 

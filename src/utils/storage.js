@@ -36,6 +36,7 @@ export const DEFAULT_SETTINGS = {
   showTranslation: true,
   showTransliteration: false,
   showAudio: false,
+  reciter: 'ar.alafasy',
 }
 
 // Prayer-time reminder preferences. `location` is { latitude, longitude,

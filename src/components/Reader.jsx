@@ -49,6 +49,7 @@ export default function Reader() {
             : await getPage(p, {
                 translation: settings.showTranslation,
                 transliteration: settings.showTransliteration,
+                reciter: settings.reciter,
               })
         setData(result)
       } catch {
@@ -57,7 +58,7 @@ export default function Reader() {
         setLoading(false)
       }
     },
-    [mode, settings.showTranslation, settings.showTransliteration]
+    [mode, settings.showTranslation, settings.showTransliteration, settings.reciter]
   )
 
   useEffect(() => {

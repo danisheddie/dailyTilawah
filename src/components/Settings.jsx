@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Reminders from './Reminders'
 import SyncSettings from './SyncSettings'
+import { RECITERS } from '../utils/api'
 import {
   GOALS,
   getGoal,
@@ -190,11 +191,30 @@ export default function Settings() {
           />
           <Toggle
             label="Show audio controls"
-            description="Recitation by Mishary Alafasy"
+            description="Play recitation for each ayah"
             checked={settings.showAudio}
             onChange={(v) => toggle('showAudio', v)}
           />
         </div>
+
+        {settings.showAudio && (
+          <div className="mt-3">
+            <label className="block text-sm font-medium text-teal">
+              Reciter
+            </label>
+            <select
+              value={settings.reciter}
+              onChange={(e) => toggle('reciter', e.target.value)}
+              className="mt-2 w-full rounded-2xl border border-teal/15 bg-transparent px-4 py-3 text-sm text-teal outline-none transition focus:border-teal"
+            >
+              {RECITERS.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </section>
 
       {/* Prayer-time reminders */}
