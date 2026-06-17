@@ -15,6 +15,7 @@ export const SYNC_KEYS = [
   'tilawah:onboarded',
   'tilawah:userName',
   'tilawah:userGoal',
+  'tilawah:customGoalPages',
   'tilawah:streak',
   'tilawah:lastCompletedDate',
   'tilawah:totalPagesRead',
@@ -201,6 +202,10 @@ export function mergeSnapshots(a = {}, b = {}) {
 
   // preferences: latest edit wins; onboarding is sticky once true
   out['tilawah:userGoal'] = newer['tilawah:userGoal'] ?? a['tilawah:userGoal'] ?? b['tilawah:userGoal']
+  out['tilawah:customGoalPages'] =
+    newer['tilawah:customGoalPages'] ??
+    a['tilawah:customGoalPages'] ??
+    b['tilawah:customGoalPages']
   out['tilawah:settings'] = newer['tilawah:settings'] ?? a['tilawah:settings'] ?? b['tilawah:settings']
   out['tilawah:onboarded'] =
     Boolean(a['tilawah:onboarded']) || Boolean(b['tilawah:onboarded'])

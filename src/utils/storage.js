@@ -17,6 +17,8 @@ const KEYS = {
   settings: 'tilawah:settings',
   reminders: 'tilawah:reminders',
   clientId: 'tilawah:clientId',
+  customGoalPages: 'tilawah:customGoalPages',
+  betaDismissed: 'tilawah:betaDismissed',
 }
 
 // The reading goals the user can choose from. `pages` is the daily target
@@ -27,6 +29,21 @@ export const GOALS = [
   { id: 'two', label: '2 pages', pages: 2 },
   { id: 'juz', label: '1 juz', pages: 20 },
 ]
+
+// Bounds for a user-defined custom daily goal (in mushaf pages).
+export const MIN_CUSTOM_GOAL = 0.5
+export const MAX_CUSTOM_GOAL = 604
+
+export function clampGoalPages(n) {
+  const v = Number(n)
+  if (!Number.isFinite(v) || v <= 0) return 1
+  return Math.min(MAX_CUSTOM_GOAL, Math.max(MIN_CUSTOM_GOAL, v))
+}
+
+export function goalLabel(pages) {
+  const x = Number.isInteger(pages) ? pages : Number(pages).toFixed(1)
+  return `${x} ${Number(pages) === 1 ? 'page' : 'pages'}`
+}
 
 export const DEFAULT_SETTINGS = {
   // 'list'   = ayah list in the KFGQPC Uthmanic font (exact mushaf font +
@@ -73,10 +90,20 @@ export function isOnboarded() {
   return read(KEYS.onboarded, false) === true
 }
 
-export function completeOnboarding(goalId, name) {
-  setGoal(goalId)
+export function completeOnboarding(goalId, name, customPages) {
+  setGoal(goalId, customPages)
   setName(name)
   write(KEYS.onboarded, true)
+}
+
+// --- beta notice -----------------------------------------------------------
+
+export function isBetaDismissed() {
+  return read(KEYS.betaDismissed, false) === true
+}
+
+export function dismissBeta() {
+  write(KEYS.betaDismissed, true)
 }
 
 // --- name ------------------------------------------------------------------
@@ -95,10 +122,19 @@ export function setName(name) {
 
 export function getGoal() {
   const id = read(KEYS.goal, 'one')
+  if (id === 'custom') {
+    const pages = clampGoalPages(read(KEYS.customGoalPages, 1))
+    return { id: 'custom', label: goalLabel(pages), pages }
+  }
   return GOALS.find((g) => g.id === id) || GOALS[1]
 }
 
-export function setGoal(goalId) {
+export function setGoal(goalId, customPages) {
+  if (goalId === 'custom') {
+    write(KEYS.goal, 'custom')
+    write(KEYS.customGoalPages, clampGoalPages(customPages))
+    return
+  }
   const valid = GOALS.find((g) => g.id === goalId) ? goalId : 'one'
   write(KEYS.goal, valid)
 }

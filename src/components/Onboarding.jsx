@@ -3,7 +3,14 @@
 
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { GOALS, completeOnboarding, setLastPage } from '../utils/storage'
+import {
+  GOALS,
+  MIN_CUSTOM_GOAL,
+  MAX_CUSTOM_GOAL,
+  clampGoalPages,
+  completeOnboarding,
+  setLastPage,
+} from '../utils/storage'
 import StartingPoint from './StartingPoint'
 
 export default function Onboarding({ onDone }) {
@@ -12,10 +19,11 @@ export default function Onboarding({ onDone }) {
   const [step, setStep] = useState(0)
   const [name, setName] = useState('')
   const [goalId, setGoalId] = useState('one')
+  const [customPages, setCustomPages] = useState(3)
   const [startPage, setStartPage] = useState(1)
 
   function finish() {
-    completeOnboarding(goalId, name)
+    completeOnboarding(goalId, name, customPages)
     setLastPage(startPage)
     onDone?.()
     navigate('/', { replace: true })
@@ -94,6 +102,31 @@ export default function Onboarding({ onDone }) {
                 {g.label}
               </button>
             ))}
+            <button
+              onClick={() => setGoalId('custom')}
+              className={`rounded-2xl border px-5 py-4 text-left text-base font-medium transition ${
+                goalId === 'custom'
+                  ? 'border-teal bg-teal text-paper'
+                  : 'border-teal/15 text-teal active:scale-[0.99]'
+              }`}
+            >
+              Custom
+            </button>
+            {goalId === 'custom' && (
+              <div className="flex items-center gap-3 px-1">
+                <input
+                  type="number"
+                  min={MIN_CUSTOM_GOAL}
+                  max={MAX_CUSTOM_GOAL}
+                  step={0.5}
+                  value={customPages}
+                  onChange={(e) => setCustomPages(e.target.value)}
+                  onBlur={(e) => setCustomPages(clampGoalPages(e.target.value))}
+                  className="w-24 rounded-2xl border border-teal/15 bg-transparent px-4 py-3 text-center text-base text-teal outline-none transition focus:border-teal"
+                />
+                <span className="text-sm text-muted">pages per day</span>
+              </div>
+            )}
           </div>
           <button className="btn-primary mt-8 w-full" onClick={() => setStep(3)}>
             Continue

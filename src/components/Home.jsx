@@ -7,6 +7,7 @@ import { formatGregorian, formatHijri } from '../utils/dateUtils'
 import { nextPrayer, formatTime } from '../utils/prayer'
 import StreakBadge from './StreakBadge'
 import DailyReflection from './DailyReflection'
+import BetaNotice from './BetaNotice'
 
 function GearIcon() {
   return (
@@ -59,6 +60,8 @@ export default function Home() {
           <GearIcon />
         </button>
       </header>
+
+      <BetaNotice />
 
       {name && (
         <div className="mt-8 text-center">

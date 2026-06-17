@@ -8,6 +8,9 @@ import StartingPoint from './StartingPoint'
 import { RECITERS } from '../utils/api'
 import {
   GOALS,
+  MIN_CUSTOM_GOAL,
+  MAX_CUSTOM_GOAL,
+  clampGoalPages,
   getGoal,
   setGoal,
   getSettings,
@@ -51,7 +54,11 @@ function Toggle({ label, description, checked, onChange }) {
 
 export default function Settings() {
   const navigate = useNavigate()
-  const [goalId, setGoalId] = useState(() => getGoal().id)
+  const initialGoal = getGoal()
+  const [goalId, setGoalId] = useState(() => initialGoal.id)
+  const [customPages, setCustomPages] = useState(() =>
+    initialGoal.id === 'custom' ? initialGoal.pages : 3
+  )
   const [settings, setSettings] = useState(() => getSettings())
   const [name, setNameState] = useState(() => getName())
   const [resumePage, setResumePage] = useState(() => getLastPage())
@@ -62,7 +69,13 @@ export default function Settings() {
 
   function changeGoal(id) {
     setGoalId(id)
-    setGoal(id)
+    if (id === 'custom') setGoal('custom', customPages)
+    else setGoal(id)
+  }
+
+  function changeCustomPages(value) {
+    setCustomPages(value)
+    if (goalId === 'custom') setGoal('custom', value)
   }
 
   function toggle(key, value) {
@@ -137,7 +150,33 @@ export default function Settings() {
               {g.label}
             </button>
           ))}
+          <button
+            onClick={() => changeGoal('custom')}
+            className={`rounded-2xl border px-4 py-3 text-sm font-medium transition ${
+              goalId === 'custom'
+                ? 'border-teal bg-teal text-paper'
+                : 'border-teal/15 text-teal active:scale-[0.99]'
+            }`}
+          >
+            Custom
+          </button>
         </div>
+
+        {goalId === 'custom' && (
+          <div className="mt-3 flex items-center gap-3">
+            <input
+              type="number"
+              min={MIN_CUSTOM_GOAL}
+              max={MAX_CUSTOM_GOAL}
+              step={0.5}
+              value={customPages}
+              onChange={(e) => changeCustomPages(e.target.value)}
+              onBlur={(e) => changeCustomPages(clampGoalPages(e.target.value))}
+              className="w-24 rounded-2xl border border-teal/15 bg-transparent px-4 py-3 text-center text-sm text-teal outline-none transition focus:border-teal"
+            />
+            <span className="text-sm text-muted">pages per day</span>
+          </div>
+        )}
       </section>
 
       {/* Reading view */}
@@ -281,6 +320,9 @@ export default function Settings() {
 
       <p className="mt-10 text-center text-xs text-muted">
         Tilawah · One page a day. Every day.
+      </p>
+      <p className="mt-1 text-center text-[11px] text-muted/80">
+        Beta · thank you for testing 🤍 Use it freely — your feedback shapes it.
       </p>
     </div>
   )
