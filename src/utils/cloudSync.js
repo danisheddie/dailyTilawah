@@ -6,7 +6,7 @@
 // All network calls no-op when the backend isn't configured (config.js empty),
 // mirroring the reminder backend.
 
-import { WORKER_URL } from '../config'
+import { WORKER_URL, googleAuthConfigured } from '../config'
 import { todayISO } from './dateUtils'
 
 // localStorage keys that make up a syncable snapshot. Device-specific keys
@@ -26,10 +26,13 @@ export const SYNC_KEYS = [
 ]
 
 const CODE_KEY = 'tilawah:syncCode'
+const GTOKEN_KEY = 'tilawah:gToken'
+const GPROFILE_KEY = 'tilawah:gProfile'
 // Unambiguous alphabet (no 0/O/1/I) for readable codes like ABCD-EFGH-JKLM.
 const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
 
 export const syncConfigured = () => Boolean(WORKER_URL)
+export const googleConfigured = () => googleAuthConfigured()
 
 export function generateSyncCode() {
   const bytes = new Uint8Array(12)
@@ -97,6 +100,50 @@ export function clearSyncCode() {
   } catch {
     /* ignore */
   }
+}
+
+// --- Google session --------------------------------------------------------
+export function getGoogleToken() {
+  try {
+    return localStorage.getItem(GTOKEN_KEY) || null
+  } catch {
+    return null
+  }
+}
+export function getGoogleProfile() {
+  try {
+    const raw = localStorage.getItem(GPROFILE_KEY)
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
+export function setGoogleSession(token, profile) {
+  try {
+    localStorage.setItem(GTOKEN_KEY, token)
+    localStorage.setItem(GPROFILE_KEY, JSON.stringify(profile || {}))
+  } catch {
+    /* ignore */
+  }
+}
+export function clearGoogleSession() {
+  try {
+    localStorage.removeItem(GTOKEN_KEY)
+    localStorage.removeItem(GPROFILE_KEY)
+  } catch {
+    /* ignore */
+  }
+}
+export const isGoogleSignedIn = () => Boolean(getGoogleToken())
+
+// The active credential for sync: a Google session takes precedence over a
+// sync code when both are present.
+function activeCredential() {
+  const token = getGoogleToken()
+  if (token) return { token }
+  const code = getSyncCode()
+  if (code) return { code: normalizeCode(code) }
+  return null
 }
 
 // --- merge (pure) ----------------------------------------------------------
@@ -190,6 +237,43 @@ export async function pushSnapshot(code, snapshot) {
   await call('/sync/push', { code: normalizeCode(code), data: snapshot })
 }
 
+// Credential-agnostic pull/push (accepts { token } or { code }).
+async function pullWith(cred) {
+  if (!syncConfigured() || !cred) return null
+  const r = await call('/sync/pull', cred)
+  return r && r.data ? r.data : null
+}
+async function pushWith(cred, snapshot) {
+  if (!syncConfigured() || !cred) return
+  await call('/sync/push', { ...cred, data: snapshot })
+}
+
+// --- Google sign-in --------------------------------------------------------
+// Exchange a Google ID token for a durable session, then merge + sync. Called
+// with the credential string from Google Identity Services.
+export async function googleSignIn(idToken) {
+  if (!syncConfigured()) throw new Error('Sync service isn’t set up yet.')
+  const r = await call('/auth/google', { idToken })
+  if (!r || !r.token) throw new Error('Sign-in failed. Please try again.')
+  setGoogleSession(r.token, r.profile)
+  const merged = mergeSnapshots(exportSnapshot(), r.data || {})
+  applySnapshot(merged)
+  await pushWith({ token: r.token }, merged)
+  return r.profile
+}
+
+export async function googleSignOut() {
+  const token = getGoogleToken()
+  if (token) {
+    try {
+      await call('/auth/signout', { token })
+    } catch {
+      /* best effort */
+    }
+  }
+  clearGoogleSession()
+}
+
 // Create a brand-new account: generate a code, push the current local data.
 export async function createAccount() {
   const code = generateSyncCode()
@@ -216,21 +300,21 @@ export async function linkAccount(code) {
 // nothing when not linked or not configured.
 let pushTimer = null
 export async function syncNow() {
-  const code = getSyncCode()
-  if (!code || !syncConfigured()) return null
-  const remote = await pullSnapshot(code)
+  const cred = activeCredential()
+  if (!cred || !syncConfigured()) return null
+  const remote = await pullWith(cred)
   const merged = mergeSnapshots(exportSnapshot(), remote || {})
   applySnapshot(merged)
-  await pushSnapshot(code, merged)
+  await pushWith(cred, merged)
   return merged
 }
 
 // Debounced push of local state after a change (e.g. finishing a page).
 export function schedulePush() {
-  const code = getSyncCode()
-  if (!code || !syncConfigured()) return
+  const cred = activeCredential()
+  if (!cred || !syncConfigured()) return
   clearTimeout(pushTimer)
   pushTimer = setTimeout(() => {
-    pushSnapshot(code, exportSnapshot()).catch(() => {})
+    pushWith(cred, exportSnapshot()).catch(() => {})
   }, 2500)
 }

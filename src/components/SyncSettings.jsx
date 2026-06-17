@@ -5,12 +5,14 @@
 import { useState } from 'react'
 import {
   syncConfigured,
+  googleConfigured,
   getSyncCode,
   clearSyncCode,
   createAccount,
   linkAccount,
   syncNow,
 } from '../utils/cloudSync'
+import GoogleSignIn from './GoogleSignIn'
 
 export default function SyncSettings() {
   const [code, setCode] = useState(() => getSyncCode())
@@ -87,14 +89,26 @@ export default function SyncSettings() {
         Back up &amp; sync
       </h2>
       <p className="mt-2 text-xs leading-relaxed text-muted">
-        Optional. Create a sync code to back up your progress and restore it on
-        another device — or in the app later. No account or password needed.
+        Optional. Keep your progress backed up and in sync across devices —
+        sign in with Google, or use a private sync code. The app works fully
+        without this.
       </p>
 
       {!configured && (
         <p className="mt-3 rounded-xl bg-gold/10 px-3 py-2 text-xs text-muted">
           Sync isn’t connected yet. It activates once the sync service is set up.
         </p>
+      )}
+
+      {/* Preferred: one-tap Google sign-in (shown when configured) */}
+      <GoogleSignIn />
+
+      {googleConfigured() && (
+        <div className="mt-6 flex items-center gap-3 text-xs text-muted">
+          <span className="h-px grow bg-teal/10" />
+          or use a sync code
+          <span className="h-px grow bg-teal/10" />
+        </div>
       )}
 
       {note && (

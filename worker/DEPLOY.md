@@ -81,14 +81,45 @@ npx wrangler tail
 
 ## Cloud sync (included — no extra setup)
 The same Worker also powers optional "Back up & sync" (Settings → Back up &
-sync). Once `WORKER_URL` is set in `src/config.js`, it works automatically —
-no VAPID keys involved, and it shares the same KV namespace:
+sync). Once `WORKER_URL` is set in `src/config.js`, the **sync code** works
+automatically — no VAPID keys involved, and it shares the same KV namespace:
 - `POST /sync/push` — `{ code, data }` stores a snapshot under `acct:<code>`.
 - `POST /sync/pull` — `{ code }` returns the stored snapshot (404 if unknown).
 
 The sync **code is the credential** (anyone with it can read/write that
 record), so it's generated with ~60 bits of entropy. Reading data only —
 prayer reminders and sync are independent and can be used separately.
+
+## Sign in with Google (optional — one-tap sync)
+This lets a user just tap **Sign in with Google** on each device instead of
+copying a code. It needs a free Google OAuth client; the Worker validates the
+sign-in and stores that user's data under `gacct:<google-user-id>`.
+
+1. **Create an OAuth Client ID** in the
+   [Google Cloud Console](https://console.cloud.google.com/apis/credentials):
+   - Create (or pick) a project → **OAuth consent screen** → External →
+     fill in app name + your email → save. Add yourself under **Test users**
+     (or **Publish** the app once you're happy).
+   - **Credentials → Create credentials → OAuth client ID → Web application**.
+   - Under **Authorised JavaScript origins**, add the site origin(s) where the
+     app runs, e.g. `https://danisheddie.github.io`
+     *(origin only — no path. For local dev also add `http://localhost:5173`.)*
+   - Copy the **Client ID** (looks like `…apps.googleusercontent.com`).
+
+2. **Tell the app and the Worker** the same client id:
+   - App: `src/config.js` → `export const GOOGLE_CLIENT_ID = '…apps.googleusercontent.com'`
+   - Worker: `worker/wrangler.toml` → `[vars] GOOGLE_CLIENT_ID = "…apps.googleusercontent.com"`
+
+3. **Redeploy** the Worker (`npm run deploy`) and push the app change to `main`.
+
+The "Sign in with Google" button appears automatically once both
+`WORKER_URL` and `GOOGLE_CLIENT_ID` are set. Endpoints:
+- `POST /auth/google` — `{ idToken }`; verified via Google's `tokeninfo`,
+  returns an opaque `token` (180-day session) + any existing data.
+- `POST /sync/pull` & `/sync/push` also accept `{ token }` instead of `{ code }`.
+
+> GitHub Pages serves the app under a path (`/dailyTilawah/`), but Google only
+> needs the **origin** (`https://danisheddie.github.io`) in the origins list.
 
 ## How reminders work
 - `POST /subscribe` — the app upserts `{subscription, location, method, madhab,

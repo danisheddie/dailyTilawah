@@ -11,6 +11,9 @@ crons = ["* * * * *"]
 [vars]
 VAPID_PUBLIC_KEY = "REPLACE_WITH_VAPID_PUBLIC_KEY"
 VAPID_SUBJECT = "mailto:you@example.com"
+# OAuth Web Client ID for "Sign in with Google" (same value goes in the app's
+# src/config.js). Leave as-is to keep Google sign-in disabled. Not a secret.
+GOOGLE_CLIENT_ID = ""
 
 # KV namespace for subscribers. Create it with:
 #   wrangler kv namespace create TILAWAH_KV

@@ -12,5 +12,15 @@
 export const WORKER_URL = ''
 export const VAPID_PUBLIC_KEY = ''
 
+// GOOGLE_CLIENT_ID — the OAuth 2.0 Web Client ID from Google Cloud Console,
+// used for "Sign in with Google". Leave empty to hide the Google option (the
+// sync-code flow still works). The same value must be set as GOOGLE_CLIENT_ID
+// on the Worker so it can verify the tokens. See worker/DEPLOY.md.
+export const GOOGLE_CLIENT_ID = ''
+
 export const remindersConfigured = () =>
   Boolean(WORKER_URL) && Boolean(VAPID_PUBLIC_KEY)
+
+// Google sign-in needs both the backend (to verify tokens) and a client ID.
+export const googleAuthConfigured = () =>
+  Boolean(WORKER_URL) && Boolean(GOOGLE_CLIENT_ID)
