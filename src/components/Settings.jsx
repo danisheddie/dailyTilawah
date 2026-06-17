@@ -278,6 +278,36 @@ export default function Settings() {
         )}
       </section>
 
+      {/* Daily reflection */}
+      <section className="mt-10">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+          Daily reflection
+        </h2>
+        <p className="mt-1 text-xs text-muted">
+          The verse/hadith shown on the home screen each day.
+        </p>
+        <div className="mt-3 grid grid-cols-2 gap-3">
+          {[
+            { id: 'both', label: 'Both' },
+            { id: 'quran', label: 'Qur’an only' },
+            { id: 'hadith', label: 'Hadith only' },
+            { id: 'off', label: 'Off' },
+          ].map((o) => (
+            <button
+              key={o.id}
+              onClick={() => toggle('reflectionMode', o.id)}
+              className={`rounded-2xl border px-4 py-3 text-sm font-medium transition ${
+                settings.reflectionMode === o.id
+                  ? 'border-teal bg-teal text-paper'
+                  : 'border-teal/15 text-teal active:scale-[0.99]'
+              }`}
+            >
+              {o.label}
+            </button>
+          ))}
+        </div>
+      </section>
+
       {/* Reading position */}
       <section className="mt-10">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">

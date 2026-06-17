@@ -164,12 +164,26 @@ export const REFLECTIONS = interleave(QURAN, HADITH)
 
 // Stable per-day index: days since the Unix epoch, computed from the local
 // calendar date so it changes at local midnight.
-function dayIndex(date = new Date()) {
+function dayIndex(len, date = new Date()) {
   const [y, m, d] = todayISO(date).split('-').map(Number)
   const epochDay = Math.floor(Date.UTC(y, m - 1, d) / 86400000)
-  return ((epochDay % REFLECTIONS.length) + REFLECTIONS.length) % REFLECTIONS.length
+  return ((epochDay % len) + len) % len
 }
 
-export function getDailyReflection(date = new Date()) {
-  return REFLECTIONS[dayIndex(date)]
+// Today's reflection for the chosen rotation mode:
+//   'both'   — verses and hadith (alternating)
+//   'quran'  — verses only
+//   'hadith' — hadith only
+//   'off'    — nothing
+export function getDailyReflection(mode = 'both', date = new Date()) {
+  const pool =
+    mode === 'quran'
+      ? QURAN
+      : mode === 'hadith'
+        ? HADITH
+        : mode === 'off'
+          ? []
+          : REFLECTIONS
+  if (!pool.length) return null
+  return pool[dayIndex(pool.length, date)]
 }

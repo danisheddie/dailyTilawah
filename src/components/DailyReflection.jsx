@@ -2,9 +2,10 @@
 // authentic hadith with its source. Changes each day.
 
 import { getDailyReflection } from '../data/reflections'
+import { getSettings } from '../utils/storage'
 
 export default function DailyReflection({ className = '' }) {
-  const r = getDailyReflection()
+  const r = getDailyReflection(getSettings().reflectionMode)
   if (!r) return null
 
   return (

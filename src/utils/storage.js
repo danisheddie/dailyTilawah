@@ -50,6 +50,8 @@ export const DEFAULT_SETTINGS = {
   //            tashkīl, always renders); 'mushaf' = exact Madani page layout
   //            via QCF v2 glyph fonts (needs the per-page fonts to load).
   readingView: 'list',
+  // Daily home-screen reflection: 'both' | 'quran' | 'hadith' | 'off'.
+  reflectionMode: 'both',
   showTranslation: true,
   translationEdition: 'en.asad',
   showTransliteration: false,
