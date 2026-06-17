@@ -11,13 +11,11 @@ export default {
       },
       fontFamily: {
         arabic: ['Amiri', 'serif'],
-        // Qur'anic text: official Madani mushaf face, then graceful fallbacks.
-        quran: [
-          '"KFGQPC Uthmanic Script HAFS"',
-          '"Amiri Quran"',
-          'Amiri',
-          'serif',
-        ],
+        // Qur'anic text for the ayah-list view. Amiri Quran is purpose-built
+        // for this Uthmani text and renders every mark (incl. the silent-alif
+        // rounded zero) correctly. The exact KFGQPC/QCF mushaf print lives in
+        // the Mushaf page view, which uses dedicated per-page glyph fonts.
+        quran: ['"Amiri Quran"', 'Amiri', 'serif'],
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       keyframes: {
