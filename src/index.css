@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* KFGQPC Uthmanic Script HAFS (Ver 18) — the official Madani mushaf naskh
+   face. Self-hosted so the default reading view never depends on a
+   third-party font CDN and works offline. */
+@font-face {
+  font-family: 'KFGQPC Uthmanic Script HAFS';
+  src: url('/fonts/UthmanicHafs1Ver18.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   color-scheme: light;
 }

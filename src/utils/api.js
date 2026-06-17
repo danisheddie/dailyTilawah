@@ -128,7 +128,9 @@ const QURAN_API = 'https://api.quran.com/api/v4'
 // Per-page QCF v2 font file. Centralised so it's a one-line change if the CDN
 // path differs. The @font-face family is assigned by MushafPage as `qcf2p<n>`.
 export function mushafFontUrl(page) {
-  return `https://cdn.jsdelivr.net/gh/quran/quran.com-frontend-next/public/fonts/quran/hafs/v2/woff2/p${page}.woff2`
+  // jsDelivr mirror of the verified QCF v2 page fonts, pinned to a branch so
+  // the path resolves reliably. Lazy-loaded one page at a time.
+  return `https://cdn.jsdelivr.net/gh/quran/quran.com-frontend-next@master/public/fonts/quran/hafs/v2/woff2/p${page}.woff2`
 }
 
 export async function getMushafPage(page) {
