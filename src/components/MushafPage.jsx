@@ -4,7 +4,7 @@
 // without scrolling) — and each line is justified edge-to-edge like the print.
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { mushafFontUrl } from '../utils/api'
+import { ensurePageFont } from '../utils/fonts'
 import { useLang } from '../utils/i18n.jsx'
 
 const BASE = 40 // px size used only for measuring natural line widths
@@ -16,17 +16,6 @@ const GAP = '0.32em' // baseline spacing between words on a line
 // edge-to-edge; shorter ones (e.g. the last line of a passage) are centered.
 const JUSTIFY_THRESHOLD = 0.7
 
-// Load (once) the QCF v2 font for a page and resolve when it's ready.
-async function ensurePageFont(page) {
-  const family = `qcf2p${page}`
-  if ([...document.fonts].some((f) => f.family === family)) return family
-  const face = new FontFace(family, `url(${mushafFontUrl(page)})`, {
-    display: 'swap',
-  })
-  await face.load()
-  document.fonts.add(face)
-  return family
-}
 
 export default function MushafPage({ page, lines, onSwitch }) {
   const { t } = useLang()

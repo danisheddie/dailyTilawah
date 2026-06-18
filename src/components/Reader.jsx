@@ -11,6 +11,7 @@ import { reportRead } from '../utils/sync'
 import { schedulePush } from '../utils/cloudSync'
 import AyahCard from './AyahCard'
 import MushafPage from './MushafPage'
+import { ensurePageFont } from '../utils/fonts'
 import { useLang } from '../utils/i18n.jsx'
 
 function Spinner() {
@@ -35,6 +36,7 @@ export default function Reader() {
   const [error, setError] = useState(false)
   const [playingIndex, setPlayingIndex] = useState(null)
   const [completion, setCompletion] = useState(null) // null | {justCompleted}
+  const [glyphPages, setGlyphPages] = useState(() => new Set()) // QCF fonts ready
 
   const audioRef = useRef(null)
   const scrollRef = useRef(null)
@@ -55,6 +57,24 @@ export default function Reader() {
                 transliteration: settings.showTransliteration,
                 reciter: settings.reciter,
               })
+        // For the ayah list, load the QCF page fonts so each ayah renders in
+        // the exact mushaf glyphs (correct tajwīd marks). Ayahs whose fonts
+        // don't load fall back to the Uthmani text.
+        if (mode === 'list') {
+          const pages = new Set()
+          for (const a of result.ayahs || []) {
+            for (const w of a.words || []) pages.add(w.page)
+          }
+          const ready = new Set()
+          await Promise.all(
+            [...pages].map((pg) =>
+              ensurePageFont(pg)
+                .then(() => ready.add(pg))
+                .catch(() => {})
+            )
+          )
+          setGlyphPages(ready)
+        }
         setData(result)
       } catch {
         setError(true)
@@ -205,6 +225,10 @@ export default function Reader() {
                 )}
                 <AyahCard
                   ayah={ayah}
+                  glyphs={
+                    !!ayah.words?.length &&
+                    ayah.words.every((w) => glyphPages.has(w.page))
+                  }
                   showTranslation={settings.showTranslation}
                   showTransliteration={settings.showTransliteration}
                   showAudio={settings.showAudio}

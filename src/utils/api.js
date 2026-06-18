@@ -35,27 +35,38 @@ export const RECITERS = [
 export const TOTAL_PAGES = 604
 
 function cacheKey(page, editions) {
-  // v2: now also carries quran.com's official Uthmani text for display.
-  return `tilawah:page2:${page}:${editions.join(',')}`
+  // v3: also carries quran.com's per-word QCF v2 glyphs for the ayah list.
+  return `tilawah:page3:${page}:${editions.join(',')}`
 }
 
-// The official King Fahd "Uthmani" text (quran.com), keyed by "surah:ayah".
-// This is the text the KFGQPC Uthmanic Hafs font is designed for, so tajwīd
-// marks render exactly as the printed Madani mushaf. Returns null on failure
-// (the reader then falls back to the alquran.cloud Arabic text).
-async function fetchUthmaniMap(page) {
+// Per-ayah QCF v2 glyph words from quran.com, keyed by "surah:ayah". Each ayah
+// gets { words: [{ code, page, end }], text } where `code` is the QCF glyph
+// (rendered in the matching per-page font for an exact mushaf look) and `text`
+// is the reconstructed Uthmani string used as a fallback. Returns null on
+// failure (the reader then falls back to the alquran.cloud Arabic text).
+async function fetchPageWords(page) {
   try {
-    const url = `${QURAN_API}/verses/by_page/${page}?fields=text_uthmani&per_page=300`
+    const url =
+      `${QURAN_API}/verses/by_page/${page}` +
+      `?words=true&per_page=300` +
+      `&word_fields=code_v2,text_uthmani,page_number,char_type_name`
     const res = await fetch(url)
     if (!res.ok) return null
     const json = await res.json()
     const verses = json?.verses
     if (!Array.isArray(verses)) return null
-    const map = {}
+    const byVerse = {}
     for (const v of verses) {
-      if (v.verse_key && v.text_uthmani) map[v.verse_key] = v.text_uthmani
+      const words = []
+      let text = ''
+      for (const w of v.words || []) {
+        const end = w.char_type_name === 'end'
+        if (w.code_v2) words.push({ code: w.code_v2, page: w.page_number || page, end })
+        if (!end && w.text_uthmani) text += (text ? ' ' : '') + w.text_uthmani
+      }
+      if (words.length) byVerse[v.verse_key] = { words, text }
     }
-    return map
+    return byVerse
   } catch {
     return null
   }
@@ -90,9 +101,9 @@ export async function getPage(page, opts = {}) {
 
   // The page endpoint serves a single edition per request (unlike surah/ayah,
   // it has no /editions/ multiplexing), so fetch each edition in parallel and
-  // zip the ayahs together by index. In parallel, fetch the official Uthmani
-  // text from quran.com for display.
-  const [editionsData, uthmaniMap] = await Promise.all([
+  // zip the ayahs together by index. In parallel, fetch the official QCF v2
+  // glyph words from quran.com for an exact mushaf rendering of each ayah.
+  const [editionsData, wordsByVerse] = await Promise.all([
     Promise.all(
       editions.map(async (edition) => {
         const url = `${BASE}/page/${page}/${edition}`
@@ -106,10 +117,10 @@ export async function getPage(page, opts = {}) {
         return json.data
       })
     ),
-    fetchUthmaniMap(page),
+    fetchPageWords(page),
   ])
 
-  const result = normalise(editionsData, page, arabicEdition, translationEdition, uthmaniMap)
+  const result = normalise(editionsData, page, arabicEdition, translationEdition, wordsByVerse)
   try {
     sessionStorage.setItem(key, JSON.stringify(result))
   } catch {
@@ -142,7 +153,7 @@ function normalise(
   page,
   arabicEdition = ARABIC,
   translationEdition = TRANSLATION,
-  uthmaniMap = null
+  wordsByVerse = null
 ) {
   const byIdentifier = {}
   editionsData.forEach((ed) => {
@@ -159,12 +170,14 @@ function normalise(
     // every surah except Al-Faatiha (ayah 1 is the basmalah) and At-Tawba.
     const showBasmalah =
       a.numberInSurah === 1 && surahNumber !== 1 && surahNumber !== 9
-    // Prefer the official quran.com Uthmani text (matches the KFGQPC font); it
-    // already excludes the leading basmalah. Otherwise fall back to the
-    // alquran.cloud text, splitting off any inline basmalah.
-    const official = uthmaniMap?.[`${surahNumber}:${a.numberInSurah}`]
-    const arabic = official || splitBasmalah(a.text, surahNumber, a.numberInSurah).text
+    // Prefer the official QCF v2 glyphs (exact mushaf rendering). `words` is
+    // used when its page fonts are loaded; `arabic` (the reconstructed Uthmani
+    // string, or the alquran.cloud text) is the fallback shown otherwise.
+    const vw = wordsByVerse?.[`${surahNumber}:${a.numberInSurah}`]
+    const words = vw?.words || null
+    const arabic = vw?.text || splitBasmalah(a.text, surahNumber, a.numberInSurah).text
     return {
+      words,
       number: a.number,
       numberInSurah: a.numberInSurah,
       surahNumber,

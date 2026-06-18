@@ -19,6 +19,7 @@ export default function AyahCard({
   showAudio,
   isPlaying,
   onTogglePlay,
+  glyphs, // true once the QCF page fonts for this ayah's words are loaded
 }) {
   return (
     <article className="border-b border-teal/5 py-6 last:border-b-0">
@@ -31,16 +32,37 @@ export default function AyahCard({
           />
         )}
 
-        <p
-          dir="rtl"
-          lang="ar"
-          className="grow font-quran text-3xl leading-[2.3] text-teal sm:text-4xl"
-        >
-          {ayah.arabic}{' '}
-          <span className="font-arabic text-gold text-xl mx-1.5">
-            ﴿{toArabicNumber(ayah.numberInSurah)}﴾
-          </span>
-        </p>
+        {glyphs ? (
+          // Exact mushaf rendering: each word in its QCF v2 page glyph; the
+          // ayah-end word carries the ornate number, shown in gold.
+          <p
+            dir="rtl"
+            lang="ar"
+            className="grow text-3xl leading-[2.5] text-teal sm:text-4xl"
+          >
+            {ayah.words.map((w, i) => (
+              <span
+                key={i}
+                style={{ fontFamily: `qcf2p${w.page}` }}
+                className={w.end ? 'text-gold' : undefined}
+              >
+                {w.code}
+                {i < ayah.words.length - 1 ? ' ' : ''}
+              </span>
+            ))}
+          </p>
+        ) : (
+          <p
+            dir="rtl"
+            lang="ar"
+            className="grow font-quran text-3xl leading-[2.3] text-teal sm:text-4xl"
+          >
+            {ayah.arabic}{' '}
+            <span className="font-arabic text-gold text-xl mx-1.5">
+              ﴿{toArabicNumber(ayah.numberInSurah)}﴾
+            </span>
+          </p>
+        )}
       </div>
 
       {showTransliteration && ayah.transliteration && (
