@@ -26,6 +26,38 @@ import {
   setLastPage,
 } from '../utils/storage'
 
+// A titled, collapsible group used to keep the Settings page tidy.
+function Collapse({ title, defaultOpen = false, children }) {
+  const [open, setOpen] = useState(defaultOpen)
+  return (
+    <section className="mt-3 overflow-hidden rounded-2xl border border-teal/10">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between gap-3 px-4 py-4 text-left"
+      >
+        <span className="text-sm font-semibold text-teal">{title}</span>
+        <span className="text-muted">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            aria-hidden="true"
+            className={`transition-transform ${open ? 'rotate-180' : ''}`}
+          >
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </span>
+      </button>
+      {open && <div className="px-4 pb-5">{children}</div>}
+    </section>
+  )
+}
+
 function Toggle({ label, description, checked, onChange }) {
   return (
     <label className="flex cursor-pointer items-center justify-between gap-4 py-4">
@@ -123,8 +155,9 @@ export default function Settings() {
         </div>
       </section>
 
+      <Collapse title={t('settings.appearance')} defaultOpen>
       {/* App language */}
-      <section className="mt-10">
+      <section className="mt-6 first:mt-0">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
           {t('settings.appLanguage')}
         </h2>
@@ -142,7 +175,7 @@ export default function Settings() {
       </section>
 
       {/* Theme */}
-      <section className="mt-10">
+      <section className="mt-6 first:mt-0">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
           {t('settings.theme')}
         </h2>
@@ -168,7 +201,7 @@ export default function Settings() {
       </section>
 
       {/* Reading size */}
-      <section className="mt-10">
+      <section className="mt-6 first:mt-0">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
           {t('settings.readingSize')}
         </h2>
@@ -192,6 +225,7 @@ export default function Settings() {
           ))}
         </div>
       </section>
+      </Collapse>
 
       {/* Name */}
       <section className="mt-10">
@@ -209,8 +243,9 @@ export default function Settings() {
         />
       </section>
 
+      <Collapse title={t('settings.reading')}>
       {/* Goal */}
-      <section className="mt-10">
+      <section className="mt-6 first:mt-0">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
           {t('settings.dailyGoal')}
         </h2>
@@ -258,7 +293,7 @@ export default function Settings() {
       </section>
 
       {/* Reading view */}
-      <section className="mt-10">
+      <section className="mt-6 first:mt-0">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
           {t('settings.readingView')}
         </h2>
@@ -290,7 +325,7 @@ export default function Settings() {
       </section>
 
       {/* Reading aids (apply to the Translation view) */}
-      <section className="mt-10">
+      <section className="mt-6 first:mt-0">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
           {t('settings.readingAids')}
         </h2>
@@ -355,7 +390,7 @@ export default function Settings() {
       </section>
 
       {/* Daily reflection */}
-      <section className="mt-10">
+      <section className="mt-6 first:mt-0">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
           {t('settings.dailyReflection')}
         </h2>
@@ -383,7 +418,7 @@ export default function Settings() {
       </section>
 
       {/* Reading position */}
-      <section className="mt-10">
+      <section className="mt-6 first:mt-0">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
           {t('settings.readingPosition')}
         </h2>
@@ -399,12 +434,15 @@ export default function Settings() {
           />
         </div>
       </section>
+      </Collapse>
 
-      {/* Prayer-time reminders */}
-      <Reminders />
+      <Collapse title={t('reminders.title')}>
+        <Reminders />
+      </Collapse>
 
-      {/* Back up & sync */}
-      <SyncSettings />
+      <Collapse title={t('sync.title')}>
+        <SyncSettings />
+      </Collapse>
 
       {/* Reset */}
       <section className="mt-12">

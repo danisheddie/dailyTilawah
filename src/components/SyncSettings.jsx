@@ -86,11 +86,8 @@ export default function SyncSettings() {
   }
 
   return (
-    <section className="mt-10">
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-        {t('sync.title')}
-      </h2>
-      <p className="mt-2 text-xs leading-relaxed text-muted">{t('sync.intro')}</p>
+    <div>
+      <p className="text-xs leading-relaxed text-muted">{t('sync.intro')}</p>
 
       {!configured && (
         <p className="mt-3 rounded-xl bg-gold/10 px-3 py-2 text-xs text-muted">
@@ -170,6 +167,6 @@ export default function SyncSettings() {
           </div>
         </div>
       )}
-    </section>
+    </div>
   )
 }

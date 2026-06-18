@@ -126,13 +126,8 @@ export default function Reminders() {
   }
 
   return (
-    <section className="mt-10">
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-        {t('reminders.title')}
-      </h2>
-      <p className="mt-2 text-xs leading-relaxed text-muted">
-        {t('reminders.sub')}
-      </p>
+    <div>
+      <p className="text-xs leading-relaxed text-muted">{t('reminders.sub')}</p>
 
       {/* Enable toggle */}
       <div className="mt-4 flex items-center justify-between gap-4">
@@ -248,6 +243,6 @@ export default function Reminders() {
           </ul>
         </div>
       )}
-    </section>
+    </div>
   )
 }
