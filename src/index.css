@@ -14,8 +14,32 @@
   font-display: swap;
 }
 
+/* Theme palettes. `paper` = base surface (and text on accents); `teal` =
+   primary/foreground (and accent fills); they invert between light and dark so
+   the existing bg-teal/text-paper combos stay legible everywhere. */
 :root {
   color-scheme: light;
+  --c-paper: 250 249 246;
+  --c-teal: 27 79 114;
+  --c-gold: 201 168 76;
+  --c-muted: 107 114 128;
+  --read-scale: 1;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+  --c-paper: 16 21 27; /* dark surface (and dark text on light accents) */
+  --c-teal: 214 228 238; /* light foreground (and light accent fills) */
+  --c-gold: 212 179 92;
+  --c-muted: 151 161 173;
+}
+
+[data-theme='sepia'] {
+  color-scheme: light;
+  --c-paper: 244 236 219; /* warm cream */
+  --c-teal: 74 60 44; /* dark warm brown */
+  --c-gold: 154 122 58;
+  --c-muted: 122 106 85;
 }
 
 html,
@@ -26,8 +50,8 @@ body,
 
 body {
   margin: 0;
-  background-color: #faf9f6;
-  color: #1b4f72;
+  background-color: rgb(var(--c-paper));
+  color: rgb(var(--c-teal));
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -36,13 +60,13 @@ body {
 /* Calm, minimal scrollbars */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #d8d4cb transparent;
+  scrollbar-color: rgb(var(--c-muted) / 0.4) transparent;
 }
 *::-webkit-scrollbar {
   width: 6px;
 }
 *::-webkit-scrollbar-thumb {
-  background-color: #d8d4cb;
+  background-color: rgb(var(--c-muted) / 0.4);
   border-radius: 9999px;
 }
 

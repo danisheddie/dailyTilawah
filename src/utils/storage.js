@@ -52,6 +52,10 @@ export const DEFAULT_SETTINGS = {
   readingView: 'list',
   // App UI language: 'en' | 'ms' | 'id'.
   appLang: 'en',
+  // Reading theme: 'light' | 'dark' | 'sepia'.
+  theme: 'light',
+  // Arabic reading size: 's' | 'm' | 'l'.
+  readingSize: 'm',
   // Daily home-screen reflection: 'both' | 'quran' | 'hadith' | 'off'.
   reflectionMode: 'both',
   showTranslation: true,

@@ -7,6 +7,7 @@ import SyncSettings from './SyncSettings'
 import StartingPoint from './StartingPoint'
 import { RECITERS, TRANSLATIONS } from '../utils/api'
 import { useLang, LANGUAGES } from '../utils/i18n.jsx'
+import { applyTheme } from '../utils/theme'
 import {
   GOALS,
   MIN_CUSTOM_GOAL,
@@ -84,6 +85,11 @@ export default function Settings() {
     setSettings(setSetting(key, value))
   }
 
+  function changeTheme(theme) {
+    setSettings(setSetting('theme', theme))
+    applyTheme(theme)
+  }
+
   function doReset() {
     resetProgress()
     setConfirmReset(false)
@@ -133,6 +139,58 @@ export default function Settings() {
             </option>
           ))}
         </select>
+      </section>
+
+      {/* Theme */}
+      <section className="mt-10">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+          {t('settings.theme')}
+        </h2>
+        <div className="mt-3 grid grid-cols-3 gap-3">
+          {[
+            ['light', 'settings.themeLight'],
+            ['dark', 'settings.themeDark'],
+            ['sepia', 'settings.themeSepia'],
+          ].map(([id, key]) => (
+            <button
+              key={id}
+              onClick={() => changeTheme(id)}
+              className={`rounded-2xl border px-2 py-3 text-sm font-medium transition ${
+                settings.theme === id
+                  ? 'border-teal bg-teal text-paper'
+                  : 'border-teal/15 text-teal active:scale-[0.99]'
+              }`}
+            >
+              {t(key)}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* Reading size */}
+      <section className="mt-10">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+          {t('settings.readingSize')}
+        </h2>
+        <div className="mt-3 grid grid-cols-3 gap-3">
+          {[
+            ['s', 'settings.sizeSmall'],
+            ['m', 'settings.sizeMedium'],
+            ['l', 'settings.sizeLarge'],
+          ].map(([id, key]) => (
+            <button
+              key={id}
+              onClick={() => toggle('readingSize', id)}
+              className={`rounded-2xl border px-2 py-3 font-medium transition ${
+                settings.readingSize === id
+                  ? 'border-teal bg-teal text-paper'
+                  : 'border-teal/15 text-teal active:scale-[0.99]'
+              } ${id === 's' ? 'text-xs' : id === 'l' ? 'text-base' : 'text-sm'}`}
+            >
+              {t(key)}
+            </button>
+          ))}
+        </div>
       </section>
 
       {/* Name */}

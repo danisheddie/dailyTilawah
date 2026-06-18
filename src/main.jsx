@@ -3,7 +3,13 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App.jsx'
 import { LanguageProvider } from './utils/i18n.jsx'
+import { getSettings } from './utils/storage'
+import { applyTheme } from './utils/theme'
 import './index.css'
+
+// Sync the theme (and the browser UI colour) with the saved preference. The
+// data-theme attribute is also set pre-paint by an inline script in index.html.
+applyTheme(getSettings().theme)
 
 // Guarantee the official KFGQPC Uthmanic Hafs font is registered on every
 // device (with the correct base path), so silent-letter marks like the ṣifr

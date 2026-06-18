@@ -4,10 +4,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        paper: '#FAF9F6',
-        teal: '#1B4F72',
-        gold: '#C9A84C',
-        muted: '#6B7280',
+        // Themeable via CSS variables (see index.css). Channels are space-
+        // separated RGB so Tailwind's /opacity modifiers keep working.
+        paper: 'rgb(var(--c-paper) / <alpha-value>)',
+        teal: 'rgb(var(--c-teal) / <alpha-value>)',
+        gold: 'rgb(var(--c-gold) / <alpha-value>)',
+        muted: 'rgb(var(--c-muted) / <alpha-value>)',
       },
       fontFamily: {
         arabic: ['Amiri', 'serif'],

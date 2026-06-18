@@ -225,6 +225,7 @@ export default function Reader() {
                 )}
                 <AyahCard
                   ayah={ayah}
+                  size={settings.readingSize}
                   glyphs={
                     !!ayah.words?.length &&
                     ayah.words.every((w) => glyphPages.has(w.page))

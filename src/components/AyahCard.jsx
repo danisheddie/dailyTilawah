@@ -12,6 +12,12 @@ function toArabicNumber(n) {
     .join('')
 }
 
+const ARABIC_SIZE = {
+  s: 'text-2xl sm:text-3xl',
+  m: 'text-3xl sm:text-4xl',
+  l: 'text-4xl sm:text-5xl',
+}
+
 export default function AyahCard({
   ayah,
   showTranslation,
@@ -20,7 +26,9 @@ export default function AyahCard({
   isPlaying,
   onTogglePlay,
   glyphs, // true once the QCF page fonts for this ayah's words are loaded
+  size = 'm',
 }) {
+  const arabicSize = ARABIC_SIZE[size] || ARABIC_SIZE.m
   return (
     <article className="border-b border-teal/5 py-6 last:border-b-0">
       <div className="flex items-start justify-between gap-3">
@@ -38,7 +46,7 @@ export default function AyahCard({
           <p
             dir="rtl"
             lang="ar"
-            className="grow text-3xl leading-[2.5] text-teal sm:text-4xl"
+            className={`grow leading-[2.5] text-teal ${arabicSize}`}
           >
             {ayah.words.map((w, i) => (
               <span
@@ -55,7 +63,7 @@ export default function AyahCard({
           <p
             dir="rtl"
             lang="ar"
-            className="grow font-quran text-3xl leading-[2.3] text-teal sm:text-4xl"
+            className={`grow font-quran leading-[2.3] text-teal ${arabicSize}`}
           >
             {ayah.arabic}{' '}
             <span className="font-arabic text-gold text-xl mx-1.5">
