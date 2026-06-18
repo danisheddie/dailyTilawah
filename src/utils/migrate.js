@@ -33,13 +33,15 @@ export function runMigration() {
       <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;font-family:Inter,system-ui,sans-serif;color:#1b4f72;background:#faf9f6;padding:24px;text-align:center">
         <div style="font-size:30px" aria-hidden="true">🕌</div>
         <h1 style="font-size:20px;font-weight:600;margin:0">Tilawah has a new home</h1>
-        <p style="color:#6b7280;max-width:300px;line-height:1.5;margin:0">
-          We've moved to <b>dailytilawah.app</b>. Taking you there now —
-          please bookmark and share this link.
+        <p style="color:#6b7280;max-width:320px;line-height:1.5;margin:0">
+          We've moved to <b>dailytilawah.app</b> — please bookmark and share
+          this link. Your progress comes with you.
         </p>
-        <a href="${url}" style="margin-top:8px;background:#1b4f72;color:#faf9f6;padding:12px 22px;border-radius:16px;text-decoration:none;font-weight:600">Continue</a>
+        <a href="${url}" style="margin-top:8px;background:#1b4f72;color:#faf9f6;padding:12px 24px;border-radius:16px;text-decoration:none;font-weight:600">Continue to dailytilawah.app</a>
+        <p style="color:#9aa3ad;font-size:12px;margin:4px 0 0">Redirecting automatically…</p>
       </div>`
-    setTimeout(() => location.replace(url), 2200)
+    // User taps Continue; otherwise auto-redirect as a safety net.
+    setTimeout(() => location.replace(url), 8000)
     return true
   }
 
