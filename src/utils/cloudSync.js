@@ -24,6 +24,7 @@ export const SYNC_KEYS = [
   'tilawah:todayProgress',
   'tilawah:progressDate',
   'tilawah:settings',
+  'tilawah:bookmarks',
 ]
 
 const CODE_KEY = 'tilawah:syncCode'
@@ -214,6 +215,20 @@ export function mergeSnapshots(a = {}, b = {}) {
   const aName = a['tilawah:userName'] || ''
   const bName = b['tilawah:userName'] || ''
   out['tilawah:userName'] = aName && bName ? newer['tilawah:userName'] : aName || bName
+
+  // bookmarks: union by page (so neither device loses a saved page)
+  const bm = {}
+  for (const list of [a['tilawah:bookmarks'], b['tilawah:bookmarks']]) {
+    if (Array.isArray(list)) {
+      for (const item of list) {
+        if (item && typeof item.page === 'number') {
+          bm[item.page] = bm[item.page] || item
+        }
+      }
+    }
+  }
+  const mergedBookmarks = Object.values(bm).sort((x, y) => x.page - y.page)
+  if (mergedBookmarks.length) out['tilawah:bookmarks'] = mergedBookmarks
 
   out._updatedAt = Math.max(aT, bT)
   return out

@@ -75,6 +75,15 @@ const en = {
   'reader.streak': '{n}-day streak',
   'reader.readAnother': 'Read another page',
   'reader.doneToday': 'Done for today',
+  'jump.title': 'Jump to',
+  'jump.bookmarks': 'Bookmarks',
+  'jump.juz': 'Juz',
+  'jump.surah': 'Surah',
+  'jump.noBookmarks':
+    'No bookmarks yet. Tap the bookmark icon while reading to save a page.',
+  'jump.removeBookmark': 'Remove bookmark',
+  'jump.addBookmark': 'Bookmark this page',
+  'jump.open': 'Jump to Juz or Surah',
 
   'settings.title': 'Settings',
   'settings.dayStreak': 'day streak',
@@ -258,6 +267,15 @@ const ms = {
   'reader.streak': 'rentetan {n} hari',
   'reader.readAnother': 'Baca satu lagi halaman',
   'reader.doneToday': 'Cukup untuk hari ini',
+  'jump.title': 'Pergi ke',
+  'jump.bookmarks': 'Penanda',
+  'jump.juz': 'Juzuk',
+  'jump.surah': 'Surah',
+  'jump.noBookmarks':
+    'Tiada penanda lagi. Ketik ikon penanda semasa membaca untuk menyimpan halaman.',
+  'jump.removeBookmark': 'Buang penanda',
+  'jump.addBookmark': 'Tanda halaman ini',
+  'jump.open': 'Pergi ke Juzuk atau Surah',
 
   'settings.title': 'Tetapan',
   'settings.dayStreak': 'hari rentetan',
@@ -444,6 +462,15 @@ const id = {
   'reader.streak': 'rentetan {n} hari',
   'reader.readAnother': 'Baca halaman lain',
   'reader.doneToday': 'Cukup untuk hari ini',
+  'jump.title': 'Lompat ke',
+  'jump.bookmarks': 'Penanda',
+  'jump.juz': 'Juz',
+  'jump.surah': 'Surah',
+  'jump.noBookmarks':
+    'Belum ada penanda. Ketuk ikon penanda saat membaca untuk menyimpan halaman.',
+  'jump.removeBookmark': 'Hapus penanda',
+  'jump.addBookmark': 'Tandai halaman ini',
+  'jump.open': 'Lompat ke Juz atau Surah',
 
   'settings.title': 'Pengaturan',
   'settings.dayStreak': 'hari rentetan',

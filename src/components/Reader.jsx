@@ -6,11 +6,19 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getPage, getMushafPage, TOTAL_PAGES } from '../utils/api'
-import { getLastPage, getSettings, setSetting, recordPageRead } from '../utils/storage'
+import {
+  getLastPage,
+  getSettings,
+  setSetting,
+  recordPageRead,
+  isBookmarked,
+  toggleBookmark,
+} from '../utils/storage'
 import { reportRead } from '../utils/sync'
 import { schedulePush } from '../utils/cloudSync'
 import AyahCard from './AyahCard'
 import MushafPage from './MushafPage'
+import JumpSheet from './JumpSheet'
 import { ensurePageFont } from '../utils/fonts'
 import { useLang } from '../utils/i18n.jsx'
 
@@ -37,6 +45,8 @@ export default function Reader() {
   const [playingIndex, setPlayingIndex] = useState(null)
   const [completion, setCompletion] = useState(null) // null | {justCompleted}
   const [glyphPages, setGlyphPages] = useState(() => new Set()) // QCF fonts ready
+  const [showJump, setShowJump] = useState(false)
+  const [bookmarked, setBookmarked] = useState(false)
 
   const audioRef = useRef(null)
   const scrollRef = useRef(null)
@@ -94,8 +104,20 @@ export default function Reader() {
   useEffect(() => {
     load(page)
     scrollRef.current?.scrollTo({ top: 0 })
+    setBookmarked(isBookmarked(page))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, mode])
+
+  function toggleBm() {
+    toggleBookmark(page)
+    setBookmarked((b) => !b)
+    schedulePush()
+  }
+
+  function jumpTo(p) {
+    setShowJump(false)
+    if (p !== page) setPage(p)
+  }
 
   // --- audio (list view only) ----------------------------------------------
   function stopAudio() {
@@ -180,7 +202,28 @@ export default function Reader() {
             </p>
           )}
         </div>
-        <span className="w-[34px]" aria-hidden="true" />
+        <div className="flex items-center">
+          <button
+            onClick={toggleBm}
+            aria-label={bookmarked ? t('jump.removeBookmark') : t('jump.addBookmark')}
+            className={`rounded-full p-1.5 transition active:scale-90 ${
+              bookmarked ? 'text-gold' : 'text-muted'
+            }`}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill={bookmarked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+            </svg>
+          </button>
+          <button
+            onClick={() => setShowJump(true)}
+            aria-label={t('jump.open')}
+            className="rounded-full p-1.5 text-muted transition active:scale-90"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M4 6h16M4 12h16M4 18h10" />
+            </svg>
+          </button>
+        </div>
       </header>
 
       {/* Body */}
@@ -262,6 +305,9 @@ export default function Reader() {
           </div>
         </div>
       )}
+
+      {/* Jump-to panel: bookmarks, juz, surah */}
+      {showJump && <JumpSheet onJump={jumpTo} onClose={() => setShowJump(false)} />}
 
       {/* Completion celebration */}
       {completion && (

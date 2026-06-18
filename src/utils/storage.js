@@ -19,6 +19,7 @@ const KEYS = {
   clientId: 'tilawah:clientId',
   customGoalPages: 'tilawah:customGoalPages',
   betaDismissed: 'tilawah:betaDismissed',
+  bookmarks: 'tilawah:bookmarks',
 }
 
 // The reading goals the user can choose from. `pages` is the daily target
@@ -199,6 +200,33 @@ export function setLastPage(page) {
 
 export function getTotalPagesRead() {
   return read(KEYS.totalPagesRead, 0)
+}
+
+// --- bookmarks -------------------------------------------------------------
+// A bookmark is a saved page: { page, ts }. Kept sorted by page.
+
+export function getBookmarks() {
+  const list = read(KEYS.bookmarks, [])
+  return Array.isArray(list) ? list : []
+}
+
+export function isBookmarked(page) {
+  return getBookmarks().some((b) => b.page === page)
+}
+
+export function toggleBookmark(page) {
+  const list = getBookmarks()
+  const next = list.some((b) => b.page === page)
+    ? list.filter((b) => b.page !== page)
+    : [...list, { page, ts: Date.now() }].sort((a, b) => a.page - b.page)
+  write(KEYS.bookmarks, next)
+  return next
+}
+
+export function removeBookmark(page) {
+  const next = getBookmarks().filter((b) => b.page !== page)
+  write(KEYS.bookmarks, next)
+  return next
 }
 
 // --- daily progress --------------------------------------------------------
