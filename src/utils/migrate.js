@@ -20,15 +20,27 @@ function decode(str) {
 // Returns true if a redirect was started (the caller should not boot the app).
 export function runMigration() {
   // Old site → carry the local snapshot to the new domain, then go there.
+  // Show a brief "we've moved" splash first so anyone opening a shared old
+  // link actually sees (and can bookmark/re-share) the new address.
   if (location.hostname === OLD_HOST) {
+    let url
     try {
-      const payload = encode(exportSnapshot())
-      location.replace(`${NEW_ORIGIN}/#migrate=${payload}`)
-      return true
+      url = `${NEW_ORIGIN}/#migrate=${encode(exportSnapshot())}`
     } catch {
-      location.replace(NEW_ORIGIN)
-      return true
+      url = NEW_ORIGIN
     }
+    document.body.innerHTML = `
+      <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;font-family:Inter,system-ui,sans-serif;color:#1b4f72;background:#faf9f6;padding:24px;text-align:center">
+        <div style="font-size:30px" aria-hidden="true">🕌</div>
+        <h1 style="font-size:20px;font-weight:600;margin:0">Tilawah has a new home</h1>
+        <p style="color:#6b7280;max-width:300px;line-height:1.5;margin:0">
+          We've moved to <b>dailytilawah.app</b>. Taking you there now —
+          please bookmark and share this link.
+        </p>
+        <a href="${url}" style="margin-top:8px;background:#1b4f72;color:#faf9f6;padding:12px 22px;border-radius:16px;text-decoration:none;font-weight:600">Continue</a>
+      </div>`
+    setTimeout(() => location.replace(url), 2200)
+    return true
   }
 
   // New site → import an incoming snapshot once, merging with anything already
