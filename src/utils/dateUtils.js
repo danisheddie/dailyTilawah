@@ -28,18 +28,83 @@ export function formatGregorian(date = new Date()) {
   }).format(date)
 }
 
-// e.g. "29 Dhuʻl-Hijjah 1447 AH" using the Intl Islamic calendar.
+// Hijri month names (transliterated) — supplied by us rather than relying on
+// the device's locale data, which is missing/incorrect on some Android builds
+// (they render Gregorian names like "January" and a "BC" era for the Islamic
+// calendar). The same names are used across app languages.
+const HIJRI_MONTHS = [
+  'Muharram',
+  'Safar',
+  'Rabiʻ al-Awwal',
+  'Rabiʻ al-Thani',
+  'Jumada al-Ula',
+  'Jumada al-Thani',
+  'Rajab',
+  'Shaʻban',
+  'Ramadan',
+  'Shawwal',
+  'Dhuʻl-Qiʻdah',
+  'Dhuʻl-Hijjah',
+]
+
+// Arithmetic (Kuwaiti/tabular) Gregorian→Hijri conversion. Device-independent
+// fallback for runtimes that don't apply the Islamic calendar at all.
+function gregorianToHijri(date) {
+  const day = date.getDate()
+  const month = date.getMonth() + 1
+  const year = date.getFullYear()
+  const a = Math.floor((14 - month) / 12)
+  const y = year + 4800 - a
+  const m = month + 12 * a - 3
+  const jdn =
+    day +
+    Math.floor((153 * m + 2) / 5) +
+    365 * y +
+    Math.floor(y / 4) -
+    Math.floor(y / 100) +
+    Math.floor(y / 400) -
+    32045
+  let l = jdn - 1948440 + 10632
+  const n = Math.floor((l - 1) / 10631)
+  l = l - 10631 * n + 354
+  const j =
+    Math.floor((10985 - l) / 5316) * Math.floor((50 * l) / 17719) +
+    Math.floor(l / 5670) * Math.floor((43 * l) / 15238)
+  l =
+    l -
+    Math.floor((30 - j) / 15) * Math.floor((17719 * j) / 50) -
+    Math.floor(j / 16) * Math.floor((15238 * j) / 43) +
+    29
+  const hMonth = Math.floor((24 * l) / 709)
+  const hDay = l - Math.floor((709 * hMonth) / 24)
+  const hYear = 30 * n + j - 30
+  return { year: hYear, month: hMonth, day: hDay }
+}
+
+// e.g. "Muharram 3, 1448 AH". Uses the Intl Islamic (Umm al-Qura) calendar for
+// the numbers — which is reliable even where the *names* aren't — and our own
+// month names + era. Falls back to the arithmetic conversion if Intl doesn't
+// apply the Islamic calendar (year would come back Gregorian-sized).
 export function formatHijri(date = new Date()) {
+  let day, month, year
   try {
-    const formatted = new Intl.DateTimeFormat('en-TN-u-ca-islamic', {
+    const parts = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {
       day: 'numeric',
-      month: 'long',
+      month: 'numeric',
       year: 'numeric',
-    }).format(date)
-    // Some runtimes already include the era ("AH") in the formatted year;
-    // only add it when it's missing, to avoid "1448 AH AH".
-    return /\bAH\b/.test(formatted) ? formatted : `${formatted} AH`
+    }).formatToParts(date)
+    const get = (t) => parts.find((p) => p.type === t)?.value
+    day = parseInt(get('day'), 10)
+    month = parseInt(get('month'), 10)
+    year = parseInt(get('year'), 10)
   } catch {
-    return ''
+    /* fall through to arithmetic */
   }
+  // Validate: a real Hijri year for this era is ~1300–1600; anything else (e.g.
+  // a Gregorian 2026) means the Islamic calendar wasn't applied.
+  if (!(month >= 1 && month <= 12 && year > 1000 && year < 1700)) {
+    ;({ day, month, year } = gregorianToHijri(date))
+  }
+  if (!(month >= 1 && month <= 12)) return ''
+  return `${HIJRI_MONTHS[month - 1]} ${day}, ${year} AH`
 }
