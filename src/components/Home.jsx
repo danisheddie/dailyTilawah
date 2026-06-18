@@ -43,8 +43,8 @@ export default function Home() {
   const fmt = (n) => (Number.isInteger(n) ? n : n.toFixed(1))
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-md flex-col px-6 py-8">
-      <header className="flex items-start justify-between">
+    <div className="mx-auto flex h-[100dvh] max-w-md flex-col overflow-hidden px-6 pb-6 pt-6">
+      <header className="flex shrink-0 items-start justify-between">
         <div>
           <p className="text-sm font-medium text-teal">{formatHijri()}</p>
           <p className="mt-0.5 text-xs text-muted">{formatGregorian()}</p>
@@ -63,32 +63,38 @@ export default function Home() {
         </button>
       </header>
 
-      <BetaNotice />
-
-      {name && (
-        <div className="mt-8 text-center">
-          <p className="text-xs uppercase tracking-wide text-muted">
-            {t('home.salam')}
-          </p>
-          <p className="mt-1 text-2xl font-semibold text-teal">{name}</p>
-        </div>
-      )}
-
-      <div className="mt-12 flex flex-col items-center text-center">
-        <StreakBadge streak={streak} size="lg" />
-        <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted">
-          {completedToday
-            ? t('home.complete')
-            : streak > 0
-              ? t('home.keepStreak')
-              : t('home.beginToday')}
-        </p>
+      <div className="shrink-0">
+        <BetaNotice />
       </div>
 
-      <DailyReflection className="mt-10" />
+      {/* Middle: greeting, streak, reflection — centered, absorbs slack */}
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 text-center">
+        {name && (
+          <div>
+            <p className="text-xs uppercase tracking-wide text-muted">
+              {t('home.salam')}
+            </p>
+            <p className="mt-1 text-2xl font-semibold text-teal">{name}</p>
+          </div>
+        )}
 
-      <div className="mt-auto pt-12">
-        <div className="mb-3 flex items-center justify-between text-sm">
+        <div className="flex flex-col items-center">
+          <StreakBadge streak={streak} size="lg" />
+          <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted">
+            {completedToday
+              ? t('home.complete')
+              : streak > 0
+                ? t('home.keepStreak')
+                : t('home.beginToday')}
+          </p>
+        </div>
+
+        <DailyReflection className="w-full" />
+      </div>
+
+      {/* Bottom: today's goal + action */}
+      <div className="shrink-0 pt-4">
+        <div className="mb-2 flex items-center justify-between text-sm">
           <span className="font-medium text-teal">{t('home.todayGoal')}</span>
           <span className="text-muted">
             {fmt(Math.min(todayProgress, goal.pages))} / {fmt(goal.pages)}{' '}
@@ -103,7 +109,7 @@ export default function Home() {
         </div>
 
         <button
-          className="btn-primary mt-8 w-full"
+          className="btn-primary mt-5 w-full"
           onClick={() => navigate('/read')}
         >
           {completedToday || started
@@ -111,7 +117,7 @@ export default function Home() {
             : t('home.startToday')}
         </button>
         {started && (
-          <p className="mt-3 text-center text-xs text-muted">
+          <p className="mt-2 text-center text-xs text-muted">
             {t('home.resuming', { page: lastPage })}
           </p>
         )}

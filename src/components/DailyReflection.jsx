@@ -12,7 +12,7 @@ export default function DailyReflection({ className = '' }) {
 
   return (
     <figure
-      className={`rounded-3xl border border-teal/10 bg-teal/[0.04] px-6 py-6 text-center ${className}`}
+      className={`rounded-3xl border border-teal/10 bg-teal/[0.04] px-5 py-4 text-center ${className}`}
     >
       <span className="text-[11px] uppercase tracking-[0.18em] text-gold">
         {r.type === "Qur'an" ? t('reflection.verse') : t('reflection.hadith')}
@@ -22,17 +22,17 @@ export default function DailyReflection({ className = '' }) {
         <p
           dir="rtl"
           lang="ar"
-          className="mt-3 font-quran text-2xl leading-[2] text-teal"
+          className="mt-2 font-quran text-xl leading-loose text-teal"
         >
           {r.arabic}
         </p>
       )}
 
-      <blockquote className="mt-3 text-[15px] leading-relaxed text-teal/90">
+      <blockquote className="mt-2 text-sm leading-relaxed text-teal/90">
         “{r.text}”
       </blockquote>
 
-      <figcaption className="mt-3 text-xs font-medium text-muted">
+      <figcaption className="mt-2 text-xs font-medium text-muted">
         — {r.source}
       </figcaption>
     </figure>
