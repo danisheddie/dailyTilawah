@@ -85,14 +85,16 @@ function gregorianToHijri(date) {
 // the numbers — which is reliable even where the *names* aren't — and our own
 // month names + era. Falls back to the arithmetic conversion if Intl doesn't
 // apply the Islamic calendar (year would come back Gregorian-sized).
-export function formatHijri(date = new Date()) {
+export function formatHijri(date = new Date(), offset = 0) {
+  // Apply the user's adjustment (±days) to align with their local sighting.
+  const d = offset ? new Date(date.getTime() + offset * 86400000) : date
   let day, month, year
   try {
     const parts = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {
       day: 'numeric',
       month: 'numeric',
       year: 'numeric',
-    }).formatToParts(date)
+    }).formatToParts(d)
     const get = (t) => parts.find((p) => p.type === t)?.value
     day = parseInt(get('day'), 10)
     month = parseInt(get('month'), 10)
@@ -103,7 +105,7 @@ export function formatHijri(date = new Date()) {
   // Validate: a real Hijri year for this era is ~1300–1600; anything else (e.g.
   // a Gregorian 2026) means the Islamic calendar wasn't applied.
   if (!(month >= 1 && month <= 12 && year > 1000 && year < 1700)) {
-    ;({ day, month, year } = gregorianToHijri(date))
+    ;({ day, month, year } = gregorianToHijri(d))
   }
   if (!(month >= 1 && month <= 12)) return ''
   return `${HIJRI_MONTHS[month - 1]} ${day}, ${year} AH`

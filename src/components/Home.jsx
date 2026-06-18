@@ -2,7 +2,7 @@
 // clear action to start (or continue) today's reading.
 
 import { useNavigate } from 'react-router-dom'
-import { getProgressSummary, getName, getReminders } from '../utils/storage'
+import { getProgressSummary, getName, getReminders, getSettings } from '../utils/storage'
 import { formatGregorian, formatHijri } from '../utils/dateUtils'
 import { nextPrayer, formatTime } from '../utils/prayer'
 import StreakBadge from './StreakBadge'
@@ -46,7 +46,9 @@ export default function Home() {
     <div className="mx-auto flex h-[100dvh] max-w-md flex-col overflow-hidden px-6 pb-6 pt-6">
       <header className="flex shrink-0 items-start justify-between">
         <div>
-          <p className="text-sm font-medium text-teal">{formatHijri()}</p>
+          <p className="text-sm font-medium text-teal">
+            {formatHijri(new Date(), getSettings().hijriOffset)}
+          </p>
           <p className="mt-0.5 text-xs text-muted">{formatGregorian()}</p>
           {upcoming && (
             <p className="mt-1 text-xs text-gold">

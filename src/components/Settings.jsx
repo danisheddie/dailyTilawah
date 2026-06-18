@@ -8,6 +8,7 @@ import StartingPoint from './StartingPoint'
 import { RECITERS, TRANSLATIONS } from '../utils/api'
 import { useLang, LANGUAGES } from '../utils/i18n.jsx'
 import { applyTheme } from '../utils/theme'
+import { formatHijri } from '../utils/dateUtils'
 import {
   GOALS,
   MIN_CUSTOM_GOAL,
@@ -223,6 +224,39 @@ export default function Settings() {
               {t(key)}
             </button>
           ))}
+        </div>
+      </section>
+
+      {/* Hijri date adjustment */}
+      <section className="mt-6 first:mt-0">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+          {t('settings.hijriDate')}
+        </h2>
+        <p className="mt-1 text-xs text-muted">{t('settings.hijriDateSub')}</p>
+        <div className="mt-3 flex items-center justify-between rounded-2xl border border-teal/15 px-2 py-2">
+          <button
+            onClick={() =>
+              toggle('hijriOffset', Math.max(-2, (settings.hijriOffset || 0) - 1))
+            }
+            aria-label="-1 day"
+            className="flex h-9 w-10 items-center justify-center rounded-xl text-xl text-teal transition active:scale-90 disabled:opacity-30"
+            disabled={(settings.hijriOffset || 0) <= -2}
+          >
+            −
+          </button>
+          <span className="text-sm font-medium text-teal">
+            {formatHijri(new Date(), settings.hijriOffset || 0)}
+          </span>
+          <button
+            onClick={() =>
+              toggle('hijriOffset', Math.min(2, (settings.hijriOffset || 0) + 1))
+            }
+            aria-label="+1 day"
+            className="flex h-9 w-10 items-center justify-center rounded-xl text-xl text-teal transition active:scale-90 disabled:opacity-30"
+            disabled={(settings.hijriOffset || 0) >= 2}
+          >
+            +
+          </button>
         </div>
       </section>
       </Collapse>

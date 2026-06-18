@@ -57,6 +57,8 @@ export const DEFAULT_SETTINGS = {
   theme: 'light',
   // Arabic reading size: 's' | 'm' | 'l'.
   readingSize: 'm',
+  // Hijri date adjustment in days (-2..+2) to match local moon sighting.
+  hijriOffset: 0,
   // Daily home-screen reflection: 'both' | 'quran' | 'hadith' | 'off'.
   reflectionMode: 'both',
   showTranslation: true,
