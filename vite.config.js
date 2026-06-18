@@ -2,10 +2,11 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
-// `base` is the path the app is served from. Defaults to the GitHub Pages
-// project path so https://<user>.github.io/dailyTilawah/ keeps working; set
-// VITE_BASE=/ in the Cloudflare Pages build so the custom domain serves at root.
+// `base` is the path the app is served from. The GitHub Actions build targets
+// the project path (https://<user>.github.io/dailyTilawah/); every other build
+// (Cloudflare, local dev) serves at the root domain. Auto-detected so no build
+// variable is required.
 export default defineConfig({
-  base: process.env.VITE_BASE || '/dailyTilawah/',
+  base: process.env.GITHUB_ACTIONS ? '/dailyTilawah/' : '/',
   plugins: [react()],
 })
