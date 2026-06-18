@@ -122,22 +122,17 @@ export default function Settings() {
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
           {t('settings.appLanguage')}
         </h2>
-        <p className="mt-1 text-xs text-muted">{t('settings.appLanguageSub')}</p>
-        <div className="mt-3 grid grid-cols-3 gap-3">
+        <select
+          value={lang}
+          onChange={(e) => setLang(e.target.value)}
+          className="mt-3 w-full rounded-2xl border border-teal/15 bg-transparent px-4 py-3 text-sm text-teal outline-none transition focus:border-teal"
+        >
           {LANGUAGES.map((l) => (
-            <button
-              key={l.id}
-              onClick={() => setLang(l.id)}
-              className={`rounded-2xl border px-2 py-3 text-sm font-medium transition ${
-                lang === l.id
-                  ? 'border-teal bg-teal text-paper'
-                  : 'border-teal/15 text-teal active:scale-[0.99]'
-              }`}
-            >
+            <option key={l.id} value={l.id}>
               {l.name}
-            </button>
+            </option>
           ))}
-        </div>
+        </select>
       </section>
 
       {/* Name */}
