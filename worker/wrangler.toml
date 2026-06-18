@@ -4,7 +4,7 @@ compatibility_date = "2024-09-23"
 
 # Run the reminder scheduler every minute.
 [triggers]
-crons = ["* * * * *"]
+crons = ["*/2 * * * *"]
 
 # Public, non-secret config. VAPID_PUBLIC_KEY and VAPID_SUBJECT are safe to
 # commit; the private key is set via `wrangler secret put VAPID_PRIVATE_JWK`.

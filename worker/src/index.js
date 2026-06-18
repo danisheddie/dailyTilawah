@@ -99,7 +99,7 @@ async function handleTest(request, env) {
         title: 'Daily Tilawah',
         body: 'Test reminder — notifications are working. 🕌',
         tag: 'tilawah-test',
-        url: '/dailyTilawah/',
+        url: 'https://dailytilawah.app/',
       },
       vapidFrom(env)
     )
@@ -256,8 +256,9 @@ async function runReminders(env, now = new Date()) {
       const t = times[key]
       if (!t) continue
       const delta = now.getTime() - t.getTime()
-      // Fire within the minute the prayer begins (cron granularity ~1 min).
-      if (delta >= 0 && delta < 90 * 1000 && !record.notified.prayers.includes(key)) {
+      // Fire within a few minutes of the prayer (cron runs every 2 min; the
+      // per-prayer `notified` set prevents duplicate sends across overlaps).
+      if (delta >= 0 && delta < 180 * 1000 && !record.notified.prayers.includes(key)) {
         due = key
         break
       }
@@ -269,7 +270,7 @@ async function runReminders(env, now = new Date()) {
       title: `${PRAYER_NAMES[due]} — time to read`,
       body: "You haven't read your page today. One page is enough. 🕌",
       tag: `tilawah-${todayLocal}-${due}`,
-      url: '/dailyTilawah/',
+      url: 'https://dailytilawah.app/',
     }
 
     try {
