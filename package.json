@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "icons": "node scripts/gen-icons.mjs"
+    "icons": "node scripts/gen-icons.mjs",
+    "build-data": "node scripts/build-quran-data.mjs"
   },
   "dependencies": {
     "adhan": "^4.4.4",
