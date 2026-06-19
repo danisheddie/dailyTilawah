@@ -5,7 +5,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getPage, getMushafPage, TOTAL_PAGES } from '../utils/api'
+import { getPage, getMushafPage, TOTAL_PAGES, TRANSLATIONS } from '../utils/api'
 import {
   getLastPage,
   getSettings,
@@ -106,7 +106,7 @@ export default function Reader() {
     scrollRef.current?.scrollTo({ top: 0 })
     setBookmarked(isBookmarked(page))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, mode])
+  }, [page, mode, settings.translationEdition, settings.showTranslation, settings.showTransliteration, settings.reciter])
 
   function toggleBm() {
     toggleBookmark(page)
@@ -118,6 +118,13 @@ export default function Reader() {
     setShowJump(false)
     if (p !== page) setPage(p)
   }
+
+  function changeSetting(key, value) {
+    setSettings(setSetting(key, value))
+  }
+
+  // A page is "already read" in this pass once you've progressed past it.
+  const alreadyRead = page < getLastPage()
 
   // --- audio (list view only) ----------------------------------------------
   function stopAudio() {
@@ -196,7 +203,17 @@ export default function Reader() {
           </svg>
         </button>
         <div className="text-center">
-          <p className="text-sm font-semibold text-teal">{t('reader.page', { page })}</p>
+          <p className="flex items-center justify-center gap-1.5 text-sm font-semibold text-teal">
+            {t('reader.page', { page })}
+            {alreadyRead && (
+              <span className="inline-flex items-center gap-0.5 text-[11px] font-medium text-gold">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" aria-hidden="true">
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
+                {t('reader.read')}
+              </span>
+            )}
+          </p>
           {data?.surahs?.length > 0 && (
             <p className="text-xs text-muted">
               {data.surahs.map((s) => s.englishName).join(' · ')}
@@ -246,6 +263,22 @@ export default function Reader() {
 
         {!loading && !error && data && mode === 'list' && (
           <>
+            {settings.showTranslation && (
+              <div className="mb-2 flex items-center justify-end gap-2">
+                <span className="text-xs text-muted">{t('settings.translation')}</span>
+                <select
+                  value={settings.translationEdition}
+                  onChange={(e) => changeSetting('translationEdition', e.target.value)}
+                  className="rounded-xl border border-teal/15 bg-transparent px-2.5 py-1.5 text-xs text-teal outline-none transition focus:border-teal"
+                >
+                  {TRANSLATIONS.map((tr) => (
+                    <option key={tr.id} value={tr.id}>
+                      {tr.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
             {data.ayahs.map((ayah, i) => (
               <div key={ayah.number}>
                 {ayah.numberInSurah === 1 && (
@@ -294,6 +327,9 @@ export default function Reader() {
               {t('reader.prev')}
             </button>
             <button className="btn-primary grow" onClick={finishPage}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
               {t('reader.markRead')}
             </button>
             <button
