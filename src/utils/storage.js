@@ -359,5 +359,7 @@ export function resetProgress() {
     KEYS.completedToday,
     KEYS.todayProgress,
     KEYS.progressDate,
+    KEYS.khatmCount,
+    KEYS.longestStreak,
   ].forEach((k) => localStorage.removeItem(k))
 }
