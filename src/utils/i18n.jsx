@@ -202,6 +202,8 @@ const en = {
   'reminders.errLocationNeeded':
     'Location permission is needed to calculate prayer times for where you are.',
   'reminders.errLocationFail': 'Couldn’t get your location. Please try again.',
+  'reminders.iosHint':
+    'On iPhone, reminders only work when the app is added to your Home Screen. Tap Share → "Add to Home Screen", then open Tilawah from there.',
   'reminders.errGeneric': 'Something went wrong. Please try again.',
 }
 
@@ -399,6 +401,8 @@ const ms = {
     'Kebenaran lokasi diperlukan untuk mengira waktu solat di tempat anda.',
   'reminders.errLocationFail':
     'Tidak dapat mendapatkan lokasi anda. Sila cuba lagi.',
+  'reminders.iosHint':
+    'Pada iPhone, peringatan hanya berfungsi apabila aplikasi ditambah ke Skrin Utama. Ketik Kongsi → "Tambah ke Skrin Utama", kemudian buka Tilawah dari sana.',
   'reminders.errGeneric': 'Sesuatu tidak kena. Sila cuba lagi.',
 }
 
@@ -596,6 +600,8 @@ const id = {
     'Izin lokasi diperlukan untuk menghitung waktu salat di tempat Anda.',
   'reminders.errLocationFail':
     'Tidak dapat memperoleh lokasi Anda. Silakan coba lagi.',
+  'reminders.iosHint':
+    'Di iPhone, pengingat hanya berfungsi jika aplikasi ditambahkan ke Layar Utama. Ketuk Bagikan → "Tambahkan ke Layar Utama", lalu buka Tilawah dari sana.',
   'reminders.errGeneric': 'Terjadi kesalahan. Silakan coba lagi.',
 }
 

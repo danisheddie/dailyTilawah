@@ -47,6 +47,11 @@ export default function Reminders() {
 
   const supported = pushSupported()
   const configured = remindersConfigured()
+  const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent)
+  const isStandalone =
+    window.matchMedia('(display-mode: standalone)').matches ||
+    !!window.navigator.standalone
+  const needsHomescreen = isIos && !isStandalone
   const times = r.location
     ? computePrayerTimes({ ...r.location, method: r.method, madhab: r.madhab })
     : null
@@ -129,6 +134,13 @@ export default function Reminders() {
     <div>
       <p className="text-xs leading-relaxed text-muted">{t('reminders.sub')}</p>
 
+      {/* iOS homescreen hint — shown proactively before the toggle */}
+      {needsHomescreen && (
+        <p className="mt-3 rounded-xl bg-gold/10 px-3 py-2 text-xs text-muted">
+          {t('reminders.iosHint')}
+        </p>
+      )}
+
       {/* Enable toggle */}
       <div className="mt-4 flex items-center justify-between gap-4">
         <span className="text-sm font-medium text-teal">
@@ -138,7 +150,7 @@ export default function Reminders() {
           type="button"
           role="switch"
           aria-checked={r.enabled}
-          disabled={busy || (!r.enabled && !configured)}
+          disabled={busy || (!r.enabled && (!configured || needsHomescreen))}
           onClick={() => (r.enabled ? disable() : enable())}
           className={`relative h-6 w-11 shrink-0 rounded-full transition disabled:opacity-40 ${
             r.enabled ? 'bg-teal' : 'bg-muted/30'
