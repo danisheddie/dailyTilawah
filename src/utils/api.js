@@ -391,6 +391,16 @@ export const JUZ_START_PAGES = [
   322, 342, 362, 382, 402, 422, 442, 462, 482, 502, 522, 542, 562, 582,
 ]
 
+// Which Juz (1–30) a given mushaf page falls in.
+export function juzForPage(page) {
+  let juz = 1
+  for (let i = 0; i < JUZ_START_PAGES.length; i++) {
+    if (page >= JUZ_START_PAGES[i]) juz = i + 1
+    else break
+  }
+  return juz
+}
+
 // Mushaf page where each surah begins, indexed 0 → Surah 1 (Madani 604-page).
 export const SURAH_PAGES = [
   1, 2, 50, 77, 106, 128, 151, 177, 187, 208, 221, 235, 249, 255, 262, 267,

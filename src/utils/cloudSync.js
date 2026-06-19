@@ -25,6 +25,8 @@ export const SYNC_KEYS = [
   'tilawah:progressDate',
   'tilawah:settings',
   'tilawah:bookmarks',
+  'tilawah:khatmCount',
+  'tilawah:longestStreak',
 ]
 
 const CODE_KEY = 'tilawah:syncCode'
@@ -167,6 +169,8 @@ export function mergeSnapshots(a = {}, b = {}) {
 
   // lifetime counters: keep the furthest progress
   out['tilawah:totalPagesRead'] = num('tilawah:totalPagesRead')
+  out['tilawah:khatmCount'] = num('tilawah:khatmCount')
+  out['tilawah:longestStreak'] = num('tilawah:longestStreak')
   out['tilawah:lastPage'] = Math.max(
     1,
     Math.min(604, num('tilawah:lastPage') || 1)

@@ -81,7 +81,13 @@ export default function Home() {
         )}
 
         <div className="flex flex-col items-center">
-          <StreakBadge streak={streak} size="lg" />
+          <button
+            onClick={() => navigate('/journey')}
+            aria-label={t('journey.viewJourney')}
+            className="transition active:scale-95"
+          >
+            <StreakBadge streak={streak} size="lg" />
+          </button>
           <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted">
             {completedToday
               ? t('home.complete')

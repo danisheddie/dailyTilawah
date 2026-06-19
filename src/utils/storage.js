@@ -20,6 +20,8 @@ const KEYS = {
   customGoalPages: 'tilawah:customGoalPages',
   betaDismissed: 'tilawah:betaDismissed',
   bookmarks: 'tilawah:bookmarks',
+  khatmCount: 'tilawah:khatmCount',
+  longestStreak: 'tilawah:longestStreak',
 }
 
 // The reading goals the user can choose from. `pages` is the daily target
@@ -274,15 +276,45 @@ export function getProgressSummary() {
   }
 }
 
+// --- journey (whole-Qur'an progress) ---------------------------------------
+
+export function getKhatmCount() {
+  return read(KEYS.khatmCount, 0)
+}
+
+export function getLongestStreak() {
+  return Math.max(read(KEYS.longestStreak, 0), getStreak())
+}
+
+export function getJourneySummary() {
+  return {
+    lastPage: getLastPage(),
+    totalPagesRead: getTotalPagesRead(),
+    khatmCount: getKhatmCount(),
+    streak: getStreak(),
+    longestStreak: getLongestStreak(),
+  }
+}
+
 // Record that the user finished reading one page. Updates lifetime totals,
 // today's progress, and — if the daily goal is met — the streak.
 // Returns a summary including `justCompleted` so the UI can celebrate.
 export function recordPageRead(page) {
   rolloverIfNeeded()
 
-  // lifetime total + furthest position
+  // lifetime total
   write(KEYS.totalPagesRead, getTotalPagesRead() + 1)
-  setLastPage(Math.min(604, page + 1))
+
+  // furthest position — finishing the last page completes a khatm and starts a
+  // fresh pass at page 1.
+  let khatmCompleted = false
+  if (page >= 604) {
+    write(KEYS.khatmCount, getKhatmCount() + 1)
+    setLastPage(1)
+    khatmCompleted = true
+  } else {
+    setLastPage(page + 1)
+  }
 
   const goal = getGoal()
   const progress = getTodayProgress() + 1
@@ -297,7 +329,7 @@ export function recordPageRead(page) {
     bumpStreak()
   }
 
-  return { ...getProgressSummary(), justCompleted }
+  return { ...getProgressSummary(), justCompleted, khatmCompleted }
 }
 
 function bumpStreak() {
@@ -313,6 +345,7 @@ function bumpStreak() {
   }
   write(KEYS.streak, streak)
   write(KEYS.lastCompletedDate, today)
+  if (streak > read(KEYS.longestStreak, 0)) write(KEYS.longestStreak, streak)
 }
 
 // --- reset -----------------------------------------------------------------

@@ -166,14 +166,15 @@ export default function Reader() {
     reportRead() // suppress today's remaining prayer-time reminders
     schedulePush() // back up progress to the cloud if sync is on
     stopAudio()
-    if (result.justCompleted) setCompletion(result)
+    if (result.justCompleted || result.khatmCompleted) setCompletion(result)
     else goToNext()
   }
 
   function goToNext() {
     setCompletion(null)
+    // Finishing the last page wraps to page 1 to begin a new khatm.
     if (page < TOTAL_PAGES) setPage(page + 1)
-    else navigate('/')
+    else setPage(1)
   }
 
   function goToPrev() {
@@ -314,15 +315,26 @@ export default function Reader() {
         <div className="fixed inset-0 z-20 flex items-center justify-center bg-paper/95 px-6 backdrop-blur">
           <div className="animate-scale-in text-center">
             <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-gold/15 text-3xl">
-              ✦
+              {completion.khatmCompleted ? '🌙' : '✦'}
             </div>
             <p className="font-quran text-3xl leading-loose text-teal sm:text-4xl" dir="rtl" lang="ar">
               جَزَاكَ اللَّهُ خَيْرًا
             </p>
-            <p className="mt-3 text-base text-muted">{t('reader.rewardYou')}</p>
-            <p className="mt-1 text-sm text-gold">
-              {t('reader.streak', { n: completion.streak })}
-            </p>
+            {completion.khatmCompleted ? (
+              <>
+                <p className="mt-3 text-base font-semibold text-teal">
+                  {t('reader.khatmTitle')}
+                </p>
+                <p className="mt-1 text-sm text-muted">{t('reader.khatmBody')}</p>
+              </>
+            ) : (
+              <>
+                <p className="mt-3 text-base text-muted">{t('reader.rewardYou')}</p>
+                <p className="mt-1 text-sm text-gold">
+                  {t('reader.streak', { n: completion.streak })}
+                </p>
+              </>
+            )}
             <div className="mt-10 flex flex-col gap-3">
               <button className="btn-primary" onClick={goToNext}>
                 {t('reader.readAnother')}
