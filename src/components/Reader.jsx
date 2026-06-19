@@ -322,22 +322,32 @@ export default function Reader() {
       {/* Bottom action bar */}
       {!loading && !error && data && (
         <div className="fixed inset-x-0 bottom-0 mx-auto max-w-2xl border-t border-teal/10 bg-paper/95 px-5 py-3 backdrop-blur">
-          <div className="flex items-center gap-3">
-            <button className="btn-ghost px-4" onClick={goToPrev} disabled={page <= 1}>
-              {t('reader.prev')}
+          <div className="flex items-center gap-2.5">
+            <button
+              className="btn-ghost px-3"
+              onClick={goToPrev}
+              disabled={page <= 1}
+              aria-label={t('reader.prev')}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
             </button>
-            <button className="btn-primary grow" onClick={finishPage}>
+            <button className="btn-primary grow whitespace-nowrap" onClick={finishPage}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
                 <path d="M20 6 9 17l-5-5" />
               </svg>
               {t('reader.markRead')}
             </button>
             <button
-              className="btn-ghost px-4"
+              className="btn-ghost px-3"
               onClick={goToNext}
               disabled={page >= TOTAL_PAGES}
+              aria-label={t('reader.next')}
             >
-              {t('reader.next')}
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="M9 18l6-6-6-6" />
+              </svg>
             </button>
           </div>
         </div>
