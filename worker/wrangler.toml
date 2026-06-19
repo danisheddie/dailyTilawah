@@ -9,8 +9,8 @@ crons = ["*/2 * * * *"]
 # Public, non-secret config. VAPID_PUBLIC_KEY and VAPID_SUBJECT are safe to
 # commit; the private key is set via `wrangler secret put VAPID_PRIVATE_JWK`.
 [vars]
-VAPID_PUBLIC_KEY = "REPLACE_WITH_VAPID_PUBLIC_KEY"
-VAPID_SUBJECT = "mailto:you@example.com"
+VAPID_PUBLIC_KEY = "BCWQpqlISYr8PPeBYl6KgyJ79e1eivoIU4_Zd8i5KqwRAa6C84888ZX_3hdlQIbQ_yohPjKMl24Q_r6dk8NAIog"
+VAPID_SUBJECT = "mailto:danisheddie1405@gmail.com"
 # OAuth Web Client ID for "Sign in with Google" (same value goes in the app's
 # src/config.js). Leave as-is to keep Google sign-in disabled. Not a secret.
 GOOGLE_CLIENT_ID = "515296416644-so2t69g3kdn222gfq2dc18v651qbidkq.apps.googleusercontent.com"
