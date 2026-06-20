@@ -302,6 +302,18 @@ export function getJourneySummary() {
 export function recordPageRead(page) {
   rolloverIfNeeded()
 
+  // Idempotent: a page is only counted the first time you pass it. Re-marking
+  // a page you've already read (below your furthest point) does nothing, so it
+  // can't inflate today's progress, lifetime total, or the streak.
+  if (page < getLastPage()) {
+    return {
+      ...getProgressSummary(),
+      justCompleted: false,
+      khatmCompleted: false,
+      alreadyRead: true,
+    }
+  }
+
   // lifetime total
   write(KEYS.totalPagesRead, getTotalPagesRead() + 1)
 
