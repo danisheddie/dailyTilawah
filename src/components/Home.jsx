@@ -56,13 +56,24 @@ export default function Home() {
             </p>
           )}
         </div>
-        <button
-          onClick={() => navigate('/settings')}
-          aria-label="Settings"
-          className="rounded-full p-2 text-muted transition active:scale-90"
-        >
-          <GearIcon />
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => navigate('/journey')}
+            aria-label={t('journey.viewJourney')}
+            className="rounded-full p-2 text-muted transition active:scale-90"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+              <path d="M3 20h18M7 20v-7M12 20V6M17 20v-10" />
+            </svg>
+          </button>
+          <button
+            onClick={() => navigate('/settings')}
+            aria-label="Settings"
+            className="rounded-full p-2 text-muted transition active:scale-90"
+          >
+            <GearIcon />
+          </button>
+        </div>
       </header>
 
       <div className="shrink-0">
