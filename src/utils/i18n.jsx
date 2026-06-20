@@ -161,6 +161,11 @@ const en = {
   'start.fail': 'Couldn’t look that up. Check your connection and try again.',
   'start.setTo': 'Set to {label} — page {page}.',
   'start.beginning': 'the beginning',
+  'start.dataNote':
+    'This only changes where reading resumes — your streak, pages read, and completions stay.',
+  'start.beginningConfirm':
+    'Start again from page 1? Your streak, pages read, and completions are kept — only your reading position moves to the beginning.',
+  'start.confirmBeginning': 'Yes, start from page 1',
 
   'sync.title': 'Back up & sync',
   'sync.intro':
@@ -375,6 +380,11 @@ const ms = {
   'start.fail': 'Tidak dapat dicari. Semak sambungan anda dan cuba lagi.',
   'start.setTo': 'Ditetapkan ke {label} — halaman {page}.',
   'start.beginning': 'permulaan',
+  'start.dataNote':
+    'Ini hanya mengubah tempat bacaan disambung — streak, halaman dibaca, dan khatam anda kekal.',
+  'start.beginningConfirm':
+    'Mula semula dari halaman 1? Streak, halaman dibaca, dan khatam anda dikekalkan — hanya kedudukan bacaan berpindah ke permulaan.',
+  'start.confirmBeginning': 'Ya, mula dari halaman 1',
 
   'sync.title': 'Sandaran & penyegerakan',
   'sync.intro':
@@ -591,6 +601,11 @@ const id = {
   'start.fail': 'Tidak dapat menemukannya. Periksa koneksi dan coba lagi.',
   'start.setTo': 'Ditetapkan ke {label} — halaman {page}.',
   'start.beginning': 'awal',
+  'start.dataNote':
+    'Ini hanya mengubah tempat bacaan dilanjutkan — rentetan, halaman dibaca, dan khatam Anda tetap.',
+  'start.beginningConfirm':
+    'Mulai lagi dari halaman 1? Rentetan, halaman dibaca, dan khatam Anda tetap — hanya posisi bacaan berpindah ke awal.',
+  'start.confirmBeginning': 'Ya, mulai dari halaman 1',
 
   'sync.title': 'Cadangkan & sinkronkan',
   'sync.intro':

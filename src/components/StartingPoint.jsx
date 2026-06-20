@@ -13,6 +13,7 @@ export default function StartingPoint({ onApplied }) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(false)
   const [done, setDone] = useState(null) // null | { page, label }
+  const [confirmBeginning, setConfirmBeginning] = useState(false)
 
   const maxAyah = SURAH_AYAHS[surah - 1] || 286
 
@@ -40,6 +41,7 @@ export default function StartingPoint({ onApplied }) {
   function startFromBeginning() {
     onApplied?.(1)
     setDone({ page: 1, label: t('start.beginning') })
+    setConfirmBeginning(false)
   }
 
   return (
@@ -79,13 +81,39 @@ export default function StartingPoint({ onApplied }) {
         {busy ? t('start.finding') : t('start.set')}
       </button>
 
-      <button
-        className="mt-3 w-full text-center text-sm text-muted underline-offset-2 hover:underline"
-        onClick={startFromBeginning}
-        disabled={busy}
-      >
-        {t('start.orBeginning')}
-      </button>
+      {!confirmBeginning ? (
+        <button
+          className="mt-3 w-full text-center text-sm text-muted underline-offset-2 hover:underline"
+          onClick={() => setConfirmBeginning(true)}
+          disabled={busy}
+        >
+          {t('start.orBeginning')}
+        </button>
+      ) : (
+        <div className="mt-3 rounded-2xl border border-teal/15 bg-teal/5 p-4 text-center">
+          <p className="text-xs leading-relaxed text-muted">
+            {t('start.beginningConfirm')}
+          </p>
+          <div className="mt-3 flex gap-3">
+            <button
+              className="btn-ghost grow px-4 py-2 text-sm"
+              onClick={() => setConfirmBeginning(false)}
+            >
+              {t('common.cancel')}
+            </button>
+            <button
+              className="btn-primary grow px-4 py-2 text-sm"
+              onClick={startFromBeginning}
+            >
+              {t('start.confirmBeginning')}
+            </button>
+          </div>
+        </div>
+      )}
+
+      <p className="mt-3 text-center text-[11px] leading-relaxed text-muted/80">
+        {t('start.dataNote')}
+      </p>
 
       {error && (
         <p className="mt-3 text-center text-sm text-red-500">{t('start.fail')}</p>
