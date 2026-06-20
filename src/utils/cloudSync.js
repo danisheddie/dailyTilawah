@@ -27,6 +27,7 @@ export const SYNC_KEYS = [
   'tilawah:bookmarks',
   'tilawah:khatmCount',
   'tilawah:longestStreak',
+  'tilawah:readHistory',
 ]
 
 const CODE_KEY = 'tilawah:syncCode'
@@ -233,6 +234,13 @@ export function mergeSnapshots(a = {}, b = {}) {
   }
   const mergedBookmarks = Object.values(bm).sort((x, y) => x.page - y.page)
   if (mergedBookmarks.length) out['tilawah:bookmarks'] = mergedBookmarks
+
+  // read history: union of completed dates
+  const days = new Set()
+  for (const list of [a['tilawah:readHistory'], b['tilawah:readHistory']]) {
+    if (Array.isArray(list)) for (const d of list) days.add(d)
+  }
+  if (days.size) out['tilawah:readHistory'] = [...days].sort()
 
   out._updatedAt = Math.max(aT, bT)
   return out

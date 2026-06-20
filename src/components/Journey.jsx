@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { getJourneySummary } from '../utils/storage'
 import { juzForPage } from '../utils/api'
 import { useLang } from '../utils/i18n.jsx'
+import ReadingCalendar from './ReadingCalendar'
 
 function Ring({ pct }) {
   const r = 52
@@ -115,6 +116,9 @@ export default function Journey() {
         <Stat value={totalPagesRead} label={t('journey.pagesRead')} />
         <Stat value={khatmCount} label={t('journey.completionsShort')} />
       </section>
+
+      {/* Consistency calendar */}
+      <ReadingCalendar />
     </div>
   )
 }

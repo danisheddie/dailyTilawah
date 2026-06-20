@@ -22,6 +22,7 @@ const KEYS = {
   bookmarks: 'tilawah:bookmarks',
   khatmCount: 'tilawah:khatmCount',
   longestStreak: 'tilawah:longestStreak',
+  readHistory: 'tilawah:readHistory',
 }
 
 // The reading goals the user can choose from. `pages` is the daily target
@@ -286,6 +287,39 @@ export function getLongestStreak() {
   return Math.max(read(KEYS.longestStreak, 0), getStreak())
 }
 
+// Dates (YYYY-MM-DD) on which the daily goal was completed — for the calendar.
+// On first access, seed from the current streak so past consistency shows.
+export function getReadHistory() {
+  const stored = read(KEYS.readHistory, null)
+  if (Array.isArray(stored)) return stored
+  const seeded = seedReadHistoryFromStreak()
+  write(KEYS.readHistory, seeded)
+  return seeded
+}
+
+function seedReadHistoryFromStreak() {
+  const streak = getStreak()
+  const last = read(KEYS.lastCompletedDate, null)
+  if (!streak || !last) return []
+  const [y, m, d] = last.split('-').map(Number)
+  const base = new Date(y, m - 1, d)
+  const out = []
+  for (let i = 0; i < streak; i++) {
+    const dt = new Date(base)
+    dt.setDate(base.getDate() - i)
+    out.push(todayISO(dt))
+  }
+  return out.sort()
+}
+
+export function markReadDay(date = todayISO()) {
+  const h = getReadHistory()
+  if (h.includes(date)) return h
+  const next = [...h, date].sort()
+  write(KEYS.readHistory, next)
+  return next
+}
+
 export function getJourneySummary() {
   return {
     lastPage: getLastPage(),
@@ -339,6 +373,7 @@ export function recordPageRead(page) {
     write(KEYS.completedToday, true)
     justCompleted = true
     bumpStreak()
+    markReadDay()
   }
 
   return { ...getProgressSummary(), justCompleted, khatmCompleted }

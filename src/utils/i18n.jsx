@@ -97,6 +97,8 @@ const en = {
   'journey.pagesRead': 'Pages read',
   'journey.completionsShort': 'Completions',
   'journey.viewJourney': 'View your journey',
+  'journey.consistency': 'Reading days',
+  'journey.daysThisMonth': '{n} days',
   'reader.khatmTitle': 'You completed the Qur’an!',
   'reader.khatmBody': 'May Allah accept it and make the Qur’an a light for you.',
 
@@ -308,6 +310,8 @@ const ms = {
   'journey.pagesRead': 'Halaman dibaca',
   'journey.completionsShort': 'Khatam',
   'journey.viewJourney': 'Lihat perjalanan anda',
+  'journey.consistency': 'Hari membaca',
+  'journey.daysThisMonth': '{n} hari',
   'reader.khatmTitle': 'Anda telah khatam al-Qur’an!',
   'reader.khatmBody': 'Semoga Allah menerimanya dan menjadikan al-Qur’an cahaya bagi anda.',
 
@@ -522,6 +526,8 @@ const id = {
   'journey.pagesRead': 'Halaman dibaca',
   'journey.completionsShort': 'Khatam',
   'journey.viewJourney': 'Lihat perjalanan Anda',
+  'journey.consistency': 'Hari membaca',
+  'journey.daysThisMonth': '{n} hari',
   'reader.khatmTitle': 'Anda telah khatam Al-Qur’an!',
   'reader.khatmBody': 'Semoga Allah menerimanya dan menjadikan Al-Qur’an cahaya bagi Anda.',
 
