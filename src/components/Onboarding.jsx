@@ -31,8 +31,37 @@ export default function Onboarding({ onDone }) {
     navigate('/', { replace: true })
   }
 
+  // Steps 1–4 carry a small back control and progress dots so the flow feels
+  // navigable, not a one-way chute. The welcome screen (0) stays clean.
+  const TOTAL_STEPS = 4
+
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center px-6 py-12 text-center">
+      {step >= 1 && (
+        <div className="absolute inset-x-0 top-0 mx-auto flex max-w-md items-center justify-between px-6 pt-6">
+          <button
+            onClick={() => setStep(step - 1)}
+            aria-label={t('common.back')}
+            className="rounded-full p-1.5 text-muted transition active:scale-90"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
+          <div className="flex items-center gap-1.5">
+            {Array.from({ length: TOTAL_STEPS }, (_, i) => (
+              <span
+                key={i}
+                className={`h-1.5 rounded-full transition-all ${
+                  i + 1 === step ? 'w-5 bg-teal' : 'w-1.5 bg-teal/20'
+                }`}
+              />
+            ))}
+          </div>
+          <span className="w-8" aria-hidden="true" />
+        </div>
+      )}
+
       {step === 0 && (
         <div className="animate-fade-in">
           <p className="font-arabic text-2xl text-gold" dir="rtl" lang="ar">
