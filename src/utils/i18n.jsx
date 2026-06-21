@@ -87,6 +87,8 @@ const en = {
   'jump.bookmarks': 'Bookmarks',
   'jump.juz': 'Juz',
   'jump.surah': 'Surah',
+  'jump.searchSurah': 'Search by name or number',
+  'jump.noSurahMatch': 'No surah found.',
   'jump.noBookmarks':
     'No bookmarks yet. Tap the bookmark icon while reading to save a page.',
   'jump.removeBookmark': 'Remove bookmark',
@@ -312,6 +314,8 @@ const ms = {
   'jump.bookmarks': 'Penanda',
   'jump.juz': 'Juzuk',
   'jump.surah': 'Surah',
+  'jump.searchSurah': 'Cari mengikut nama atau nombor',
+  'jump.noSurahMatch': 'Tiada surah ditemui.',
   'jump.noBookmarks':
     'Tiada penanda lagi. Ketik ikon penanda semasa membaca untuk menyimpan halaman.',
   'jump.removeBookmark': 'Buang penanda',
@@ -540,6 +544,8 @@ const id = {
   'jump.bookmarks': 'Penanda',
   'jump.juz': 'Juz',
   'jump.surah': 'Surah',
+  'jump.searchSurah': 'Cari berdasarkan nama atau nomor',
+  'jump.noSurahMatch': 'Surah tidak ditemukan.',
   'jump.noBookmarks':
     'Belum ada penanda. Ketuk ikon penanda saat membaca untuk menyimpan halaman.',
   'jump.removeBookmark': 'Hapus penanda',

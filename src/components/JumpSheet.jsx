@@ -14,6 +14,7 @@ export default function JumpSheet({ onJump, onClose }) {
   const { t } = useLang()
   const [tab, setTab] = useState('bookmarks')
   const [bookmarks, setBookmarks] = useState(() => getBookmarks())
+  const [query, setQuery] = useState('')
 
   const tabs = [
     { id: 'bookmarks', label: t('jump.bookmarks') },
@@ -24,6 +25,15 @@ export default function JumpSheet({ onJump, onClose }) {
   function drop(page) {
     setBookmarks(removeBookmark(page))
   }
+
+  // Forgiving surah search: ignore case, hyphens and apostrophes so "baqara",
+  // "al-baqara" and "Al-Baqara" all match. Bare digits match the surah number.
+  const norm = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '')
+  const nq = norm(query)
+  const surahMatches = SURAH_NAMES.map((name, i) => ({ name, i })).filter(
+    ({ name, i }) =>
+      !nq || norm(name).includes(nq) || String(i + 1).includes(query.trim())
+  )
 
   return (
     <div className="fixed inset-0 z-30 flex flex-col justify-end bg-teal/30 backdrop-blur-sm">
@@ -52,7 +62,10 @@ export default function JumpSheet({ onJump, onClose }) {
           {tabs.map((tb) => (
             <button
               key={tb.id}
-              onClick={() => setTab(tb.id)}
+              onClick={() => {
+                setTab(tb.id)
+                setQuery('')
+              }}
               className={`rounded-xl px-3 py-2 text-sm font-medium transition ${
                 tab === tb.id
                   ? 'bg-teal text-paper'
@@ -114,22 +127,38 @@ export default function JumpSheet({ onJump, onClose }) {
           )}
 
           {tab === 'surah' && (
-            <ul className="divide-y divide-teal/5">
-              {SURAH_NAMES.map((name, i) => (
-                <li key={i}>
-                  <button
-                    onClick={() => onJump(SURAH_PAGES[i])}
-                    className="flex w-full items-center gap-3 py-2.5 text-left active:opacity-70"
-                  >
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-teal/5 text-xs font-semibold text-teal">
-                      {i + 1}
-                    </span>
-                    <span className="grow text-sm text-teal">{name}</span>
-                    <span className="text-xs text-muted">{SURAH_PAGES[i]}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
+            <>
+              <input
+                type="text"
+                inputMode="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={t('jump.searchSurah')}
+                className="mb-2 w-full rounded-xl border border-teal/15 bg-transparent px-3 py-2 text-sm text-teal outline-none transition placeholder:text-muted focus:border-teal"
+              />
+              {surahMatches.length === 0 ? (
+                <p className="py-10 text-center text-sm text-muted">
+                  {t('jump.noSurahMatch')}
+                </p>
+              ) : (
+                <ul className="divide-y divide-teal/5">
+                  {surahMatches.map(({ name, i }) => (
+                    <li key={i}>
+                      <button
+                        onClick={() => onJump(SURAH_PAGES[i])}
+                        className="flex w-full items-center gap-3 py-2.5 text-left active:opacity-70"
+                      >
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-teal/5 text-xs font-semibold text-teal">
+                          {i + 1}
+                        </span>
+                        <span className="grow text-sm text-teal">{name}</span>
+                        <span className="text-xs text-muted">{SURAH_PAGES[i]}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
           )}
         </div>
       </div>
