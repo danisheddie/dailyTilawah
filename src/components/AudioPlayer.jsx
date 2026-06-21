@@ -1,7 +1,7 @@
 // A minimal per-ayah play / pause button. Playback itself is orchestrated
 // by the Reader so only one ayah sounds at a time and auto-advances.
 
-export default function AudioPlayer({ isPlaying, disabled, onToggle }) {
+export default function AudioPlayer({ isPlaying, isLoading, disabled, onToggle }) {
   return (
     <button
       type="button"
@@ -11,7 +11,11 @@ export default function AudioPlayer({ isPlaying, disabled, onToggle }) {
       className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full
         border border-teal/15 text-teal transition active:scale-90 disabled:opacity-40"
     >
-      {isPlaying ? (
+      {isLoading ? (
+        // Buffering — recitation streams from the CDN, so show it's loading
+        // rather than leaving a silent, seemingly-dead button.
+        <span className="h-4 w-4 animate-spin rounded-full border-2 border-teal/20 border-t-teal" />
+      ) : isPlaying ? (
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
           <rect x="6" y="5" width="4" height="14" rx="1" />
           <rect x="14" y="5" width="4" height="14" rx="1" />

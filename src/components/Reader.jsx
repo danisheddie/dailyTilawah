@@ -44,6 +44,7 @@ export default function Reader() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [playingIndex, setPlayingIndex] = useState(null)
+  const [loadingAudio, setLoadingAudio] = useState(null) // index buffering
   const [completion, setCompletion] = useState(null) // null | {justCompleted}
   const [glyphPages, setGlyphPages] = useState(() => new Set()) // QCF fonts ready
   const [showJump, setShowJump] = useState(false)
@@ -160,6 +161,7 @@ export default function Reader() {
       audioRef.current = null
     }
     setPlayingIndex(null)
+    setLoadingAudio(null)
   }
 
   // Recitations stream from the islamic.network CDN by global ayah number. Not
@@ -181,6 +183,10 @@ export default function Reader() {
 
     const audio = new Audio(audioSrc(ayah.number, settings.reciter, AUDIO_BITRATES[brIdx]))
     audioRef.current = audio
+    setLoadingAudio(index) // buffering until sound actually starts
+    audio.onplaying = () => {
+      if (audioRef.current === audio) setLoadingAudio(null)
+    }
     audio.onended = () => {
       if (index + 1 < ayahs.length) playIndex(index + 1)
       else stopAudio()
@@ -361,6 +367,7 @@ export default function Reader() {
                   showTransliteration={settings.showTransliteration}
                   showAudio={settings.showAudio}
                   isPlaying={playingIndex === i}
+                  isLoadingAudio={loadingAudio === i}
                   onTogglePlay={() => togglePlay(i)}
                 />
               </div>

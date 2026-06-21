@@ -24,6 +24,7 @@ export default function AyahCard({
   showTransliteration,
   showAudio,
   isPlaying,
+  isLoadingAudio,
   onTogglePlay,
   glyphs, // true once the QCF page fonts for this ayah's words are loaded
   size = 'm',
@@ -35,6 +36,7 @@ export default function AyahCard({
         {showAudio && (
           <AudioPlayer
             isPlaying={isPlaying}
+            isLoading={isLoadingAudio}
             disabled={!ayah.audio}
             onToggle={onTogglePlay}
           />
