@@ -55,8 +55,8 @@ const en = {
 
   'install.title': 'Add Tilawah to your Home Screen',
   'install.body':
-    'Install it for a full-screen, offline experience — and so reminders can reach you.',
-  'install.button': 'Install',
+    'Add it for a faster, full-screen, offline experience.',
+  'install.button': 'Add to Home Screen',
   'install.iosSteps': 'In Safari: tap Share, then “Add to Home Screen”.',
   'install.dontShow': 'Don’t show again',
 
@@ -280,8 +280,8 @@ const ms = {
 
   'install.title': 'Tambah Tilawah ke Skrin Utama',
   'install.body':
-    'Pasang untuk pengalaman skrin penuh, luar talian — dan supaya peringatan dapat sampai kepada anda.',
-  'install.button': 'Pasang',
+    'Tambah untuk pengalaman lebih pantas, skrin penuh dan luar talian.',
+  'install.button': 'Tambah ke Skrin Utama',
   'install.iosSteps': 'Dalam Safari: ketik Kongsi, kemudian “Tambah ke Skrin Utama”.',
   'install.dontShow': 'Jangan tunjuk lagi',
 
@@ -508,8 +508,8 @@ const id = {
 
   'install.title': 'Tambahkan Tilawah ke Layar Utama',
   'install.body':
-    'Pasang untuk pengalaman layar penuh, offline — dan agar pengingat dapat menjangkau Anda.',
-  'install.button': 'Pasang',
+    'Tambahkan untuk pengalaman lebih cepat, layar penuh, dan offline.',
+  'install.button': 'Tambahkan ke Layar Utama',
   'install.iosSteps': 'Di Safari: ketuk Bagikan, lalu “Tambahkan ke Layar Utama”.',
   'install.dontShow': 'Jangan tampilkan lagi',
 
