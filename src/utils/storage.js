@@ -330,9 +330,9 @@ export function getJourneySummary() {
   }
 }
 
-// Record that the user finished reading one page. Updates lifetime totals,
-// today's progress, and — if the daily goal is met — the streak.
-// Returns a summary including `justCompleted` so the UI can celebrate.
+// Record that the user finished reading one page. Reading any new page keeps
+// the streak and marks the day; the daily goal is a separate target whose
+// completion sets `justCompleted` so the UI can celebrate.
 export function recordPageRead(page) {
   rolloverIfNeeded()
 
@@ -362,18 +362,23 @@ export function recordPageRead(page) {
     setLastPage(page + 1)
   }
 
+  // Reading any new page keeps the streak alive and marks today on the
+  // calendar (both idempotent per day) — consistency rewards showing up, it
+  // isn't gated by hitting the full daily goal.
+  bumpStreak()
+  markReadDay()
+
   const goal = getGoal()
   const progress = getTodayProgress() + 1
   write(KEYS.todayProgress, progress)
 
+  // The daily goal is a separate target: meeting it triggers the celebration.
   const wasComplete = read(KEYS.completedToday, false) === true
   let justCompleted = false
 
   if (!wasComplete && progress >= goal.pages) {
     write(KEYS.completedToday, true)
     justCompleted = true
-    bumpStreak()
-    markReadDay()
   }
 
   return { ...getProgressSummary(), justCompleted, khatmCompleted }
