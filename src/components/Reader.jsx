@@ -135,22 +135,40 @@ export default function Reader() {
     setPlayingIndex(null)
   }
 
-  function playIndex(index) {
+  // Recitations stream from the islamic.network CDN by global ayah number. Not
+  // every reciter is hosted at every bitrate, so try a few until one loads
+  // (otherwise that reciter would be silent).
+  const AUDIO_BITRATES = [128, 64, 192]
+  function audioSrc(globalNumber, edition, br) {
+    return `https://cdn.islamic.network/quran/audio/${br}/${edition}/${globalNumber}.mp3`
+  }
+
+  function playIndex(index, brIdx = 0) {
     const ayahs = data?.ayahs || []
     const ayah = ayahs[index]
-    if (!ayah?.audio) {
+    if (!ayah?.number) {
       stopAudio()
       return
     }
     if (audioRef.current) audioRef.current.pause()
 
-    const audio = new Audio(ayah.audio)
+    const audio = new Audio(audioSrc(ayah.number, settings.reciter, AUDIO_BITRATES[brIdx]))
     audioRef.current = audio
     audio.onended = () => {
       if (index + 1 < ayahs.length) playIndex(index + 1)
       else stopAudio()
     }
-    audio.play().catch(() => stopAudio())
+    audio.onerror = () => {
+      if (audioRef.current !== audio) return // superseded
+      if (brIdx + 1 < AUDIO_BITRATES.length) {
+        playIndex(index, brIdx + 1) // this bitrate is missing — try the next
+      } else if (index + 1 < ayahs.length) {
+        playIndex(index + 1) // give up on this ayah, continue
+      } else {
+        stopAudio()
+      }
+    }
+    audio.play().catch(() => {}) // missing file is handled by onerror above
     setPlayingIndex(index)
   }
 
