@@ -20,6 +20,7 @@ import AyahCard from './AyahCard'
 import MushafPage from './MushafPage'
 import JumpSheet from './JumpSheet'
 import { ensurePageFont } from '../utils/fonts'
+import { useWakeLock } from '../utils/useWakeLock.jsx'
 import { useLang } from '../utils/i18n.jsx'
 
 function Spinner() {
@@ -50,6 +51,9 @@ export default function Reader() {
 
   const audioRef = useRef(null)
   const scrollRef = useRef(null)
+
+  // Keep the screen on while reading — no dimming mid-page.
+  useWakeLock(true)
 
   // --- data loading --------------------------------------------------------
   const load = useCallback(
