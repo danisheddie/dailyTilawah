@@ -51,9 +51,32 @@ export default function Reader() {
 
   const audioRef = useRef(null)
   const scrollRef = useRef(null)
+  const touchStart = useRef(null)
 
   // Keep the screen on while reading — no dimming mid-page.
   useWakeLock(true)
+
+  // --- swipe to turn pages -------------------------------------------------
+  // The mushaf reads right-to-left, so we follow Arabic-book paging: swiping
+  // right advances to the next page, swiping left goes back. Only horizontal,
+  // deliberate swipes count — vertical scrolling and taps are left alone.
+  function onTouchStart(e) {
+    const t = e.changedTouches[0]
+    touchStart.current = { x: t.clientX, y: t.clientY, t: Date.now() }
+  }
+  function onTouchEnd(e) {
+    const s = touchStart.current
+    touchStart.current = null
+    if (!s || !data || loading || error || showJump || completion) return
+    const t = e.changedTouches[0]
+    const dx = t.clientX - s.x
+    const dy = t.clientY - s.y
+    // Horizontal-dominant, far enough, and quick enough to be a real swipe.
+    if (Date.now() - s.t > 600) return
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return
+    if (dx > 0) goToNext()
+    else goToPrev()
+  }
 
   // --- data loading --------------------------------------------------------
   const load = useCallback(
@@ -212,7 +235,12 @@ export default function Reader() {
 
   // --- render --------------------------------------------------------------
   return (
-    <div ref={scrollRef} className="mx-auto h-screen max-w-2xl overflow-y-auto">
+    <div
+      ref={scrollRef}
+      className="mx-auto h-screen max-w-2xl overflow-y-auto"
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+    >
       {/* Header */}
       <header className="sticky top-0 z-10 flex items-center justify-between border-b border-teal/5 bg-paper/90 px-5 py-4 backdrop-blur">
         <button
