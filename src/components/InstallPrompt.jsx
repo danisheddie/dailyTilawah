@@ -2,72 +2,18 @@
 // because iOS web-push reminders only work once installed, and installed PWAs
 // keep data longer. Platform-smart: a one-tap Install button where the browser
 // supports it (Android/desktop Chrome/Edge), step-by-step on iOS Safari.
-// Renders nothing if already installed, dismissed, or while the beta notice is
-// still showing (so only one Home banner appears at a time).
+// Shown before the beta notice (the beta notice defers via the same hook).
 
-import { useEffect, useState } from 'react'
-import { isInstallDismissed, dismissInstall, isBetaDismissed } from '../utils/storage'
+import { useState } from 'react'
+import { useInstall } from '../utils/useInstall.jsx'
 import { useLang } from '../utils/i18n.jsx'
-
-function isStandalone() {
-  return (
-    window.matchMedia('(display-mode: standalone)').matches ||
-    window.navigator.standalone === true
-  )
-}
 
 export default function InstallPrompt() {
   const { t } = useLang()
+  const { eligible, deferred, install, dontShowAgain } = useInstall()
   const [closed, setClosed] = useState(false)
-  const [deferred, setDeferred] = useState(null) // beforeinstallprompt event
 
-  const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent)
-
-  useEffect(() => {
-    function onPrompt(e) {
-      e.preventDefault()
-      setDeferred(e)
-    }
-    function onInstalled() {
-      dismissInstall()
-      setClosed(true)
-    }
-    window.addEventListener('beforeinstallprompt', onPrompt)
-    window.addEventListener('appinstalled', onInstalled)
-    return () => {
-      window.removeEventListener('beforeinstallprompt', onPrompt)
-      window.removeEventListener('appinstalled', onInstalled)
-    }
-  }, [])
-
-  // Show only once the beta notice is dismissed, when not installed/dismissed,
-  // and only if we actually have something to offer (native prompt or iOS).
-  if (
-    closed ||
-    isStandalone() ||
-    isInstallDismissed() ||
-    !isBetaDismissed() ||
-    (!deferred && !isIos)
-  ) {
-    return null
-  }
-
-  async function install() {
-    if (!deferred) return
-    deferred.prompt()
-    try {
-      await deferred.userChoice
-    } catch {
-      /* ignore */
-    }
-    setDeferred(null)
-    setClosed(true)
-  }
-
-  function dontShowAgain() {
-    dismissInstall()
-    setClosed(true)
-  }
+  if (!eligible || closed) return null
 
   return (
     <div className="mt-4 rounded-2xl border border-teal/20 bg-teal/[0.05] px-4 py-3">

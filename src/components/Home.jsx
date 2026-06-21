@@ -78,8 +78,8 @@ export default function Home() {
       </header>
 
       <div className="shrink-0">
-        <BetaNotice />
         <InstallPrompt />
+        <BetaNotice />
       </div>
 
       {/* Middle: greeting, streak, reflection — centered, absorbs slack */}

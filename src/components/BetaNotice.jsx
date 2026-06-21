@@ -3,12 +3,15 @@
 
 import { useState } from 'react'
 import { isBetaDismissed, dismissBeta } from '../utils/storage'
+import { useInstall } from '../utils/useInstall.jsx'
 import { useLang } from '../utils/i18n.jsx'
 
 export default function BetaNotice() {
   const { t } = useLang()
+  const { eligible: installEligible } = useInstall()
   const [hidden, setHidden] = useState(() => isBetaDismissed())
-  if (hidden) return null
+  // Defer to the install nudge so only one Home banner shows at a time.
+  if (hidden || installEligible) return null
 
   return (
     <div className="mt-4 rounded-2xl border border-gold/30 bg-gold/10 px-4 py-3">
