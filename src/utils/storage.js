@@ -321,6 +321,12 @@ function seedReadHistoryFromStreak() {
   return out.sort()
 }
 
+// The most recent day a page was read (YYYY-MM-DD), or null if never.
+export function getLastReadDate() {
+  const h = getReadHistory()
+  return h.length ? h[h.length - 1] : null
+}
+
 export function markReadDay(date = todayISO()) {
   const h = getReadHistory()
   if (h.includes(date)) return h
