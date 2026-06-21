@@ -19,6 +19,7 @@ const KEYS = {
   clientId: 'tilawah:clientId',
   customGoalPages: 'tilawah:customGoalPages',
   betaDismissed: 'tilawah:betaDismissed',
+  installDismissed: 'tilawah:installDismissed',
   bookmarks: 'tilawah:bookmarks',
   khatmCount: 'tilawah:khatmCount',
   longestStreak: 'tilawah:longestStreak',
@@ -119,6 +120,14 @@ export function isBetaDismissed() {
 
 export function dismissBeta() {
   write(KEYS.betaDismissed, true)
+}
+
+export function isInstallDismissed() {
+  return read(KEYS.installDismissed, false) === true
+}
+
+export function dismissInstall() {
+  write(KEYS.installDismissed, true)
 }
 
 // --- name ------------------------------------------------------------------

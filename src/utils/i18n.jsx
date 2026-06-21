@@ -53,6 +53,13 @@ const en = {
   'home.resuming': 'Resuming on page {page} of 604',
   'home.next': 'Next: {name} · {time}',
 
+  'install.title': 'Add Tilawah to your Home Screen',
+  'install.body':
+    'Install it for a full-screen, offline experience — and so reminders can reach you.',
+  'install.button': 'Install',
+  'install.iosSteps': 'In Safari: tap Share, then “Add to Home Screen”.',
+  'install.dontShow': 'Don’t show again',
+
   'beta.title': 'You’re testing an early version.',
   'beta.body':
     'Jazākallāhu khayran for helping shape Tilawah. Everything here works — read, build your streak, and use it however you like. If anything feels off, your feedback makes it better.',
@@ -270,6 +277,13 @@ const ms = {
   'home.startToday': 'Mula Bacaan Hari Ini',
   'home.resuming': 'Menyambung pada halaman {page} daripada 604',
   'home.next': 'Seterusnya: {name} · {time}',
+
+  'install.title': 'Tambah Tilawah ke Skrin Utama',
+  'install.body':
+    'Pasang untuk pengalaman skrin penuh, luar talian — dan supaya peringatan dapat sampai kepada anda.',
+  'install.button': 'Pasang',
+  'install.iosSteps': 'Dalam Safari: ketik Kongsi, kemudian “Tambah ke Skrin Utama”.',
+  'install.dontShow': 'Jangan tunjuk lagi',
 
   'beta.title': 'Anda sedang menguji versi awal.',
   'beta.body':
@@ -491,6 +505,13 @@ const id = {
   'home.startToday': 'Mulai Bacaan Hari Ini',
   'home.resuming': 'Melanjutkan di halaman {page} dari 604',
   'home.next': 'Berikutnya: {name} · {time}',
+
+  'install.title': 'Tambahkan Tilawah ke Layar Utama',
+  'install.body':
+    'Pasang untuk pengalaman layar penuh, offline — dan agar pengingat dapat menjangkau Anda.',
+  'install.button': 'Pasang',
+  'install.iosSteps': 'Di Safari: ketuk Bagikan, lalu “Tambahkan ke Layar Utama”.',
+  'install.dontShow': 'Jangan tampilkan lagi',
 
   'beta.title': 'Anda sedang menguji versi awal.',
   'beta.body':
