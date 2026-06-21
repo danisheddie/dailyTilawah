@@ -53,6 +53,10 @@ export default function Reader() {
   const audioRef = useRef(null)
   const scrollRef = useRef(null)
   const touchStart = useRef(null)
+  const playlistRef = useRef([]) // global ayah numbers for the current page
+  const pageAyahsRef = useRef({ page: null, numbers: null }) // cache for mushaf
+  const pageRef = useRef(page) // live page, for guards after awaits
+  pageRef.current = page
 
   // Keep the screen on while reading — no dimming mid-page.
   useWakeLock(true)
@@ -154,7 +158,7 @@ export default function Reader() {
   // A page is "already read" in this pass once you've progressed past it.
   const alreadyRead = page < getLastPage()
 
-  // --- audio (list view only) ----------------------------------------------
+  // --- audio (list per-ayah, mushaf whole-page) ----------------------------
   function stopAudio() {
     if (audioRef.current) {
       audioRef.current.pause()
@@ -172,30 +176,32 @@ export default function Reader() {
     return `https://cdn.islamic.network/quran/audio/${br}/${edition}/${globalNumber}.mp3`
   }
 
+  // Plays ayah `index` of playlistRef (global ayah numbers), auto-advancing to
+  // the end of the page. Shared by the list (per-ayah) and mushaf (whole-page).
   function playIndex(index, brIdx = 0) {
-    const ayahs = data?.ayahs || []
-    const ayah = ayahs[index]
-    if (!ayah?.number) {
+    const numbers = playlistRef.current
+    const number = numbers[index]
+    if (!number) {
       stopAudio()
       return
     }
     if (audioRef.current) audioRef.current.pause()
 
-    const audio = new Audio(audioSrc(ayah.number, settings.reciter, AUDIO_BITRATES[brIdx]))
+    const audio = new Audio(audioSrc(number, settings.reciter, AUDIO_BITRATES[brIdx]))
     audioRef.current = audio
     setLoadingAudio(index) // buffering until sound actually starts
     audio.onplaying = () => {
       if (audioRef.current === audio) setLoadingAudio(null)
     }
     audio.onended = () => {
-      if (index + 1 < ayahs.length) playIndex(index + 1)
+      if (index + 1 < numbers.length) playIndex(index + 1)
       else stopAudio()
     }
     audio.onerror = () => {
       if (audioRef.current !== audio) return // superseded
       if (brIdx + 1 < AUDIO_BITRATES.length) {
         playIndex(index, brIdx + 1) // this bitrate is missing — try the next
-      } else if (index + 1 < ayahs.length) {
+      } else if (index + 1 < numbers.length) {
         playIndex(index + 1) // give up on this ayah, continue
       } else {
         stopAudio()
@@ -205,9 +211,43 @@ export default function Reader() {
     setPlayingIndex(index)
   }
 
+  // List view: play/pause a single tapped ayah. The list's playlist is the
+  // page's ayahs in order, so the card index lines up with the playlist index.
   function togglePlay(index) {
     if (playingIndex === index) stopAudio()
-    else playIndex(index)
+    else {
+      playlistRef.current = (data?.ayahs || []).map((a) => a.number)
+      playIndex(index)
+    }
+  }
+
+  // Mushaf view: one control recites the whole page top to bottom. Ayah numbers
+  // aren't in the glyph data, so fetch them once (local-first, cached) on first
+  // tap rather than on every page view.
+  const pageAudioActive = playingIndex !== null || loadingAudio !== null
+  async function togglePageAudio() {
+    if (pageAudioActive) {
+      stopAudio()
+      return
+    }
+    let numbers = pageAyahsRef.current.page === page ? pageAyahsRef.current.numbers : null
+    if (!numbers) {
+      setLoadingAudio(0) // show buffering immediately while we fetch
+      try {
+        const res = await getPage(page)
+        numbers = (res.ayahs || []).map((a) => a.number).filter(Boolean)
+      } catch {
+        numbers = []
+      }
+      pageAyahsRef.current = { page, numbers }
+    }
+    if (pageRef.current !== page) return // page changed mid-fetch — abandon
+    if (!numbers.length) {
+      stopAudio()
+      return
+    }
+    playlistRef.current = numbers
+    playIndex(0)
   }
 
   useEffect(() => () => stopAudio(), [])
@@ -277,6 +317,30 @@ export default function Reader() {
           )}
         </div>
         <div className="flex items-center">
+          {/* Mushaf view has no per-ayah buttons, so one control recites the
+              whole page. The list view keeps its per-ayah players. */}
+          {mode === 'mushaf' && settings.showAudio && data && (
+            <button
+              onClick={togglePageAudio}
+              aria-label={pageAudioActive ? t('reader.pausePage') : t('reader.playPage')}
+              className={`rounded-full p-1.5 transition active:scale-90 ${
+                pageAudioActive ? 'text-gold' : 'text-muted'
+              }`}
+            >
+              {loadingAudio !== null ? (
+                <span className="block h-[18px] w-[18px] animate-spin rounded-full border-2 border-gold/30 border-t-gold" />
+              ) : playingIndex !== null ? (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <rect x="6" y="5" width="4" height="14" rx="1" />
+                  <rect x="14" y="5" width="4" height="14" rx="1" />
+                </svg>
+              ) : (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M8 5.14v13.72a1 1 0 0 0 1.5.87l11-6.86a1 1 0 0 0 0-1.74l-11-6.86A1 1 0 0 0 8 5.14Z" />
+                </svg>
+              )}
+            </button>
+          )}
           <button
             onClick={toggleBm}
             aria-label={bookmarked ? t('jump.removeBookmark') : t('jump.addBookmark')}
