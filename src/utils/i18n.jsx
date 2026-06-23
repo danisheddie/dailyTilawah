@@ -63,6 +63,8 @@ const en = {
     'Add it for a faster, full-screen, offline experience.',
   'install.button': 'Add to Home Screen',
   'install.iosSteps': 'In Safari: tap Share, then “Add to Home Screen”.',
+  'install.iosOpenSafari':
+    'Open this page in Safari first (Add to Home Screen isn’t available in other browsers), then tap Share → “Add to Home Screen”.',
   'install.dontShow': 'Don’t show again',
 
   'beta.title': 'You’re testing an early version.',
@@ -297,6 +299,8 @@ const ms = {
     'Tambah untuk pengalaman lebih pantas, skrin penuh dan luar talian.',
   'install.button': 'Tambah ke Skrin Utama',
   'install.iosSteps': 'Dalam Safari: ketik Kongsi, kemudian “Tambah ke Skrin Utama”.',
+  'install.iosOpenSafari':
+    'Buka halaman ini dalam Safari dahulu (Tambah ke Skrin Utama tiada dalam pelayar lain), kemudian ketik Kongsi → “Tambah ke Skrin Utama”.',
   'install.dontShow': 'Jangan tunjuk lagi',
 
   'beta.title': 'Anda sedang menguji versi awal.',
@@ -534,6 +538,8 @@ const id = {
     'Tambahkan untuk pengalaman lebih cepat, layar penuh, dan offline.',
   'install.button': 'Tambahkan ke Layar Utama',
   'install.iosSteps': 'Di Safari: ketuk Bagikan, lalu “Tambahkan ke Layar Utama”.',
+  'install.iosOpenSafari':
+    'Buka halaman ini di Safari dulu (Tambahkan ke Layar Utama tidak tersedia di browser lain), lalu ketuk Bagikan → “Tambahkan ke Layar Utama”.',
   'install.dontShow': 'Jangan tampilkan lagi',
 
   'beta.title': 'Anda sedang menguji versi awal.',
