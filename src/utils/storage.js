@@ -68,7 +68,7 @@ export const DEFAULT_SETTINGS = {
   showTranslation: true,
   translationEdition: 'en.asad',
   showTransliteration: false,
-  showAudio: false,
+  showAudio: true,
   reciter: 'ar.alafasy',
 }
 

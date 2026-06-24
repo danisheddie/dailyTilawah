@@ -318,8 +318,9 @@ export default function Reader() {
         </div>
         <div className="flex items-center">
           {/* Mushaf view has no per-ayah buttons, so one control recites the
-              whole page. The list view keeps its per-ayah players. */}
-          {mode === 'mushaf' && settings.showAudio && data && (
+              whole page. Always shown (the list view's per-ayah players are
+              the toggleable ones). */}
+          {mode === 'mushaf' && data && (
             <button
               onClick={togglePageAudio}
               aria-label={pageAudioActive ? t('reader.pausePage') : t('reader.playPage')}
