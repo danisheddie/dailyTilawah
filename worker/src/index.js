@@ -3,6 +3,7 @@
 // - HTTP API: subscribe / read / unsubscribe (called by the PWA)
 // - Cron (every minute): for each subscriber whose local prayer time is now
 //   and who hasn't read today, send a Web Push reminder.
+// - GET /stats: private user counts, gated by the STATS_TOKEN secret.
 //
 // Storage: one KV entry per device, key `user:<clientId>`.
 
@@ -219,6 +220,45 @@ async function handleSyncPush(request, env) {
   return json({ ok: true })
 }
 
+// Count KV keys under a prefix, paginating so the total stays accurate beyond
+// the 1000-key-per-list limit.
+async function countPrefix(env, prefix) {
+  let count = 0
+  let cursor
+  for (;;) {
+    const res = await env.TILAWAH_KV.list({ prefix, cursor, limit: 1000 })
+    count += res.keys.length
+    if (res.list_complete) break
+    cursor = res.cursor
+  }
+  return count
+}
+
+// Private usage stats. Inert until STATS_TOKEN is set (wrangler secret put),
+// then require it via `?token=` or an `Authorization: Bearer` header. Lets you
+// check user counts from a browser without running wrangler.
+async function handleStats(request, env) {
+  const expected = env.STATS_TOKEN
+  if (!expected) return json({ error: 'stats not configured' }, 501)
+  const url = new URL(request.url)
+  const auth = request.headers.get('Authorization') || ''
+  const provided =
+    url.searchParams.get('token') || (auth.startsWith('Bearer ') ? auth.slice(7) : '')
+  if (provided !== expected) return json({ error: 'unauthorized' }, 401)
+
+  const [googleUsers, codeAccounts, reminderSubscribers] = await Promise.all([
+    countPrefix(env, 'gacct:'),
+    countPrefix(env, 'acct:'),
+    countPrefix(env, 'user:'),
+  ])
+  return json({
+    googleUsers,
+    codeAccounts,
+    totalAccounts: googleUsers + codeAccounts,
+    reminderSubscribers,
+  })
+}
+
 // --- scheduler -------------------------------------------------------------
 async function runReminders(env, now = new Date()) {
   const vapid = vapidFrom(env)
@@ -293,6 +333,7 @@ export default {
     const url = new URL(request.url)
 
     if (request.method === 'GET' && url.pathname === '/health') return json({ ok: true })
+    if (request.method === 'GET' && url.pathname === '/stats') return handleStats(request, env)
     if (request.method === 'POST' && url.pathname === '/subscribe')
       return handleSubscribe(request, env)
     if (request.method === 'POST' && url.pathname === '/read') return handleRead(request, env)
