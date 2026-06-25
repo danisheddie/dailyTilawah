@@ -67,9 +67,9 @@ const en = {
     'Open this page in Safari first (Add to Home Screen isn’t available in other browsers), then tap Share → “Add to Home Screen”.',
   'install.dontShow': 'Don’t show again',
 
-  'beta.title': 'You’re testing an early version.',
+  'beta.title': 'Just launched — and still growing.',
   'beta.body':
-    'Jazākallāhu khayran for helping shape Tilawah. Everything here works — read, build your streak, and use it however you like. If anything feels off, your feedback makes it better.',
+    'Everything here works — read your page, build your streak, make it a habit. Tilawah is new, so if something feels off or you have an idea, I’d love to hear it.',
 
   'reflection.verse': 'Verse of the day',
   'reflection.hadith': 'Hadith of the day',
@@ -303,9 +303,9 @@ const ms = {
     'Buka halaman ini dalam Safari dahulu (Tambah ke Skrin Utama tiada dalam pelayar lain), kemudian ketik Kongsi → “Tambah ke Skrin Utama”.',
   'install.dontShow': 'Jangan tunjuk lagi',
 
-  'beta.title': 'Anda sedang menguji versi awal.',
+  'beta.title': 'Baru dilancarkan — dan terus berkembang.',
   'beta.body':
-    'Jazākallāhu khayran kerana membantu membentuk Tilawah. Semuanya berfungsi — baca, bina rentetan anda, dan gunakannya sesuka hati. Jika ada yang kurang kena, maklum balas anda menjadikannya lebih baik.',
+    'Semuanya di sini berfungsi — baca halaman anda, bina rentetan anda, jadikan ia kebiasaan. Tilawah masih baharu, jadi jika ada yang kurang kena atau anda ada idea, saya ingin mendengarnya.',
 
   'reflection.verse': 'Ayat hari ini',
   'reflection.hadith': 'Hadis hari ini',
@@ -542,9 +542,9 @@ const id = {
     'Buka halaman ini di Safari dulu (Tambahkan ke Layar Utama tidak tersedia di browser lain), lalu ketuk Bagikan → “Tambahkan ke Layar Utama”.',
   'install.dontShow': 'Jangan tampilkan lagi',
 
-  'beta.title': 'Anda sedang menguji versi awal.',
+  'beta.title': 'Baru diluncurkan — dan terus berkembang.',
   'beta.body':
-    'Jazākallāhu khayran telah membantu membentuk Tilawah. Semuanya berfungsi — baca, bangun rentetan Anda, dan gunakan sesuka Anda. Jika ada yang kurang pas, masukan Anda membuatnya lebih baik.',
+    'Semua di sini berfungsi — baca halaman Anda, bangun rentetan Anda, jadikan kebiasaan. Tilawah masih baru, jadi jika ada yang kurang pas atau Anda punya ide, saya senang mendengarnya.',
 
   'reflection.verse': 'Ayat hari ini',
   'reflection.hadith': 'Hadis hari ini',
