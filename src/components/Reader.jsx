@@ -160,6 +160,11 @@ export default function Reader() {
   // A page is "already read" in this pass once you've progressed past it.
   const alreadyRead = page < getLastPage()
 
+  // The two views use different data shapes (mushaf: lines, list: ayahs). After
+  // switching views in place, `data` briefly still holds the old shape until the
+  // reload lands — treat that as "not ready" so we show the spinner, not a crash.
+  const dataReady = mode === 'mushaf' ? !!data?.lines : !!data?.ayahs
+
   // --- audio (list per-ayah, mushaf whole-page) ----------------------------
   function stopAudio() {
     if (audioRef.current) {
@@ -378,7 +383,7 @@ export default function Reader() {
 
       {/* Body */}
       <main className={mode === 'mushaf' ? 'px-2 pb-28 pt-2' : 'px-5 pb-32 pt-4'}>
-        {loading && <Spinner />}
+        {(loading || (!error && !dataReady)) && <Spinner />}
 
         {!loading && error && (
           <div className="flex flex-col items-center gap-5 py-24 text-center">
@@ -389,11 +394,11 @@ export default function Reader() {
           </div>
         )}
 
-        {!loading && !error && data && mode === 'mushaf' && (
+        {!loading && !error && data?.lines && mode === 'mushaf' && (
           <MushafPage page={page} lines={data.lines} onSwitch={switchToList} />
         )}
 
-        {!loading && !error && data && mode === 'list' && (
+        {!loading && !error && data?.ayahs && mode === 'list' && (
           <>
             {data.ayahs.map((ayah, i) => (
               <div key={ayah.number}>
@@ -437,7 +442,7 @@ export default function Reader() {
       </main>
 
       {/* Bottom action bar */}
-      {!loading && !error && data && (
+      {!loading && !error && dataReady && (
         <div className="fixed inset-x-0 bottom-0 mx-auto max-w-2xl border-t border-teal/10 bg-paper/95 px-5 py-3 backdrop-blur">
           <div className="flex items-center gap-2.5">
             <button
