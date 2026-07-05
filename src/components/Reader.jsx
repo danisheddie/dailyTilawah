@@ -5,7 +5,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getPage, getMushafPage, TOTAL_PAGES, TRANSLATIONS } from '../utils/api'
+import { getPage, getMushafPage, TOTAL_PAGES } from '../utils/api'
 import {
   getLastPage,
   getSettings,
@@ -19,6 +19,7 @@ import { schedulePush } from '../utils/cloudSync'
 import AyahCard from './AyahCard'
 import MushafPage from './MushafPage'
 import JumpSheet from './JumpSheet'
+import ReadingOptions from './ReadingOptions'
 import { ensurePageFont } from '../utils/fonts'
 import { useWakeLock } from '../utils/useWakeLock.jsx'
 import { useLang } from '../utils/i18n.jsx'
@@ -48,6 +49,7 @@ export default function Reader() {
   const [completion, setCompletion] = useState(null) // null | {justCompleted}
   const [glyphPages, setGlyphPages] = useState(() => new Set()) // QCF fonts ready
   const [showJump, setShowJump] = useState(false)
+  const [showOptions, setShowOptions] = useState(false)
   const [bookmarked, setBookmarked] = useState(false)
 
   const audioRef = useRef(null)
@@ -72,7 +74,7 @@ export default function Reader() {
   function onTouchEnd(e) {
     const s = touchStart.current
     touchStart.current = null
-    if (!s || !data || loading || error || showJump || completion) return
+    if (!s || !data || loading || error || showJump || showOptions || completion) return
     const t = e.changedTouches[0]
     const dx = t.clientX - s.x
     const dy = t.clientY - s.y
@@ -289,15 +291,24 @@ export default function Reader() {
     >
       {/* Header */}
       <header className="sticky top-0 z-10 flex items-center justify-between border-b border-teal/5 bg-paper/90 px-5 py-4 backdrop-blur">
-        <button
-          onClick={() => navigate('/')}
-          aria-label="Back to home"
-          className="rounded-full p-1.5 text-muted transition active:scale-90"
-        >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-            <path d="M15 18l-6-6 6-6" />
-          </svg>
-        </button>
+        <div className="flex items-center">
+          <button
+            onClick={() => navigate('/')}
+            aria-label="Back to home"
+            className="rounded-full p-1.5 text-muted transition active:scale-90"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
+          <button
+            onClick={() => setShowOptions(true)}
+            aria-label={t('reader.options')}
+            className="rounded-full px-2 py-1.5 text-[15px] font-semibold text-muted transition active:scale-90"
+          >
+            Aa
+          </button>
+        </div>
         <div className="text-center">
           <p className="flex items-center justify-center gap-1.5 text-sm font-semibold text-teal">
             {t('reader.page', { page })}
@@ -384,22 +395,6 @@ export default function Reader() {
 
         {!loading && !error && data && mode === 'list' && (
           <>
-            {settings.showTranslation && (
-              <div className="mb-2 flex items-center justify-end gap-2">
-                <span className="text-xs text-muted">{t('settings.translation')}</span>
-                <select
-                  value={settings.translationEdition}
-                  onChange={(e) => changeSetting('translationEdition', e.target.value)}
-                  className="rounded-xl border border-teal/15 bg-transparent px-2.5 py-1.5 text-xs text-teal outline-none transition focus:border-teal"
-                >
-                  {TRANSLATIONS.map((tr) => (
-                    <option key={tr.id} value={tr.id}>
-                      {tr.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
             {data.ayahs.map((ayah, i) => (
               <div key={ayah.number}>
                 {ayah.numberInSurah === 1 && (
@@ -477,6 +472,15 @@ export default function Reader() {
 
       {/* Jump-to panel: bookmarks, juz, surah */}
       {showJump && <JumpSheet onJump={jumpTo} onClose={() => setShowJump(false)} />}
+
+      {/* Reading options: view, size, translation/transliteration/audio */}
+      {showOptions && (
+        <ReadingOptions
+          settings={settings}
+          onChange={changeSetting}
+          onClose={() => setShowOptions(false)}
+        />
+      )}
 
       {/* Completion celebration */}
       {completion && (
