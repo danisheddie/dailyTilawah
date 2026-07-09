@@ -10,7 +10,7 @@ import { useLang } from '../utils/i18n.jsx'
 
 export default function InstallPrompt() {
   const { t } = useLang()
-  const { eligible, deferred, iosNeedsSafari, install, dontShowAgain } = useInstall()
+  const { eligible, deferred, iosNeedsBrowser, install, dontShowAgain } = useInstall()
   const [closed, setClosed] = useState(false)
 
   if (!eligible || closed) return null
@@ -32,7 +32,7 @@ export default function InstallPrompt() {
             </button>
           ) : (
             <p className="mt-2 text-xs font-medium text-teal">
-              {iosNeedsSafari ? t('install.iosOpenSafari') : t('install.iosSteps')}
+              {iosNeedsBrowser ? t('install.iosOpenBrowser') : t('install.iosSteps')}
             </p>
           )}
         </div>

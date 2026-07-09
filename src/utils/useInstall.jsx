@@ -19,16 +19,19 @@ export function useInstall() {
   const [installed, setInstalled] = useState(() => isStandalone())
   const ua = navigator.userAgent
   const isIos = /iphone|ipad|ipod/i.test(ua)
-  // "Add to Home Screen" only exists in real Safari on iOS — not Chrome/Firefox
-  // (CriOS/FxiOS…) and not in-app webviews (Instagram, Facebook, etc.), which
-  // lack Safari's "Version/" token. When iOS but not Safari we tell the user to
-  // open the page in Safari first instead of showing steps they can't follow.
+  // On iOS, "Add to Home Screen" lives in the Share menu of a full browser —
+  // both Safari and Chrome (CriOS) support it. In-app webviews (Instagram,
+  // Facebook, etc.) don't, and they lack Safari's "Version/" token. Chrome is
+  // detected explicitly since it isn't a "Version/" Safari UA.
+  const isIosChrome = isIos && /CriOS/.test(ua)
   const isIosSafari =
     isIos &&
     /Safari/.test(ua) &&
     /Version\//.test(ua) &&
     !/CriOS|FxiOS|EdgiOS|OPiOS|GSA|FBAN|FBAV|Instagram|Line|MicroMessenger|Twitter/.test(ua)
-  const iosNeedsSafari = isIos && !isIosSafari
+  // Can install here? Safari or Chrome. Otherwise (in-app webview, or a browser
+  // without the option) we tell the user to open the page in a full browser.
+  const iosNeedsBrowser = isIos && !isIosSafari && !isIosChrome
 
   useEffect(() => {
     function onPrompt(e) {
@@ -66,5 +69,5 @@ export function useInstall() {
     setDismissed(true)
   }
 
-  return { eligible, deferred, isIos, iosNeedsSafari, install, dontShowAgain }
+  return { eligible, deferred, isIos, iosNeedsBrowser, install, dontShowAgain }
 }

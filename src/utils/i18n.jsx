@@ -62,9 +62,9 @@ const en = {
   'install.body':
     'Add it for a faster, full-screen, offline experience.',
   'install.button': 'Add to Home Screen',
-  'install.iosSteps': 'In Safari: tap Share, then “Add to Home Screen”.',
-  'install.iosOpenSafari':
-    'Open this page in Safari first (Add to Home Screen isn’t available in other browsers), then tap Share → “Add to Home Screen”.',
+  'install.iosSteps': 'Tap the Share button, then “Add to Home Screen”.',
+  'install.iosOpenBrowser':
+    'Open this page in Safari or Chrome first (this in-app browser can’t install it), then tap Share → “Add to Home Screen”.',
   'install.dontShow': 'Don’t show again',
 
   'beta.title': 'Just launched — and still growing.',
@@ -299,9 +299,9 @@ const ms = {
   'install.body':
     'Tambah untuk pengalaman lebih pantas, skrin penuh dan luar talian.',
   'install.button': 'Tambah ke Skrin Utama',
-  'install.iosSteps': 'Dalam Safari: ketik Kongsi, kemudian “Tambah ke Skrin Utama”.',
-  'install.iosOpenSafari':
-    'Buka halaman ini dalam Safari dahulu (Tambah ke Skrin Utama tiada dalam pelayar lain), kemudian ketik Kongsi → “Tambah ke Skrin Utama”.',
+  'install.iosSteps': 'Ketik butang Kongsi, kemudian “Tambah ke Skrin Utama”.',
+  'install.iosOpenBrowser':
+    'Buka halaman ini dalam Safari atau Chrome dahulu (pelayar dalam apl ini tidak boleh memasangnya), kemudian ketik Kongsi → “Tambah ke Skrin Utama”.',
   'install.dontShow': 'Jangan tunjuk lagi',
 
   'beta.title': 'Baru dilancarkan — dan terus berkembang.',
@@ -539,9 +539,9 @@ const id = {
   'install.body':
     'Tambahkan untuk pengalaman lebih cepat, layar penuh, dan offline.',
   'install.button': 'Tambahkan ke Layar Utama',
-  'install.iosSteps': 'Di Safari: ketuk Bagikan, lalu “Tambahkan ke Layar Utama”.',
-  'install.iosOpenSafari':
-    'Buka halaman ini di Safari dulu (Tambahkan ke Layar Utama tidak tersedia di browser lain), lalu ketuk Bagikan → “Tambahkan ke Layar Utama”.',
+  'install.iosSteps': 'Ketuk tombol Bagikan, lalu “Tambahkan ke Layar Utama”.',
+  'install.iosOpenBrowser':
+    'Buka halaman ini di Safari atau Chrome dulu (browser dalam aplikasi ini tidak bisa memasangnya), lalu ketuk Bagikan → “Tambahkan ke Layar Utama”.',
   'install.dontShow': 'Jangan tampilkan lagi',
 
   'beta.title': 'Baru diluncurkan — dan terus berkembang.',
