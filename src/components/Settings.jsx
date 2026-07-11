@@ -161,9 +161,9 @@ export default function Settings() {
         className="mt-6 flex w-full items-center justify-between rounded-2xl border border-teal/15 px-4 py-3.5 text-left transition active:scale-[0.99]"
       >
         <span className="flex items-center gap-3 text-sm font-medium text-teal">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-            <circle cx="12" cy="12" r="9" />
-            <path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .8-1 1.7" />
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
             <path d="M12 17h.01" />
           </svg>
           {t('settings.howItWorks')}
