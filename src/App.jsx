@@ -10,6 +10,7 @@ import Home from './components/Home'
 import Reader from './components/Reader'
 import Settings from './components/Settings'
 import Journey from './components/Journey'
+import Help from './components/Help'
 
 export default function App() {
   const [onboarded, setOnboarded] = useState(() => isOnboarded())
@@ -29,6 +30,7 @@ export default function App() {
       <Route path="/read" element={<Reader />} />
       <Route path="/journey" element={<Journey />} />
       <Route path="/settings" element={<Settings />} />
+      <Route path="/help" element={<Help />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

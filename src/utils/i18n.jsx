@@ -67,6 +67,34 @@ const en = {
     'Open this page in Safari or Chrome first (this in-app browser can’t install it), then tap Share → “Add to Home Screen”.',
   'install.dontShow': 'Don’t show again',
 
+  'settings.howItWorks': 'How it works',
+  'help.title': 'How it works',
+  'help.intro': 'A quick guide to getting the most out of Tilawah.',
+  'help.startTitle': 'Getting started',
+  'help.startBody':
+    'Open the app, read your page, and tap “Mark as read”. That’s it — one page a day. Your progress saves automatically on this device.',
+  'help.installTitle': 'Add to your Home Screen',
+  'help.installBody':
+    'Installing lets it open full-screen like a normal app, work offline, and (on iPhone) receive reminders.',
+  'help.installIphone':
+    'iPhone (Safari or Chrome): tap the Share button, then “Add to Home Screen”.',
+  'help.installAndroid':
+    'Android (Chrome): tap the ⋮ menu, then “Add to Home screen” or “Install app”.',
+  'help.installInApp':
+    'Opened from Instagram, WhatsApp or similar? Open the link in Safari or Chrome first.',
+  'help.readingTitle': 'Reading your way',
+  'help.readingBody':
+    'Tap “Aa” in the reader to switch between the mushaf page and a line-by-line view, change text size, and turn on translation, transliteration or audio. Swipe left or right to turn pages.',
+  'help.syncTitle': 'Sync across devices',
+  'help.syncBody':
+    'In Settings → Sync, sign in with Google or create a sync code to carry your progress and bookmarks to another phone.',
+  'help.remindersTitle': 'Prayer-time reminders',
+  'help.remindersBody':
+    'In Settings → Reminders, turn on gentle nudges at prayer times if you haven’t read yet. On iPhone, add the app to your Home Screen first.',
+  'help.progressTitle': 'Tracking your progress',
+  'help.progressBody':
+    'Your streak grows each day you read. Tap it to open your Journey — your reading calendar, pages read, and khatm progress.',
+
   'beta.title': 'Just launched — and still growing.',
   'beta.body':
     'Everything here works — read your page, build your streak, make it a habit. Tilawah is new, so if something feels off or you have an idea, I’d love to hear it.',
@@ -303,6 +331,34 @@ const ms = {
   'install.iosOpenBrowser':
     'Buka halaman ini dalam Safari atau Chrome dahulu (pelayar dalam apl ini tidak boleh memasangnya), kemudian ketik Kongsi → “Tambah ke Skrin Utama”.',
   'install.dontShow': 'Jangan tunjuk lagi',
+
+  'settings.howItWorks': 'Cara ia berfungsi',
+  'help.title': 'Cara ia berfungsi',
+  'help.intro': 'Panduan ringkas untuk memanfaatkan sepenuhnya Tilawah.',
+  'help.startTitle': 'Bermula',
+  'help.startBody':
+    'Buka apl, baca halaman anda, dan ketik “Tandai dibaca”. Itu sahaja — satu halaman sehari. Kemajuan anda disimpan secara automatik pada peranti ini.',
+  'help.installTitle': 'Tambah ke Skrin Utama',
+  'help.installBody':
+    'Memasangnya membolehkan ia dibuka skrin penuh seperti apl biasa, berfungsi luar talian, dan (pada iPhone) menerima peringatan.',
+  'help.installIphone':
+    'iPhone (Safari atau Chrome): ketik butang Kongsi, kemudian “Tambah ke Skrin Utama”.',
+  'help.installAndroid':
+    'Android (Chrome): ketik menu ⋮, kemudian “Tambah ke Skrin Utama” atau “Pasang apl”.',
+  'help.installInApp':
+    'Dibuka dari Instagram, WhatsApp atau seumpamanya? Buka pautan dalam Safari atau Chrome dahulu.',
+  'help.readingTitle': 'Membaca ikut cara anda',
+  'help.readingBody':
+    'Ketik “Aa” dalam pembaca untuk bertukar antara halaman mushaf dan paparan baris demi baris, ubah saiz teks, dan hidupkan terjemahan, transliterasi atau audio. Leret kiri atau kanan untuk menyelak halaman.',
+  'help.syncTitle': 'Segerak merentas peranti',
+  'help.syncBody':
+    'Dalam Tetapan → Segerak, log masuk dengan Google atau cipta kod segerak untuk membawa kemajuan dan penanda anda ke telefon lain.',
+  'help.remindersTitle': 'Peringatan waktu solat',
+  'help.remindersBody':
+    'Dalam Tetapan → Peringatan, hidupkan peringatan lembut pada waktu solat jika anda belum membaca. Pada iPhone, tambah apl ke Skrin Utama dahulu.',
+  'help.progressTitle': 'Menjejak kemajuan anda',
+  'help.progressBody':
+    'Rentetan anda bertambah setiap hari anda membaca. Ketik ia untuk membuka Perjalanan anda — kalendar bacaan, halaman dibaca, dan kemajuan khatam.',
 
   'beta.title': 'Baru dilancarkan — dan terus berkembang.',
   'beta.body':
@@ -543,6 +599,34 @@ const id = {
   'install.iosOpenBrowser':
     'Buka halaman ini di Safari atau Chrome dulu (browser dalam aplikasi ini tidak bisa memasangnya), lalu ketuk Bagikan → “Tambahkan ke Layar Utama”.',
   'install.dontShow': 'Jangan tampilkan lagi',
+
+  'settings.howItWorks': 'Cara kerjanya',
+  'help.title': 'Cara kerjanya',
+  'help.intro': 'Panduan singkat untuk memaksimalkan Tilawah.',
+  'help.startTitle': 'Memulai',
+  'help.startBody':
+    'Buka aplikasi, baca halaman Anda, lalu ketuk “Tandai dibaca”. Begitu saja — satu halaman sehari. Kemajuan Anda tersimpan otomatis di perangkat ini.',
+  'help.installTitle': 'Tambahkan ke Layar Utama',
+  'help.installBody':
+    'Memasangnya membuatnya terbuka layar penuh seperti aplikasi biasa, bekerja offline, dan (di iPhone) menerima pengingat.',
+  'help.installIphone':
+    'iPhone (Safari atau Chrome): ketuk tombol Bagikan, lalu “Tambahkan ke Layar Utama”.',
+  'help.installAndroid':
+    'Android (Chrome): ketuk menu ⋮, lalu “Tambahkan ke Layar Utama” atau “Instal aplikasi”.',
+  'help.installInApp':
+    'Dibuka dari Instagram, WhatsApp, atau sejenisnya? Buka tautan di Safari atau Chrome dulu.',
+  'help.readingTitle': 'Membaca sesuai cara Anda',
+  'help.readingBody':
+    'Ketuk “Aa” di pembaca untuk beralih antara halaman mushaf dan tampilan baris demi baris, mengubah ukuran teks, dan mengaktifkan terjemahan, transliterasi, atau audio. Geser kiri atau kanan untuk membalik halaman.',
+  'help.syncTitle': 'Sinkronkan antar perangkat',
+  'help.syncBody':
+    'Di Pengaturan → Sinkron, masuk dengan Google atau buat kode sinkron untuk membawa kemajuan dan markah Anda ke ponsel lain.',
+  'help.remindersTitle': 'Pengingat waktu salat',
+  'help.remindersBody':
+    'Di Pengaturan → Pengingat, aktifkan pengingat lembut pada waktu salat jika Anda belum membaca. Di iPhone, tambahkan aplikasi ke Layar Utama dulu.',
+  'help.progressTitle': 'Melacak kemajuan Anda',
+  'help.progressBody':
+    'Rentetan Anda bertambah setiap hari Anda membaca. Ketuk untuk membuka Perjalanan Anda — kalender bacaan, halaman dibaca, dan kemajuan khatam.',
 
   'beta.title': 'Baru diluncurkan — dan terus berkembang.',
   'beta.body':
