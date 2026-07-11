@@ -9,6 +9,7 @@ import StreakBadge from './StreakBadge'
 import DailyReflection from './DailyReflection'
 import BetaNotice from './BetaNotice'
 import InstallPrompt from './InstallPrompt'
+import HelpPointer from './HelpPointer'
 import { useLang } from '../utils/i18n.jsx'
 
 function GearIcon() {
@@ -121,6 +122,7 @@ export default function Home() {
 
       <div className="shrink-0">
         <InstallPrompt />
+        <HelpPointer />
         <BetaNotice />
       </div>
 

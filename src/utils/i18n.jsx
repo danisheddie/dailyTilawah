@@ -94,6 +94,7 @@ const en = {
   'help.progressTitle': 'Tracking your progress',
   'help.progressBody':
     'Your streak grows each day you read. Tap it to open your Journey — your reading calendar, pages read, and khatm progress.',
+  'help.pointer': 'New here? See how it works',
 
   'beta.title': 'Just launched — and still growing.',
   'beta.body':
@@ -359,6 +360,7 @@ const ms = {
   'help.progressTitle': 'Menjejak kemajuan anda',
   'help.progressBody':
     'Rentetan anda bertambah setiap hari anda membaca. Ketik ia untuk membuka Perjalanan anda — kalendar bacaan, halaman dibaca, dan kemajuan khatam.',
+  'help.pointer': 'Baru di sini? Lihat cara ia berfungsi',
 
   'beta.title': 'Baru dilancarkan — dan terus berkembang.',
   'beta.body':
@@ -627,6 +629,7 @@ const id = {
   'help.progressTitle': 'Melacak kemajuan Anda',
   'help.progressBody':
     'Rentetan Anda bertambah setiap hari Anda membaca. Ketuk untuk membuka Perjalanan Anda — kalender bacaan, halaman dibaca, dan kemajuan khatam.',
+  'help.pointer': 'Baru di sini? Lihat cara kerjanya',
 
   'beta.title': 'Baru diluncurkan — dan terus berkembang.',
   'beta.body':

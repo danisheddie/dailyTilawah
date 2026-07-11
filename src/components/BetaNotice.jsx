@@ -2,7 +2,7 @@
 // the app is fully usable. Shown until dismissed (remembered on the device).
 
 import { useState } from 'react'
-import { isBetaDismissed, dismissBeta } from '../utils/storage'
+import { isBetaDismissed, dismissBeta, isHelpSeen } from '../utils/storage'
 import { useInstall } from '../utils/useInstall.jsx'
 import { useLang } from '../utils/i18n.jsx'
 
@@ -10,8 +10,9 @@ export default function BetaNotice() {
   const { t } = useLang()
   const { eligible: installEligible } = useInstall()
   const [hidden, setHidden] = useState(() => isBetaDismissed())
-  // Defer to the install nudge so only one Home banner shows at a time.
-  if (hidden || installEligible) return null
+  // Only one Home banner shows at a time: defer to the install nudge, then to
+  // the first-run help pointer (until the guide has been seen/dismissed).
+  if (hidden || installEligible || !isHelpSeen()) return null
 
   return (
     <div className="mt-4 rounded-2xl border border-gold/30 bg-gold/10 px-4 py-3">

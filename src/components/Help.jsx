@@ -2,7 +2,9 @@
 // on their own: installing, syncing, reminders, reading views, progress.
 // Reached from the Home header "?" and from Settings. Replayable by anyone.
 
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { markHelpSeen } from '../utils/storage'
 import { useLang } from '../utils/i18n.jsx'
 
 function Section({ title, children }) {
@@ -19,6 +21,11 @@ function Section({ title, children }) {
 export default function Help() {
   const navigate = useNavigate()
   const { t } = useLang()
+
+  // Opening the guide retires the first-run pointer.
+  useEffect(() => {
+    markHelpSeen()
+  }, [])
 
   return (
     <div className="mx-auto min-h-screen max-w-md px-6 py-8">

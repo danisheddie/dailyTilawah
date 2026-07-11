@@ -20,6 +20,7 @@ const KEYS = {
   customGoalPages: 'tilawah:customGoalPages',
   betaDismissed: 'tilawah:betaDismissed',
   installDismissed: 'tilawah:installDismissed',
+  helpSeen: 'tilawah:helpSeen',
   bookmarks: 'tilawah:bookmarks',
   khatmCount: 'tilawah:khatmCount',
   longestStreak: 'tilawah:longestStreak',
@@ -128,6 +129,16 @@ export function isInstallDismissed() {
 
 export function dismissInstall() {
   write(KEYS.installDismissed, true)
+}
+
+// The first-run "how it works" pointer shows until the guide is opened or the
+// pointer is dismissed — both set this.
+export function isHelpSeen() {
+  return read(KEYS.helpSeen, false) === true
+}
+
+export function markHelpSeen() {
+  write(KEYS.helpSeen, true)
 }
 
 // --- name ------------------------------------------------------------------
