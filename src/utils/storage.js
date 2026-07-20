@@ -1,7 +1,7 @@
 // All localStorage read/write logic for Daily Tilawah lives here.
 // Keeping it in one place keeps components free of storage details.
 
-import { todayISO, isYesterday, isToday } from './dateUtils'
+import { todayISO, daysAgo } from './dateUtils'
 
 const KEYS = {
   onboarded: 'tilawah:onboarded',
@@ -276,14 +276,29 @@ export function isCompletedToday() {
   return read(KEYS.completedToday, false) === true
 }
 
-// Returns the effective streak, accounting for missed days.
-// A streak survives only if the last completion was today or yesterday.
+// A single missed day is quietly forgiven (a "grace" — mercy, not a game
+// mechanic): the streak survives one gap and only breaks after two missed
+// days. There's no visible token to manage — it just holds.
+const STREAK_GRACE_DAYS = 1
+
+// Returns the effective streak, accounting for missed days. It survives while
+// the last read was recent enough that today's read would still continue it —
+// today, yesterday, or (thanks to the grace) the day before.
 export function getStreak() {
   const streak = read(KEYS.streak, 0)
   const last = read(KEYS.lastCompletedDate, null)
   if (!last) return 0
-  if (isToday(last) || isYesterday(last)) return streak
-  return 0
+  return daysAgo(last) <= 1 + STREAK_GRACE_DAYS ? streak : 0
+}
+
+// True when the streak is currently alive only because of the grace — the user
+// missed yesterday but the streak still stands. Lets the UI reassure them once.
+export function isStreakOnGrace() {
+  const last = read(KEYS.lastCompletedDate, null)
+  const streak = read(KEYS.streak, 0)
+  if (!last || streak <= 0) return false
+  const gap = daysAgo(last)
+  return gap > 1 && gap <= 1 + STREAK_GRACE_DAYS
 }
 
 export function getProgressSummary() {
@@ -416,7 +431,10 @@ function bumpStreak() {
   if (last === today) return // already counted today
 
   let streak = read(KEYS.streak, 0)
-  if (last && isYesterday(last)) {
+  // Continue the streak if the last read was recent enough — yesterday, or the
+  // day before (the grace bridges a single missed day). Today's read adds one;
+  // the skipped day isn't awarded, just forgiven.
+  if (last && daysAgo(last) <= 1 + STREAK_GRACE_DAYS) {
     streak += 1
   } else {
     streak = 1 // fresh start or broken streak

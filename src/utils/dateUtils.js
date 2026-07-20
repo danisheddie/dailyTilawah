@@ -18,6 +18,18 @@ export function isYesterday(isoString) {
   return isoString === todayISO(y)
 }
 
+// Whole days from the given local ISO day to today (0 = today, 1 = yesterday).
+// Infinity when missing/unparseable, so callers can treat it as "long ago".
+export function daysAgo(isoString) {
+  if (!isoString) return Infinity
+  const [y, m, d] = isoString.split('-').map(Number)
+  if (!y || !m || !d) return Infinity
+  const then = new Date(y, m - 1, d)
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  return Math.round((today - then) / 86400000)
+}
+
 // e.g. "Tuesday, 16 June 2026"
 export function formatGregorian(date = new Date()) {
   return new Intl.DateTimeFormat('en-GB', {

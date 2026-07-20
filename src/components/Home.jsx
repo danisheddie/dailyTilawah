@@ -2,7 +2,7 @@
 // clear action to start (or continue) today's reading.
 
 import { useNavigate } from 'react-router-dom'
-import { getProgressSummary, getName, getReminders, getSettings, getLongestStreak, getLastReadDate } from '../utils/storage'
+import { getProgressSummary, getName, getReminders, getSettings, getLongestStreak, getLastReadDate, isStreakOnGrace } from '../utils/storage'
 import { formatGregorian, formatHijri } from '../utils/dateUtils'
 import { nextPrayer, formatTime } from '../utils/prayer'
 import StreakBadge from './StreakBadge'
@@ -47,13 +47,17 @@ export default function Home() {
   // A lapsed reader (had a streak before, none now) gets a gentle welcome
   // rather than the cold "begin today" — encouragement, not a scold.
   const lapsed = streak === 0 && getLongestStreak() > 0
+  // Streak held by the grace (missed yesterday) → reassure them once.
+  const onGrace = !completedToday && isStreakOnGrace()
   const message = completedToday
     ? t('home.complete')
-    : streak > 0
-      ? t('home.keepStreak')
-      : lapsed
-        ? t('home.welcomeBack')
-        : t('home.beginToday')
+    : onGrace
+      ? t('home.streakKept')
+      : streak > 0
+        ? t('home.keepStreak')
+        : lapsed
+          ? t('home.welcomeBack')
+          : t('home.beginToday')
 
   // Quiet "last read …" line, shown only when there's something to resume.
   let lastReadLabel = null
