@@ -11,6 +11,7 @@ import {
   createAccount,
   linkAccount,
   syncNow,
+  isSynced,
 } from '../utils/cloudSync'
 import GoogleSignIn from './GoogleSignIn'
 import { useLang } from '../utils/i18n.jsx'
@@ -92,6 +93,12 @@ export default function SyncSettings() {
       {!configured && (
         <p className="mt-3 rounded-xl bg-gold/10 px-3 py-2 text-xs text-muted">
           {t('sync.notConnected')}
+        </p>
+      )}
+
+      {configured && !isSynced() && (
+        <p className="mt-3 rounded-xl bg-gold/10 px-3 py-2 text-xs text-muted">
+          {t('sync.notBackedUp')}
         </p>
       )}
 

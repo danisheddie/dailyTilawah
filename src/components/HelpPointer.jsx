@@ -7,6 +7,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { isHelpSeen, markHelpSeen } from '../utils/storage'
+import { isBackupEligible } from '../utils/cloudSync'
 import { useInstall } from '../utils/useInstall.jsx'
 import { useLang } from '../utils/i18n.jsx'
 
@@ -16,7 +17,8 @@ export default function HelpPointer() {
   const { eligible: installEligible } = useInstall()
   const [hidden, setHidden] = useState(() => isHelpSeen())
 
-  if (hidden || installEligible) return null
+  // Cascade: defer to the install nudge and the backup nudge (higher priority).
+  if (hidden || installEligible || isBackupEligible()) return null
 
   return (
     <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl border border-teal/15 bg-teal/[0.04] px-4 py-3">

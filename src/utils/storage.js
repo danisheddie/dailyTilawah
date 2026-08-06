@@ -21,6 +21,7 @@ const KEYS = {
   betaDismissed: 'tilawah:betaDismissed',
   installDismissed: 'tilawah:installDismissed',
   helpSeen: 'tilawah:helpSeen',
+  backupSnooze: 'tilawah:backupSnooze',
   bookmarks: 'tilawah:bookmarks',
   khatmCount: 'tilawah:khatmCount',
   longestStreak: 'tilawah:longestStreak',
@@ -139,6 +140,20 @@ export function isHelpSeen() {
 
 export function markHelpSeen() {
   write(KEYS.helpSeen, true)
+}
+
+// The "back up your progress" nudge snoozes (not dismisses forever) — the risk
+// of data loss is ongoing, so it can resurface after a while. Stores the local
+// ISO day until which to stay hidden.
+export function isBackupSnoozed() {
+  const until = read(KEYS.backupSnooze, null)
+  return typeof until === 'string' && daysAgo(until) < 0
+}
+
+export function snoozeBackup(days = 14) {
+  const d = new Date()
+  d.setDate(d.getDate() + days)
+  write(KEYS.backupSnooze, todayISO(d))
 }
 
 // --- name ------------------------------------------------------------------

@@ -96,6 +96,12 @@ const en = {
   'help.progressBody':
     'Your streak grows each day you read. Tap it to open your Journey — your reading calendar, pages read, and khatm progress.',
   'help.pointer': 'New here? See how it works',
+  'backup.title': 'Back up your progress',
+  'backup.body':
+    'Your streak and bookmarks are saved only on this device. Set up sync so you don’t lose them if you clear your browser or switch phones.',
+  'backup.cta': 'Set up backup',
+  'sync.notBackedUp':
+    'Your progress is saved only on this device right now. Sign in or create a sync code below so it’s safely backed up.',
 
   'beta.title': 'Just launched — and still growing.',
   'beta.body':
@@ -363,6 +369,12 @@ const ms = {
   'help.progressBody':
     'Rentetan anda bertambah setiap hari anda membaca. Ketik ia untuk membuka Perjalanan anda — kalendar bacaan, halaman dibaca, dan kemajuan khatam.',
   'help.pointer': 'Baru di sini? Lihat cara ia berfungsi',
+  'backup.title': 'Sandarkan kemajuan anda',
+  'backup.body':
+    'Rentetan dan penanda anda disimpan hanya pada peranti ini. Sediakan penyegerakan supaya anda tidak kehilangannya jika pelayar dikosongkan atau bertukar telefon.',
+  'backup.cta': 'Sediakan sandaran',
+  'sync.notBackedUp':
+    'Kemajuan anda kini disimpan hanya pada peranti ini. Log masuk atau cipta kod segerak di bawah supaya ia disandarkan dengan selamat.',
 
   'beta.title': 'Baru dilancarkan — dan terus berkembang.',
   'beta.body':
@@ -633,6 +645,12 @@ const id = {
   'help.progressBody':
     'Rentetan Anda bertambah setiap hari Anda membaca. Ketuk untuk membuka Perjalanan Anda — kalender bacaan, halaman dibaca, dan kemajuan khatam.',
   'help.pointer': 'Baru di sini? Lihat cara kerjanya',
+  'backup.title': 'Cadangkan kemajuan Anda',
+  'backup.body':
+    'Rentetan dan markah Anda hanya tersimpan di perangkat ini. Siapkan sinkronisasi agar tidak hilang jika browser dibersihkan atau ganti ponsel.',
+  'backup.cta': 'Siapkan cadangan',
+  'sync.notBackedUp':
+    'Kemajuan Anda saat ini hanya tersimpan di perangkat ini. Masuk atau buat kode sinkron di bawah agar tercadang dengan aman.',
 
   'beta.title': 'Baru diluncurkan — dan terus berkembang.',
   'beta.body':

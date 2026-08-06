@@ -8,6 +8,7 @@
 
 import { WORKER_URL, googleAuthConfigured } from '../config'
 import { todayISO } from './dateUtils'
+import { getLongestStreak, isBackupSnoozed } from './storage'
 
 // localStorage keys that make up a syncable snapshot. Device-specific keys
 // (clientId, reminder push subscription/location) are deliberately excluded.
@@ -105,6 +106,19 @@ export function clearSyncCode() {
   } catch {
     /* ignore */
   }
+}
+
+// Synced = the account is backed up to the cloud, via a Google session or a
+// sync code. Un-synced users keep everything only on this device.
+export function isSynced() {
+  return Boolean(getSyncCode() || getGoogleToken())
+}
+
+// Whether to nudge the user to back up: they're invested (had a real streak)
+// but not synced, and haven't snoozed the reminder. (Install-nudge priority is
+// handled in the component so only one Home banner shows at a time.)
+export function isBackupEligible() {
+  return !isSynced() && getLongestStreak() >= 3 && !isBackupSnoozed()
 }
 
 // --- Google session --------------------------------------------------------
