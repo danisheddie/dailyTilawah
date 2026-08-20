@@ -29,7 +29,7 @@ function loadGis() {
   return gisPromise
 }
 
-export default function GoogleSignIn() {
+export default function GoogleSignIn({ onSignedIn }) {
   const { t } = useLang()
   const btnRef = useRef(null)
   const [signedIn, setSignedIn] = useState(() => isGoogleSignedIn())
@@ -52,6 +52,7 @@ export default function GoogleSignIn() {
               const p = await googleSignIn(resp.credential)
               setProfile(p)
               setSignedIn(true)
+              onSignedIn?.()
             } catch (e) {
               setError(e.message || t('google.signInFail'))
             } finally {

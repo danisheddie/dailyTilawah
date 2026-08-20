@@ -36,6 +36,10 @@ const en = {
   'onboarding.bismillahMeaning':
     'In the name of Allah, the Most Gracious, the Most Merciful.',
   'onboarding.enter': 'Enter',
+  'onboarding.syncTitle': 'Keep your progress synced?',
+  'onboarding.syncBody':
+    'Sign in with Google to back up your progress and keep it in sync across every device you use. Totally optional — you can turn it on anytime later from Settings, and everything works fine without it.',
+  'onboarding.syncSkip': 'Skip for now',
 
   'goal.half': 'Half a page',
   'goal.one': '1 page',
@@ -315,6 +319,10 @@ const ms = {
   'onboarding.bismillahMeaning':
     'Dengan nama Allah, Yang Maha Pemurah, lagi Maha Mengasihani.',
   'onboarding.enter': 'Masuk',
+  'onboarding.syncTitle': 'Kekalkan kemajuan anda tersegerak?',
+  'onboarding.syncBody':
+    'Log masuk dengan Google untuk menyandarkan kemajuan anda dan memastikannya tersegerak di setiap peranti yang anda guna. Pilihan sepenuhnya — anda boleh hidupkannya bila-bila masa dari Tetapan, dan semuanya berfungsi tanpanya.',
+  'onboarding.syncSkip': 'Langkau buat masa ini',
 
   'goal.half': 'Setengah halaman',
   'goal.one': '1 halaman',
@@ -597,6 +605,10 @@ const id = {
   'onboarding.bismillahMeaning':
     'Dengan nama Allah, Yang Maha Pengasih, lagi Maha Penyayang.',
   'onboarding.enter': 'Masuk',
+  'onboarding.syncTitle': 'Jaga kemajuan Anda tetap tersinkron?',
+  'onboarding.syncBody':
+    'Masuk dengan Google untuk mencadangkan kemajuan Anda dan menjaganya tetap tersinkron di setiap perangkat yang Anda pakai. Sepenuhnya opsional — Anda bisa mengaktifkannya kapan saja dari Pengaturan, dan semuanya tetap berfungsi tanpanya.',
+  'onboarding.syncSkip': 'Lewati dulu',
 
   'goal.half': 'Setengah halaman',
   'goal.one': '1 halaman',

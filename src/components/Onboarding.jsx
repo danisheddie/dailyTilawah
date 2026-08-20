@@ -12,17 +12,19 @@ import {
   setLastPage,
 } from '../utils/storage'
 import StartingPoint from './StartingPoint'
+import GoogleSignIn from './GoogleSignIn'
 import { useLang } from '../utils/i18n.jsx'
 
 export default function Onboarding({ onDone }) {
   const navigate = useNavigate()
   const { t } = useLang()
-  // 0 welcome, 1 name, 2 goal, 3 starting point, 4 bismillah
+  // 0 welcome, 1 name, 2 goal, 3 starting point, 4 sync, 5 bismillah
   const [step, setStep] = useState(0)
   const [name, setName] = useState('')
   const [goalId, setGoalId] = useState('one')
   const [customPages, setCustomPages] = useState(3)
   const [startPage, setStartPage] = useState(1)
+  const [synced, setSynced] = useState(false)
 
   function finish() {
     completeOnboarding(goalId, name, customPages)
@@ -33,7 +35,7 @@ export default function Onboarding({ onDone }) {
 
   // Steps 1–4 carry a small back control and progress dots so the flow feels
   // navigable, not a one-way chute. The welcome screen (0) stays clean.
-  const TOTAL_STEPS = 4
+  const TOTAL_STEPS = 5
 
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center px-6 py-12 text-center">
@@ -178,6 +180,23 @@ export default function Onboarding({ onDone }) {
       )}
 
       {step === 4 && (
+        <div className="w-full animate-fade-in">
+          <h2 className="text-2xl font-semibold text-teal">
+            {t('onboarding.syncTitle')}
+          </h2>
+          <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-muted">
+            {t('onboarding.syncBody')}
+          </p>
+          <div className="mx-auto mt-6 max-w-xs">
+            <GoogleSignIn onSignedIn={() => setSynced(true)} />
+          </div>
+          <button className="btn-primary mt-8 w-full" onClick={() => setStep(5)}>
+            {synced ? t('common.continue') : t('onboarding.syncSkip')}
+          </button>
+        </div>
+      )}
+
+      {step === 5 && (
         <div className="animate-scale-in">
           <p
             className="font-arabic text-3xl leading-loose text-teal sm:text-4xl"
