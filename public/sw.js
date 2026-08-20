@@ -11,7 +11,10 @@
    - Local data / icons / fonts / manifest → stale-while-revalidate.
    - Audio and anything else → straight to the network. */
 
-const CACHE = 'tilawah-cache-v1'
+// Bump this on any deploy that must invalidate the shell/asset cache. The
+// activate handler deletes every cache whose name isn't this one, so a stale
+// shell (pointing at purged hashed assets) can never blank the app again.
+const CACHE = 'tilawah-cache-v2'
 // '/' on Cloudflare, '/dailyTilawah/' on the legacy GitHub build.
 const BASE = self.location.pathname.replace(/sw\.js$/, '')
 
