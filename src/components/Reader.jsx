@@ -20,6 +20,7 @@ import AyahCard from './AyahCard'
 import MushafPage from './MushafPage'
 import JumpSheet from './JumpSheet'
 import ReadingOptions from './ReadingOptions'
+import Sheet from './ui/Sheet'
 import { ensurePageFont } from '../utils/fonts'
 import { useWakeLock } from '../utils/useWakeLock.jsx'
 import { useLang } from '../utils/i18n.jsx'
@@ -50,7 +51,9 @@ export default function Reader() {
   const [glyphPages, setGlyphPages] = useState(() => new Set()) // QCF fonts ready
   const [showJump, setShowJump] = useState(false)
   const [showOptions, setShowOptions] = useState(false)
+  const [showMenu, setShowMenu] = useState(false)
   const [bookmarked, setBookmarked] = useState(false)
+  const [, forceTick] = useState(0) // bump to refresh the "read" mark in place
 
   const audioRef = useRef(null)
   const scrollRef = useRef(null)
@@ -266,13 +269,28 @@ export default function Reader() {
   }
 
   // --- finishing a page ----------------------------------------------------
-  function finishPage() {
+  // Record the current page as read (idempotent — only new pages count).
+  function recordCurrent() {
     const result = recordPageRead(page)
     reportRead() // suppress today's remaining prayer-time reminders
     schedulePush() // back up progress to the cloud if sync is on
+    return result
+  }
+
+  // Advancing marks the page read, then moves on (or celebrates a completion).
+  function finishPage() {
+    const result = recordCurrent()
     stopAudio()
     if (result.justCompleted || result.khatmCompleted) setCompletion(result)
     else goToNext()
+  }
+
+  // Explicit "mark as read" from the menu — records without leaving the page.
+  function markRead() {
+    setShowMenu(false)
+    const result = recordCurrent()
+    if (result.justCompleted || result.khatmCompleted) setCompletion(result)
+    else forceTick((n) => n + 1) // refresh alreadyRead without leaving the page
   }
 
   function goToNext() {
@@ -294,91 +312,49 @@ export default function Reader() {
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
-      {/* Header */}
-      <header className="sticky top-0 z-10 flex items-center justify-between border-b border-teal/5 bg-paper/90 px-5 py-4 backdrop-blur">
-        <div className="flex items-center">
-          <button
-            onClick={() => navigate('/')}
-            aria-label="Back to home"
-            className="rounded-full p-1.5 text-muted transition active:scale-90"
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <path d="M15 18l-6-6 6-6" />
-            </svg>
-          </button>
-          <button
-            onClick={() => setShowOptions(true)}
-            aria-label={t('reader.options')}
-            className="rounded-full px-2 py-1.5 text-[15px] font-semibold text-muted transition active:scale-90"
-          >
-            Aa
-          </button>
-        </div>
-        <div className="text-center">
-          <p className="flex items-center justify-center gap-1.5 text-sm font-semibold text-teal">
-            {t('reader.page', { page })}
+      {/* Header: back · surah + page (tap to jump) · overflow */}
+      <header className="sticky top-0 z-10 flex items-center gap-2 border-b border-teal/[0.06] bg-paper/90 px-3 py-3 backdrop-blur">
+        <button
+          onClick={() => navigate('/')}
+          aria-label="Back to home"
+          className="rounded-lg p-2 text-muted transition active:scale-90"
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+        </button>
+        <button
+          onClick={() => setShowJump(true)}
+          className="min-w-0 flex-1 text-center transition active:opacity-70"
+        >
+          <p className="truncate t-heading">
+            {data?.surahs?.length
+              ? data.surahs.map((s) => s.englishName).join(' · ')
+              : t('reader.page', { page })}
+          </p>
+          <p className="mt-0.5 flex items-center justify-center gap-1.5 text-xs text-muted">
+            {t('reader.pageOf', { page, total: TOTAL_PAGES })}
             {alreadyRead && (
-              <span className="inline-flex items-center gap-0.5 text-[11px] font-medium text-gold">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" aria-hidden="true">
+              <span className="inline-flex items-center gap-0.5 text-gold">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M20 6 9 17l-5-5" />
                 </svg>
                 {t('reader.read')}
               </span>
             )}
           </p>
-          {data?.surahs?.length > 0 && (
-            <p className="text-xs text-muted">
-              {data.surahs.map((s) => s.englishName).join(' · ')}
-            </p>
-          )}
-        </div>
-        <div className="flex items-center">
-          {/* Mushaf view has no per-ayah buttons, so one control recites the
-              whole page. Always shown (the list view's per-ayah players are
-              the toggleable ones). */}
-          {mode === 'mushaf' && data && (
-            <button
-              onClick={togglePageAudio}
-              aria-label={pageAudioActive ? t('reader.pausePage') : t('reader.playPage')}
-              className={`rounded-full p-1.5 transition active:scale-90 ${
-                pageAudioActive ? 'text-gold' : 'text-muted'
-              }`}
-            >
-              {loadingAudio !== null ? (
-                <span className="block h-[18px] w-[18px] animate-spin rounded-full border-2 border-gold/30 border-t-gold" />
-              ) : playingIndex !== null ? (
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <rect x="6" y="5" width="4" height="14" rx="1" />
-                  <rect x="14" y="5" width="4" height="14" rx="1" />
-                </svg>
-              ) : (
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <path d="M8 5.14v13.72a1 1 0 0 0 1.5.87l11-6.86a1 1 0 0 0 0-1.74l-11-6.86A1 1 0 0 0 8 5.14Z" />
-                </svg>
-              )}
-            </button>
-          )}
-          <button
-            onClick={toggleBm}
-            aria-label={bookmarked ? t('jump.removeBookmark') : t('jump.addBookmark')}
-            className={`rounded-full p-1.5 transition active:scale-90 ${
-              bookmarked ? 'text-gold' : 'text-muted'
-            }`}
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill={bookmarked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-            </svg>
-          </button>
-          <button
-            onClick={() => setShowJump(true)}
-            aria-label={t('jump.open')}
-            className="rounded-full p-1.5 text-muted transition active:scale-90"
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <path d="M4 6h16M4 12h16M4 18h10" />
-            </svg>
-          </button>
-        </div>
+        </button>
+        <button
+          onClick={() => setShowMenu(true)}
+          aria-label={t('reader.more')}
+          className="rounded-lg p-2 text-muted transition active:scale-90"
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <circle cx="5" cy="12" r="1.6" />
+            <circle cx="12" cy="12" r="1.6" />
+            <circle cx="19" cy="12" r="1.6" />
+          </svg>
+        </button>
       </header>
 
       {/* Body */}
@@ -403,13 +379,15 @@ export default function Reader() {
             {data.ayahs.map((ayah, i) => (
               <div key={ayah.number}>
                 {ayah.numberInSurah === 1 && (
-                  <div className="mb-2 mt-6 first:mt-0 rounded-2xl bg-teal/5 px-4 py-3 text-center">
-                    <p className="font-quran text-2xl text-teal" dir="rtl" lang="ar">
-                      {ayah.surahName}
-                    </p>
-                    <p className="mt-0.5 text-xs uppercase tracking-wide text-muted">
-                      {ayah.surahEnglishName}
-                    </p>
+                  <div className="mb-4 mt-8 first:mt-2 text-center">
+                    <div className="flex items-center justify-center gap-3">
+                      <span className="h-px w-10 bg-gold/40" />
+                      <p className="font-quran text-2xl leading-none text-teal" dir="rtl" lang="ar">
+                        {ayah.surahName}
+                      </p>
+                      <span className="h-px w-10 bg-gold/40" />
+                    </div>
+                    <p className="mt-2 t-eyebrow">{ayah.surahEnglishName}</p>
                   </div>
                 )}
                 {ayah.showBasmalah && (
@@ -441,33 +419,34 @@ export default function Reader() {
         )}
       </main>
 
-      {/* Bottom action bar */}
-      {!loading && !error && dataReady && (
-        <div className="fixed inset-x-0 bottom-0 mx-auto max-w-2xl border-t border-teal/10 bg-paper/95 px-5 py-3 backdrop-blur">
-          <div className="flex items-center gap-2.5">
+      {/* Bottom navigation: prev · page (tap to jump) · next. Advancing marks
+          the page read; the page pill jumps. Floats over a soft fade. */}
+      {!loading && !error && dataReady && !completion && (
+        <div className="pointer-events-none fixed inset-x-0 bottom-0 mx-auto max-w-2xl bg-gradient-to-t from-paper via-paper/90 to-transparent px-5 pb-5 pt-10">
+          <div className="pointer-events-auto mx-auto flex max-w-xs items-center gap-3">
             <button
-              className="btn-ghost px-3"
               onClick={goToPrev}
               disabled={page <= 1}
               aria-label={t('reader.prev')}
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-teal/15 bg-paper text-teal transition active:scale-90 disabled:opacity-30"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M15 18l-6-6 6-6" />
               </svg>
             </button>
-            <button className="btn-primary grow whitespace-nowrap" onClick={finishPage}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
-                <path d="M20 6 9 17l-5-5" />
-              </svg>
-              {t('reader.markRead')}
+            <button
+              onClick={() => setShowJump(true)}
+              className="grow rounded-full bg-teal py-3 text-center text-sm font-semibold text-paper shadow-card transition active:scale-[0.98]"
+            >
+              {t('reader.page', { page })}
             </button>
             <button
-              className="btn-ghost px-3"
-              onClick={goToNext}
+              onClick={finishPage}
               disabled={page >= TOTAL_PAGES}
               aria-label={t('reader.next')}
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-teal/15 bg-paper text-teal transition active:scale-90 disabled:opacity-30"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M9 18l6-6-6-6" />
               </svg>
             </button>
@@ -485,6 +464,79 @@ export default function Reader() {
           onChange={changeSetting}
           onClose={() => setShowOptions(false)}
         />
+      )}
+
+      {/* Overflow menu: options, bookmark, jump, listen (mushaf), mark read */}
+      {showMenu && (
+        <Sheet title={t('reader.more')} onClose={() => setShowMenu(false)}>
+          <div className="-mt-1 divide-y divide-teal/[0.06]">
+            <button
+              className="row"
+              onClick={() => {
+                setShowMenu(false)
+                setShowOptions(true)
+              }}
+            >
+              <span className="flex items-center gap-3 text-[15px] text-teal">
+                <span className="w-5 text-center font-semibold">Aa</span>
+                {t('reader.options')}
+              </span>
+            </button>
+            <button className="row" onClick={toggleBm}>
+              <span className={`flex items-center gap-3 text-[15px] ${bookmarked ? 'text-gold' : 'text-teal'}`}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill={bookmarked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                </svg>
+                {bookmarked ? t('jump.removeBookmark') : t('jump.addBookmark')}
+              </span>
+            </button>
+            <button
+              className="row"
+              onClick={() => {
+                setShowMenu(false)
+                setShowJump(true)
+              }}
+            >
+              <span className="flex items-center gap-3 text-[15px] text-teal">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M4 6h16M4 12h16M4 18h10" />
+                </svg>
+                {t('jump.title')}
+              </span>
+            </button>
+            {mode === 'mushaf' && (
+              <button
+                className="row"
+                onClick={() => {
+                  setShowMenu(false)
+                  togglePageAudio()
+                }}
+              >
+                <span className="flex items-center gap-3 text-[15px] text-teal">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    {pageAudioActive ? (
+                      <>
+                        <rect x="6" y="5" width="4" height="14" rx="1" />
+                        <rect x="14" y="5" width="4" height="14" rx="1" />
+                      </>
+                    ) : (
+                      <path d="M8 5.14v13.72a1 1 0 0 0 1.5.87l11-6.86a1 1 0 0 0 0-1.74l-11-6.86A1 1 0 0 0 8 5.14Z" />
+                    )}
+                  </svg>
+                  {pageAudioActive ? t('reader.pausePage') : t('reader.playPage')}
+                </span>
+              </button>
+            )}
+            <button className="row" onClick={markRead}>
+              <span className="flex items-center gap-3 text-[15px] text-teal">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
+                {t('reader.markRead')}
+              </span>
+            </button>
+          </div>
+        </Sheet>
       )}
 
       {/* Completion celebration */}
