@@ -413,7 +413,7 @@ export default function Reader() {
       {/* Bottom bar: prev · Mark as read · next. The arrows only navigate; the
           centre button marks the page read (and moves on). Floats over a fade. */}
       {!loading && !error && dataReady && !completion && (
-        <div className="pointer-events-none fixed inset-x-0 bottom-0 mx-auto max-w-2xl bg-gradient-to-t from-paper via-paper/90 to-transparent px-5 pb-5 pt-10">
+        <div className="pointer-events-none fixed inset-x-0 bottom-0 mx-auto max-w-2xl bg-gradient-to-t from-paper via-paper/90 to-transparent px-5 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-10">
           <div className="pointer-events-auto mx-auto flex max-w-sm items-center gap-3">
             <button
               onClick={goToPrev}
