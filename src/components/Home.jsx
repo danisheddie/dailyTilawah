@@ -97,7 +97,7 @@ export default function Home() {
           : t('home.beginToday')
 
   return (
-    <div className="mx-auto min-h-[100dvh] max-w-md px-6 pb-12 pt-6">
+    <div className="mx-auto min-h-[100dvh] max-w-md px-6 pb-28 pt-6">
       {/* Top: date + next prayer, quiet nav */}
       <header className="flex items-start justify-between">
         <div>
@@ -143,27 +143,21 @@ export default function Home() {
       <HelpPointer />
       <BetaNotice />
 
-      {/* Hero: continue reading */}
+      {/* Hero: where you're reading (tappable). The primary CTA lives at the
+          bottom of the screen, within thumb reach. */}
       <section className="mt-7">
-        <div className="relative overflow-hidden rounded-2xl bg-teal/[0.04] px-5 py-5 shadow-card">
-          <div className="pr-20">
-            <p className="t-display">{surahForPage(lastPage)}</p>
-            <p className="mt-1 t-body">{t('reader.page', { page: lastPage })}</p>
-            <button
-              className="btn-primary mt-4"
-              onClick={() => navigate('/read')}
-            >
-              {completedToday || started ? t('home.continueReading') : t('home.startToday')}
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M5 12h14M13 6l6 6-6 6" />
-              </svg>
-            </button>
-          </div>
+        <button
+          onClick={() => navigate('/read')}
+          className="relative w-full overflow-hidden rounded-2xl bg-teal/[0.04] px-5 py-6 text-left shadow-card transition active:scale-[0.99]"
+        >
+          <p className="section-label">{t('home.continueReading')}</p>
+          <p className="mt-1.5 t-display">{surahForPage(lastPage)}</p>
+          <p className="mt-1 t-body">{t('reader.page', { page: lastPage })}</p>
           {/* Decorative rub-el-hizb medallion */}
-          <div className="pointer-events-none absolute right-4 top-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-teal">
+          <div className="pointer-events-none absolute right-4 top-1/2 flex h-16 w-16 -translate-y-1/2 items-center justify-center rounded-2xl bg-teal">
             <span className="text-3xl leading-none text-gold" aria-hidden="true">۞</span>
           </div>
-        </div>
+        </button>
         <p className="mt-2.5 px-1 text-center t-caption">{message}</p>
       </section>
 
@@ -216,6 +210,19 @@ export default function Home() {
       <section className="mt-8">
         <DailyReflection />
       </section>
+
+      {/* Primary action, anchored in the thumb zone */}
+      <div className="pointer-events-none fixed inset-x-0 bottom-0 mx-auto max-w-md bg-gradient-to-t from-paper via-paper/95 to-transparent px-6 pb-[max(1rem,env(safe-area-inset-bottom))] pt-8">
+        <button
+          className="btn-primary pointer-events-auto w-full"
+          onClick={() => navigate('/read')}
+        >
+          {completedToday || started ? t('home.continueReading') : t('home.startToday')}
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </button>
+      </div>
     </div>
   )
 }
