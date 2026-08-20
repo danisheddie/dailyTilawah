@@ -14,11 +14,14 @@
 // Bump this on any deploy that must invalidate the shell/asset cache. The
 // activate handler deletes every cache whose name isn't this one, so a stale
 // shell (pointing at purged hashed assets) can never blank the app again.
-const CACHE = 'tilawah-cache-v2'
+const CACHE = 'tilawah-cache-v3'
 // '/' on Cloudflare, '/dailyTilawah/' on the legacy GitHub build.
 const BASE = self.location.pathname.replace(/sw\.js$/, '')
 
 self.addEventListener('install', (event) => {
+  // If a worker is already active, this install is an UPDATE (replacing an old
+  // version) rather than a first-ever visit. Only updates need the auto-reload.
+  self.__isUpdate = !!self.registration.active
   // Precache the shell so the app can open offline after the first visit.
   event.waitUntil(
     caches
@@ -32,9 +35,24 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
+      // A new worker version starts clean: drop EVERY cache so a stale shell
+      // (pointing at purged hashed assets) can never blank the app again.
       const keys = await caches.keys()
-      await Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))
+      await Promise.all(keys.map((k) => caches.delete(k)))
       await self.clients.claim()
+      // Auto-heal: on an UPDATE, reload any open window so a currently-blank
+      // page recovers on its own — no user action needed. Skipped on a first
+      // install so new visitors don't get a needless double-load.
+      if (self.__isUpdate) {
+        const clients = await self.clients.matchAll({ type: 'window' })
+        for (const client of clients) {
+          try {
+            client.navigate(client.url)
+          } catch {
+            /* older browsers: the next manual launch still recovers */
+          }
+        }
+      }
     })()
   )
 })
