@@ -53,7 +53,6 @@ export default function Reader() {
   const [showOptions, setShowOptions] = useState(false)
   const [showMenu, setShowMenu] = useState(false)
   const [bookmarked, setBookmarked] = useState(false)
-  const [, forceTick] = useState(0) // bump to refresh the "read" mark in place
 
   const audioRef = useRef(null)
   const scrollRef = useRef(null)
@@ -277,20 +276,12 @@ export default function Reader() {
     return result
   }
 
-  // Advancing marks the page read, then moves on (or celebrates a completion).
+  // "Mark as read": record the page, then move on (or celebrate a completion).
   function finishPage() {
     const result = recordCurrent()
     stopAudio()
     if (result.justCompleted || result.khatmCompleted) setCompletion(result)
     else goToNext()
-  }
-
-  // Explicit "mark as read" from the menu — records without leaving the page.
-  function markRead() {
-    setShowMenu(false)
-    const result = recordCurrent()
-    if (result.justCompleted || result.khatmCompleted) setCompletion(result)
-    else forceTick((n) => n + 1) // refresh alreadyRead without leaving the page
   }
 
   function goToNext() {
@@ -419,11 +410,11 @@ export default function Reader() {
         )}
       </main>
 
-      {/* Bottom navigation: prev · page (tap to jump) · next. Advancing marks
-          the page read; the page pill jumps. Floats over a soft fade. */}
+      {/* Bottom bar: prev · Mark as read · next. The arrows only navigate; the
+          centre button marks the page read (and moves on). Floats over a fade. */}
       {!loading && !error && dataReady && !completion && (
         <div className="pointer-events-none fixed inset-x-0 bottom-0 mx-auto max-w-2xl bg-gradient-to-t from-paper via-paper/90 to-transparent px-5 pb-5 pt-10">
-          <div className="pointer-events-auto mx-auto flex max-w-xs items-center gap-3">
+          <div className="pointer-events-auto mx-auto flex max-w-sm items-center gap-3">
             <button
               onClick={goToPrev}
               disabled={page <= 1}
@@ -435,13 +426,18 @@ export default function Reader() {
               </svg>
             </button>
             <button
-              onClick={() => setShowJump(true)}
-              className="grow rounded-full bg-teal py-3 text-center text-sm font-semibold text-paper shadow-card transition active:scale-[0.98]"
+              onClick={finishPage}
+              className="grow rounded-full bg-teal py-3.5 text-center text-sm font-semibold text-paper shadow-card transition active:scale-[0.98]"
             >
-              {t('reader.page', { page })}
+              <span className="inline-flex items-center gap-2">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
+                {t('reader.markRead')}
+              </span>
             </button>
             <button
-              onClick={finishPage}
+              onClick={goToNext}
               disabled={page >= TOTAL_PAGES}
               aria-label={t('reader.next')}
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-teal/15 bg-paper text-teal transition active:scale-90 disabled:opacity-30"
@@ -527,14 +523,6 @@ export default function Reader() {
                 </span>
               </button>
             )}
-            <button className="row" onClick={markRead}>
-              <span className="flex items-center gap-3 text-[15px] text-teal">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M20 6 9 17l-5-5" />
-                </svg>
-                {t('reader.markRead')}
-              </span>
-            </button>
           </div>
         </Sheet>
       )}
