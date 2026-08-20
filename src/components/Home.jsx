@@ -145,8 +145,7 @@ export default function Home() {
 
       {/* Hero: continue reading */}
       <section className="mt-7">
-        <p className="section-label">{t('home.continueReading')}</p>
-        <div className="relative mt-2 overflow-hidden rounded-2xl bg-teal/[0.04] px-5 py-5 shadow-card">
+        <div className="relative overflow-hidden rounded-2xl bg-teal/[0.04] px-5 py-5 shadow-card">
           <div className="pr-20">
             <p className="t-display">{surahForPage(lastPage)}</p>
             <p className="mt-1 t-body">{t('reader.page', { page: lastPage })}</p>
