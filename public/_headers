@@ -1,0 +1,8 @@
+# The service worker must never be served from the HTTP cache, or browsers keep
+# running an old worker and never pick up fixes (this caused a stale-cache
+# blank-page outage). Always revalidate sw.js and the manifest.
+/sw.js
+  Cache-Control: no-cache
+
+/manifest.webmanifest
+  Cache-Control: no-cache
