@@ -212,7 +212,7 @@ export default function Home() {
       </section>
 
       {/* Primary action, anchored in the thumb zone */}
-      <div className="pointer-events-none fixed inset-x-0 bottom-0 mx-auto max-w-md bg-gradient-to-t from-paper via-paper/95 to-transparent px-6 pb-[max(1rem,env(safe-area-inset-bottom))] pt-8">
+      <div className="pointer-events-none fixed inset-x-0 bottom-0 mx-auto max-w-md bg-gradient-to-t from-paper via-paper/95 to-transparent px-6 pb-[max(1.75rem,calc(env(safe-area-inset-bottom)+0.5rem))] pt-8">
         <button
           className="btn-primary pointer-events-auto w-full"
           onClick={() => navigate('/read')}
