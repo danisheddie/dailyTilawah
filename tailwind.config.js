@@ -24,6 +24,20 @@ export default {
         ],
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
+      // The app uses exactly three corner radii. Overriding these keeps the
+      // existing utility names but standardizes their values:
+      //   rounded-lg  = 8px   (small: chips, inputs, icon buttons)
+      //   rounded-xl  = 14px  (standard: cards, rows, buttons)
+      //   rounded-2xl = 20px  (large/special: hero, sheets, medallions)
+      borderRadius: {
+        lg: '8px',
+        xl: '14px',
+        '2xl': '20px',
+      },
+      boxShadow: {
+        // One soft, restrained elevation — no heavy drop shadows.
+        card: '0 1px 2px rgb(var(--c-teal) / 0.04), 0 6px 20px rgb(var(--c-teal) / 0.04)',
+      },
       keyframes: {
         'fade-in': {
           '0%': { opacity: '0', transform: 'translateY(8px)' },
