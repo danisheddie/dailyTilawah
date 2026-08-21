@@ -23,6 +23,9 @@ export default {
           'serif',
         ],
         sans: ['Inter', 'system-ui', 'sans-serif'],
+        // Editorial serif for headings and surah names — the premium, printed
+        // feel of the redesigned Home. Georgia is a close system fallback.
+        display: ['"Playfair Display"', 'Georgia', 'serif'],
       },
       // The app uses exactly three corner radii. Overriding these keeps the
       // existing utility names but standardizes their values:

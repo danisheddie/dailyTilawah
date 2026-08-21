@@ -54,7 +54,7 @@ export default function Journey() {
   const juz = juzForPage(lastPage)
 
   return (
-    <div className="mx-auto min-h-screen max-w-md px-6 py-8">
+    <div className="mx-auto min-h-screen max-w-md px-6 pb-28 pt-8">
       <header className="flex items-center gap-3">
         <button
           onClick={() => navigate('/')}

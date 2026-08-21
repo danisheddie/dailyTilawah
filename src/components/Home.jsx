@@ -1,5 +1,6 @@
-// Home: the calm dashboard, recomposed around continuing the Qur'an. A
-// continue-reading hero leads; goal, quiet stats, and a reflection follow.
+// Home: the premium dashboard. A date/prayer header, today's reading progress,
+// a two-part stats card, the verse of the day, and a navy "continue reading"
+// dock pinned above the tab bar. Playfair Display carries the headings.
 
 import { useNavigate } from 'react-router-dom'
 import {
@@ -13,26 +14,13 @@ import {
 } from '../utils/storage'
 import { SURAH_PAGES, SURAH_NAMES } from '../utils/api'
 import { formatGregorian, formatHijri } from '../utils/dateUtils'
+import { getDailyReflection } from '../data/reflections'
 import { nextPrayer, formatTime } from '../utils/prayer'
-import Stat from './ui/Stat'
-import DailyReflection from './DailyReflection'
-import BetaNotice from './BetaNotice'
 import InstallPrompt from './InstallPrompt'
+import BetaNotice from './BetaNotice'
 import BackupNudge from './BackupNudge'
 import HelpPointer from './HelpPointer'
 import { useLang } from '../utils/i18n.jsx'
-
-function IconBtn({ label, onClick, children }) {
-  return (
-    <button
-      onClick={onClick}
-      aria-label={label}
-      className="rounded-lg p-2 text-muted transition active:scale-90"
-    >
-      {children}
-    </button>
-  )
-}
 
 // The surah whose start page is nearest at or before `page` — the one you're
 // resuming in, resolved synchronously from the page tables.
@@ -62,10 +50,9 @@ export default function Home() {
   }
 
   const pct = Math.min(100, Math.round((todayProgress / goal.pages) * 100))
-  const started = lastPage > 1 || todayProgress > 0
   const fmt = (n) => (Number.isInteger(n) ? n : n.toFixed(1))
 
-  // Relative "last read" — powers the streak stat's sub-line.
+  // Relative "last read" — the streak stat's sub-line.
   const lastReadDate = getLastReadDate()
   let lastReadRel = null
   if (lastReadDate) {
@@ -82,59 +69,44 @@ export default function Home() {
           ? t('home.lastReadYesterday')
           : t('home.lastReadDaysAgo', { n: days })
   }
+  // Surface the grace to keep the sub-line encouraging even after a missed day.
+  if (!completedToday && isStreakOnGrace()) lastReadRel = t('home.streakKept')
 
-  // A single quiet line of encouragement reflecting today's state.
-  const lapsed = streak === 0 && getLongestStreak() > 0
-  const onGrace = !completedToday && isStreakOnGrace()
-  const message = completedToday
-    ? t('home.complete')
-    : onGrace
-      ? t('home.streakKept')
-      : streak > 0
-        ? t('home.keepStreak')
-        : lapsed
-          ? t('home.welcomeBack')
-          : t('home.beginToday')
+  // Verse of the day — always a Qur'an verse here (hadith live in Reflection).
+  const verse = getDailyReflection('quran')
+
+  const resumeSurah = surahForPage(lastPage)
 
   return (
-    <div className="mx-auto min-h-[100dvh] max-w-md px-6 pb-28 pt-6">
-      {/* Top: date + next prayer, quiet nav */}
+    <>
+    <div className="mx-auto min-h-[100dvh] max-w-md px-6 pb-52 pt-5">
+      {/* Header: date + next prayer on the left, profile on the right */}
       <header className="flex items-start justify-between">
         <div>
-          <p className="flex items-center gap-2 text-[15px] font-semibold text-teal">
+          <p className="flex items-center gap-2 font-display text-[17px] font-semibold text-teal">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="text-gold" aria-hidden="true">
               <path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zM4 9h16M8 3v3M16 3v3" />
             </svg>
             {formatHijri(new Date(), getSettings().hijriOffset)}
           </p>
           {upcoming ? (
-            <p className="mt-1 text-xs text-gold">
-              {t('home.next', { name: upcoming.name, time: formatTime(upcoming.time) })}
+            <p className="mt-1 text-[13px] font-medium text-gold">
+              {upcoming.name} · {formatTime(upcoming.time)}
             </p>
           ) : (
-            <p className="mt-1 text-xs text-muted">{formatGregorian()}</p>
+            <p className="mt-1 text-[13px] text-muted">{formatGregorian()}</p>
           )}
         </div>
-        <div className="-mr-2 flex items-center">
-          <IconBtn label={t('help.title')} onClick={() => navigate('/help')}>
-            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="10" />
-              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-              <path d="M12 17h.01" />
-            </svg>
-          </IconBtn>
-          <IconBtn label={t('journey.viewJourney')} onClick={() => navigate('/journey')}>
-            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M3 20h18M7 20v-7M12 20V6M17 20v-10" />
-            </svg>
-          </IconBtn>
-          <IconBtn label="Settings" onClick={() => navigate('/settings')}>
-            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="3" />
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" />
-            </svg>
-          </IconBtn>
-        </div>
+        <button
+          aria-label="Settings"
+          onClick={() => navigate('/settings')}
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-teal/12 bg-teal/[0.04] text-teal transition active:scale-95"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 20c0-3.5 3.6-6 8-6s8 2.5 8 6" />
+          </svg>
+        </button>
       </header>
 
       {/* Dismissible notices (only one shows at a time) */}
@@ -143,86 +115,127 @@ export default function Home() {
       <HelpPointer />
       <BetaNotice />
 
-      {/* Hero: where you're reading (tappable). The primary CTA lives at the
-          bottom of the screen, within thumb reach. */}
-      <section className="mt-7">
-        <button
-          onClick={() => navigate('/read')}
-          className="relative w-full overflow-hidden rounded-2xl bg-teal/[0.04] px-5 py-6 text-left shadow-card transition active:scale-[0.99]"
-        >
-          <p className="section-label">{t('home.continueReading')}</p>
-          <p className="mt-1.5 t-display">{surahForPage(lastPage)}</p>
-          <p className="mt-1 t-body">{t('reader.page', { page: lastPage })}</p>
-          {/* Decorative rub-el-hizb medallion */}
-          <div className="pointer-events-none absolute right-4 top-1/2 flex h-16 w-16 -translate-y-1/2 items-center justify-center rounded-2xl bg-teal">
-            <span className="text-3xl leading-none text-gold" aria-hidden="true">۞</span>
-          </div>
-        </button>
-        <p className="mt-2.5 px-1 text-center t-caption">{message}</p>
-      </section>
-
-      {/* Today's goal */}
-      <section className="mt-7">
-        <div className="mb-2 flex items-center justify-between">
-          <span className="t-heading">{t('home.todayGoal')}</span>
-          <span className="text-sm text-muted">
+      {/* Today's reading progress */}
+      <section className="mt-8">
+        <div className="flex items-baseline justify-between">
+          <span className="t-eyebrow">{t('home.todaysReading')}</span>
+          <span className="text-[13px] font-medium text-muted">
             {fmt(Math.min(todayProgress, goal.pages))} / {fmt(goal.pages)}{' '}
             {goal.pages === 1 ? t('common.page') : t('common.pages')}
           </span>
         </div>
-        <div className="h-2 w-full overflow-hidden rounded-full bg-teal/[0.08]">
+        <div className="relative mt-2.5 h-2 w-full rounded-full bg-teal/[0.08]">
           <div
             className="h-full rounded-full bg-gold transition-all duration-500"
-            style={{ width: `${pct}%` }}
+            style={{ width: `${Math.max(pct, todayProgress > 0 ? 6 : 0)}%` }}
           />
+          {pct > 0 && (
+            <span
+              className="absolute top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-gold bg-paper shadow-sm transition-all duration-500"
+              style={{ left: `${Math.max(pct, 6)}%` }}
+            />
+          )}
         </div>
       </section>
 
-      {/* Quiet reading stats */}
-      <section className="mt-6 grid grid-cols-2 gap-3">
-        <div className="card px-4 py-4">
-          <Stat
-            accent="gold"
-            icon={
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M12 3c1.5 3 4 4.5 4 7.5a4 4 0 0 1-8 0c0-1 .5-2 1-2.5C9 10 8 8 8 6c1.5.5 3 1 4-3z" />
-              </svg>
-            }
-            value={streak}
-            label={t('settings.dayStreak')}
-            sub={lastReadRel}
-          />
-        </div>
-        <div className="card px-4 py-4">
-          <Stat
-            icon={
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M3 20h18M7 20v-7M12 20V6M17 20v-10" />
-              </svg>
-            }
-            value={totalPages}
-            label={t('settings.lifetime')}
-          />
-        </div>
-      </section>
-
-      {/* Reflection — secondary */}
-      <section className="mt-8">
-        <DailyReflection />
-      </section>
-
-      {/* Primary action, anchored in the thumb zone */}
-      <div className="pointer-events-none fixed inset-x-0 bottom-0 mx-auto max-w-md bg-gradient-to-t from-paper via-paper/95 to-transparent px-6 pb-[max(1.75rem,calc(env(safe-area-inset-bottom)+0.5rem))] pt-8">
-        <button
-          className="btn-primary pointer-events-auto w-full"
-          onClick={() => navigate('/read')}
-        >
-          {completedToday || started ? t('home.continueReading') : t('home.startToday')}
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M5 12h14M13 6l6 6-6 6" />
+      {/* Stats: streak | lifetime, one card split in two */}
+      <button
+        onClick={() => navigate('/journey')}
+        className="card mt-6 flex w-full items-stretch px-2 py-4 text-left transition active:scale-[0.99]"
+      >
+        <div className="flex flex-1 items-center gap-3 px-3">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-gold" aria-hidden="true">
+            <path d="M12 3c1.5 3 4 4.5 4 7.5a4 4 0 0 1-8 0c0-1 .5-2 1-2.5C9 10 8 8 8 6c1.5.5 3 1 4-3z" />
           </svg>
+          <div className="min-w-0">
+            <p className="font-display text-2xl font-bold leading-none text-teal">{streak}</p>
+            <p className="mt-1 text-[12px] leading-tight text-muted">{t('settings.dayStreak')}</p>
+            {lastReadRel && (
+              <p className="mt-0.5 truncate text-[11px] leading-tight text-muted/80">{lastReadRel}</p>
+            )}
+          </div>
+        </div>
+        <div className="w-px self-stretch bg-teal/10" />
+        <div className="flex flex-1 items-center gap-3 px-3">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-teal/70" aria-hidden="true">
+            <path d="M3 20h18M7 20v-7M12 20V5M17 20v-10" />
+          </svg>
+          <div className="min-w-0">
+            <p className="font-display text-2xl font-bold leading-none text-teal">{totalPages}</p>
+            <p className="mt-1 text-[12px] leading-tight text-muted">{t('settings.lifetime')}</p>
+          </div>
+        </div>
+      </button>
+
+      {/* Verse of the day */}
+      {verse && <VerseOfDay verse={verse} label={t('reflection.verse')} />}
+    </div>
+
+    {/* Continue-reading dock — pinned just above the tab bar */}
+    <div className="fixed inset-x-0 z-20 bottom-[calc(var(--nav-h)+env(safe-area-inset-bottom))]">
+      <div className="mx-auto max-w-md px-3">
+        <button
+          onClick={() => navigate('/read')}
+          className="relative flex w-full items-center gap-4 overflow-hidden rounded-t-2xl bg-teal px-5 py-4 text-left shadow-[0_-6px_24px_rgb(var(--c-teal)/0.18)] transition active:scale-[0.99]"
+        >
+          {/* Geometric watermark */}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-4 -top-6 select-none text-[7rem] leading-none text-paper/[0.06]"
+          >
+            ۞
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-gold">
+              {t('home.continueReading')}
+            </p>
+            <p className="mt-1 truncate font-display text-[22px] font-semibold text-paper">
+              {resumeSurah}
+            </p>
+            <p className="mt-0.5 text-[12.5px] text-paper/70">
+              {t('reader.page', { page: lastPage })}
+            </p>
+          </div>
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-paper text-teal transition active:scale-90">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </span>
         </button>
       </div>
     </div>
+    </>
+  )
+}
+
+function VerseOfDay({ verse, label }) {
+  return (
+    <section className="mt-9">
+      <div className="flex items-center gap-3">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">
+          {label}
+        </span>
+        <span className="h-px flex-1 bg-gold/25" />
+      </div>
+      <figure className="relative mt-3">
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -left-1 -top-4 select-none font-display text-6xl leading-none text-gold/25"
+        >
+          &ldquo;
+        </span>
+        {verse.arabic && (
+          <p dir="rtl" lang="ar" className="relative pl-6 font-quran text-xl leading-loose text-teal">
+            {verse.arabic}
+          </p>
+        )}
+        <blockquote className="relative mt-2 pl-6 font-display text-[19px] font-medium italic leading-snug text-teal">
+          {verse.text}
+        </blockquote>
+        <figcaption className="mt-3 pl-6 text-[12px] font-semibold uppercase tracking-[0.08em] text-muted">
+          {verse.source}
+        </figcaption>
+      </figure>
+    </section>
   )
 }

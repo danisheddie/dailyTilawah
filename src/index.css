@@ -24,6 +24,10 @@
   --c-gold: 201 168 76;
   --c-muted: 107 114 128;
   --read-scale: 1;
+  /* Height of the bottom tab bar's tap strip (excludes the safe-area inset,
+     which is added separately). The Home "continue reading" dock is pinned
+     just above the bar using this value, so the two always agree. */
+  --nav-h: 3.5rem;
 }
 
 [data-theme='dark'] {

@@ -119,7 +119,7 @@ export default function Settings() {
   const hijriValue = `${hijriOffset > 0 ? '+' : ''}${hijriOffset} ${t('common.days')}`
 
   return (
-    <div className="mx-auto min-h-screen max-w-md px-6 pb-16 pt-6">
+    <div className="mx-auto min-h-screen max-w-md px-6 pb-28 pt-6">
       <header className="flex items-center gap-2">
         <button
           onClick={() => navigate('/')}
