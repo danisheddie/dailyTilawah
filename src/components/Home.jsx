@@ -83,7 +83,7 @@ export default function Home() {
 
   return (
     <>
-    <div className="mx-auto flex min-h-[100dvh] max-w-md flex-col px-6 pb-44 pt-5">
+    <div className="mx-auto flex min-h-[100dvh] max-w-md flex-col px-6 pb-52 pt-5">
       {/* Header: date + next prayer on the left, profile on the right */}
       <header className="flex items-start justify-between">
         <div>
@@ -195,28 +195,23 @@ export default function Home() {
       <div className="mx-auto max-w-md px-3">
         <button
           onClick={() => navigate('/read')}
-          className="relative flex w-full items-center gap-4 overflow-hidden rounded-t-2xl bg-teal px-5 py-4 text-left shadow-[0_-6px_24px_rgb(var(--c-teal)/0.18)] transition active:scale-[0.99]"
+          className="relative flex w-full items-center gap-4 overflow-hidden rounded-t-2xl bg-teal px-6 py-6 text-left shadow-[0_-6px_24px_rgb(var(--c-teal)/0.18)] transition active:scale-[0.99]"
         >
-          {/* Geometric watermark */}
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute -right-4 -top-6 select-none text-[7rem] leading-none text-paper/[0.06]"
-          >
-            ۞
-          </span>
+          {/* Geometric watermark — an 8-point star mandala */}
+          <StarMandala className="pointer-events-none absolute -right-7 top-1/2 h-48 w-48 -translate-y-1/2 text-gold/20" />
           <div className="min-w-0 flex-1">
             <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-gold">
               {t('home.continueReading')}
             </p>
-            <p className="mt-1 truncate font-display text-[22px] font-semibold text-paper">
+            <p className="mt-1 truncate font-display text-[25px] font-semibold text-paper">
               {resumeSurah}
             </p>
-            <p className="mt-0.5 text-[12.5px] text-paper/70">
+            <p className="mt-1 text-[12.5px] text-paper/70">
               {t('reader.page', { page: lastPage })}
             </p>
           </div>
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-paper text-teal transition active:scale-90">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-paper text-teal transition active:scale-90">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M5 12h14M13 6l6 6-6 6" />
             </svg>
           </span>
@@ -236,6 +231,35 @@ export default function Home() {
       />
     )}
     </>
+  )
+}
+
+// An 8-point star mandala (khatim) drawn as layered line-work — used as the
+// faint watermark on the continue-reading dock. Colour comes from the parent
+// via currentColor so it can sit at any tint/opacity.
+function StarMandala({ className = '' }) {
+  return (
+    <svg
+      viewBox="0 0 100 100"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.1"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      {/* outer 8-point star: two overlapping squares */}
+      <path d="M50 5 L95 50 L50 95 L5 50 Z" />
+      <path d="M17 17 H83 V83 H17 Z" />
+      {/* middle 8-point star */}
+      <path d="M50 24 L76 50 L50 76 L24 50 Z" />
+      <path d="M33 33 H67 V67 H33 Z" />
+      {/* inner rosette of eight petals */}
+      {Array.from({ length: 8 }).map((_, i) => (
+        <ellipse key={i} cx="50" cy="34" rx="4.4" ry="12" transform={`rotate(${i * 45} 50 50)`} />
+      ))}
+      <circle cx="50" cy="50" r="3.4" />
+    </svg>
   )
 }
 
