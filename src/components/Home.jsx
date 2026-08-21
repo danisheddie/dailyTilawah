@@ -175,7 +175,7 @@ export default function Home() {
     </div>
 
     {/* Continue-reading dock — pinned just above the tab bar */}
-    <div className="fixed inset-x-0 z-20 bottom-[calc(var(--nav-h)+env(safe-area-inset-bottom))]">
+    <div className="fixed inset-x-0 z-20 bottom-[calc(var(--nav-h)+env(safe-area-inset-bottom)+0.75rem)]">
       <div className="mx-auto max-w-md px-3">
         <button
           onClick={() => navigate('/read')}

@@ -69,7 +69,7 @@ export default function BottomNav() {
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30">
-      <div className="mx-auto max-w-md border-t border-teal/10 bg-paper/90 px-3 pb-[env(safe-area-inset-bottom)] backdrop-blur-md">
+      <div className="mx-auto max-w-md border-t border-teal/10 bg-paper/90 px-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] backdrop-blur-md">
         <div className="flex h-[var(--nav-h)] items-stretch">
           {tabs.map((tab) => (
             <Tab
