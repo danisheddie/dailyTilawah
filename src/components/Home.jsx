@@ -79,7 +79,7 @@ export default function Home() {
 
   return (
     <>
-    <div className="mx-auto min-h-[100dvh] max-w-md px-6 pb-52 pt-5">
+    <div className="mx-auto flex min-h-[100dvh] max-w-md flex-col px-6 pb-44 pt-5">
       {/* Header: date + next prayer on the left, profile on the right */}
       <header className="flex items-start justify-between">
         <div>
@@ -167,8 +167,11 @@ export default function Home() {
         </div>
       </button>
 
-      {/* Verse of the day */}
-      {verse && <VerseOfDay verse={verse} label={t('reflection.verse')} />}
+      {/* Verse of the day — centered in the space that remains so the screen
+          reads as calm breathing room, not a gap stranded above the dock. */}
+      <div className="flex flex-1 items-center py-8">
+        {verse && <VerseOfDay verse={verse} label={t('reflection.verse')} />}
+      </div>
     </div>
 
     {/* Continue-reading dock — pinned just above the tab bar */}
@@ -210,7 +213,7 @@ export default function Home() {
 
 function VerseOfDay({ verse, label }) {
   return (
-    <section className="mt-9">
+    <section className="w-full">
       <div className="flex items-center gap-3">
         <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">
           {label}
