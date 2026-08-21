@@ -197,8 +197,6 @@ export default function Home() {
           onClick={() => navigate('/read')}
           className="relative flex w-full items-center gap-4 overflow-hidden rounded-t-2xl bg-teal px-6 py-6 text-left shadow-[0_-6px_24px_rgb(var(--c-teal)/0.18)] transition active:scale-[0.99]"
         >
-          {/* Geometric watermark — an 8-point star mandala */}
-          <StarMandala className="pointer-events-none absolute -right-7 top-1/2 h-48 w-48 -translate-y-1/2 text-gold/20" />
           <div className="min-w-0 flex-1">
             <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-gold">
               {t('home.continueReading')}
@@ -231,35 +229,6 @@ export default function Home() {
       />
     )}
     </>
-  )
-}
-
-// An 8-point star mandala (khatim) drawn as layered line-work — used as the
-// faint watermark on the continue-reading dock. Colour comes from the parent
-// via currentColor so it can sit at any tint/opacity.
-function StarMandala({ className = '' }) {
-  return (
-    <svg
-      viewBox="0 0 100 100"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.1"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
-      {/* outer 8-point star: two overlapping squares */}
-      <path d="M50 5 L95 50 L50 95 L5 50 Z" />
-      <path d="M17 17 H83 V83 H17 Z" />
-      {/* middle 8-point star */}
-      <path d="M50 24 L76 50 L50 76 L24 50 Z" />
-      <path d="M33 33 H67 V67 H33 Z" />
-      {/* inner rosette of eight petals */}
-      {Array.from({ length: 8 }).map((_, i) => (
-        <ellipse key={i} cx="50" cy="34" rx="4.4" ry="12" transform={`rotate(${i * 45} 50 50)`} />
-      ))}
-      <circle cx="50" cy="50" r="3.4" />
-    </svg>
   )
 }
 
