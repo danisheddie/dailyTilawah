@@ -2,6 +2,7 @@
 // a two-part stats card, the verse of the day, and a navy "continue reading"
 // dock pinned above the tab bar. Playfair Display carries the headings.
 
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   getProgressSummary,
@@ -11,8 +12,10 @@ import {
   getLongestStreak,
   getLastReadDate,
   isStreakOnGrace,
+  setLastPage,
 } from '../utils/storage'
 import { SURAH_PAGES, SURAH_NAMES } from '../utils/api'
+import JumpSheet from './JumpSheet'
 import { formatGregorian, formatHijri } from '../utils/dateUtils'
 import { getDailyReflection } from '../data/reflections'
 import { nextPrayer, formatTime } from '../utils/prayer'
@@ -36,6 +39,7 @@ function surahForPage(page) {
 export default function Home() {
   const navigate = useNavigate()
   const { t } = useLang()
+  const [showSearch, setShowSearch] = useState(false)
   const { goal, todayProgress, completedToday, streak, lastPage } = getProgressSummary()
   const totalPages = getTotalPagesRead()
 
@@ -108,6 +112,18 @@ export default function Home() {
           </svg>
         </button>
       </header>
+
+      {/* Search: jump to any surah or page */}
+      <button
+        onClick={() => setShowSearch(true)}
+        className="mt-6 flex w-full items-center gap-3 rounded-xl border border-teal/10 bg-teal/[0.03] px-4 py-3 text-left transition active:scale-[0.99]"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className="text-muted" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-3.5-3.5" />
+        </svg>
+        <span className="text-sm text-muted">{t('home.search')}</span>
+      </button>
 
       {/* Dismissible notices (only one shows at a time) */}
       <InstallPrompt />
@@ -207,6 +223,18 @@ export default function Home() {
         </button>
       </div>
     </div>
+
+    {showSearch && (
+      <JumpSheet
+        initialTab="surah"
+        onClose={() => setShowSearch(false)}
+        onJump={(page) => {
+          setLastPage(page)
+          setShowSearch(false)
+          navigate('/read')
+        }}
+      />
+    )}
     </>
   )
 }

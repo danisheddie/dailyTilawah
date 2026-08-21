@@ -6,13 +6,14 @@ import {
   JUZ_START_PAGES,
   SURAH_PAGES,
   SURAH_NAMES,
+  TOTAL_PAGES,
 } from '../utils/api'
 import { getBookmarks, removeBookmark } from '../utils/storage'
 import { useLang } from '../utils/i18n.jsx'
 
-export default function JumpSheet({ onJump, onClose }) {
+export default function JumpSheet({ onJump, onClose, initialTab = 'bookmarks' }) {
   const { t } = useLang()
-  const [tab, setTab] = useState('bookmarks')
+  const [tab, setTab] = useState(initialTab)
   const [bookmarks, setBookmarks] = useState(() => getBookmarks())
   const [query, setQuery] = useState('')
 
@@ -34,9 +35,13 @@ export default function JumpSheet({ onJump, onClose }) {
     ({ name, i }) =>
       !nq || norm(name).includes(nq) || String(i + 1).includes(query.trim())
   )
+  // A bare page number (1–604) offers a direct jump, so the same field
+  // searches surahs and pages both.
+  const asPage = /^\d+$/.test(query.trim()) ? Number(query.trim()) : null
+  const pageJump = asPage && asPage >= 1 && asPage <= TOTAL_PAGES ? asPage : null
 
   return (
-    <div className="fixed inset-0 z-30 flex flex-col justify-end bg-teal/30 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex flex-col justify-end bg-teal/30 backdrop-blur-sm">
       {/* tap the backdrop to close */}
       <button
         className="absolute inset-0 cursor-default"
@@ -136,7 +141,22 @@ export default function JumpSheet({ onJump, onClose }) {
                 placeholder={t('jump.searchSurah')}
                 className="mb-2 w-full rounded-xl border border-teal/15 bg-transparent px-3 py-2 text-sm text-teal outline-none transition placeholder:text-muted focus:border-teal"
               />
-              {surahMatches.length === 0 ? (
+              {pageJump && (
+                <button
+                  onClick={() => onJump(pageJump)}
+                  className="mb-1 flex w-full items-center gap-3 rounded-xl bg-teal/[0.06] px-3 py-2.5 text-left transition active:scale-[0.99]"
+                >
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-teal text-xs font-semibold text-paper">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M5 12h14M13 6l6 6-6 6" />
+                    </svg>
+                  </span>
+                  <span className="text-sm font-medium text-teal">
+                    {t('jump.goToPage', { page: pageJump })}
+                  </span>
+                </button>
+              )}
+              {surahMatches.length === 0 && !pageJump ? (
                 <p className="py-10 text-center text-sm text-muted">
                   {t('jump.noSurahMatch')}
                 </p>
