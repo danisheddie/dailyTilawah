@@ -232,7 +232,7 @@ function VerseOfDay({ verse, label }) {
             {verse.arabic}
           </p>
         )}
-        <blockquote className="relative mt-2 pl-6 font-display text-[19px] font-medium italic leading-snug text-teal">
+        <blockquote className="relative mt-2 pl-6 font-display text-[19px] font-medium leading-snug text-teal">
           {verse.text}
         </blockquote>
         <figcaption className="mt-3 pl-6 text-[12px] font-semibold uppercase tracking-[0.08em] text-muted">
