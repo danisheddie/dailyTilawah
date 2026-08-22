@@ -32,7 +32,7 @@ function Tab({ active, label, onClick, children }) {
       aria-label={label}
       aria-current={active ? 'page' : undefined}
       className={`flex flex-1 flex-col items-center justify-center gap-1 transition active:scale-95 ${
-        active ? 'text-teal' : 'text-muted'
+        active ? 'text-gold' : 'text-cream/55'
       }`}
     >
       <svg
@@ -69,7 +69,7 @@ export default function BottomNav() {
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30">
-      <div className="mx-auto max-w-md border-t border-teal/10 bg-paper/90 px-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] backdrop-blur-md">
+      <div className="mx-auto max-w-md rounded-t-[20px] bg-ink px-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-1.5 shadow-[0_-8px_24px_rgb(var(--c-ink)/0.18)]">
         <div className="flex h-[var(--nav-h)] items-stretch">
           {tabs.map((tab) => (
             <Tab

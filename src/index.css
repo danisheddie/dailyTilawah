@@ -28,6 +28,11 @@
      which is added separately). The Home "continue reading" dock is pinned
      just above the bar using this value, so the two always agree. */
   --nav-h: 3.5rem;
+  /* Fixed "premium" palette used by the deep panels (Home header, continue-
+     reading card, tab bar). Deliberately the same across themes so those
+     surfaces stay the signature deep navy + cream. */
+  --c-ink: 13 43 69;
+  --c-cream: 244 238 226;
 }
 
 [data-theme='dark'] {

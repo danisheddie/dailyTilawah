@@ -10,6 +10,9 @@ export default {
         teal: 'rgb(var(--c-teal) / <alpha-value>)',
         gold: 'rgb(var(--c-gold) / <alpha-value>)',
         muted: 'rgb(var(--c-muted) / <alpha-value>)',
+        // Fixed premium palette (deep panels + their text), theme-independent.
+        ink: 'rgb(var(--c-ink) / <alpha-value>)',
+        cream: 'rgb(var(--c-cream) / <alpha-value>)',
       },
       fontFamily: {
         arabic: ['Amiri', 'serif'],

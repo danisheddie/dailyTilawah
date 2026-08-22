@@ -122,3 +122,12 @@ export function formatHijri(date = new Date(), offset = 0) {
   if (!(month >= 1 && month <= 12)) return ''
   return `${HIJRI_MONTHS[month - 1]} ${day}, ${year} AH`
 }
+
+// Same Hijri date, day-first: e.g. "8 Rabiʻ al-Awwal 1448 AH".
+export function formatHijriLong(date = new Date(), offset = 0) {
+  const s = formatHijri(date, offset)
+  if (!s) return ''
+  // Reorder "Month Day, Year AH" -> "Day Month Year AH".
+  const m = s.match(/^(.*) (\d+), (\d+) AH$/)
+  return m ? `${m[2]} ${m[1]} ${m[3]} AH` : s
+}
