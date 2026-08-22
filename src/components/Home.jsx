@@ -150,47 +150,41 @@ export default function Home() {
             )}
           </section>
 
-          {/* Streak | lifetime */}
-          <div className="mt-7 flex items-stretch">
-            <div className="min-w-0 flex-1 pr-4">
+          {/* Streak | lifetime — each column centered around the divider */}
+          <div className="mt-7 flex items-stretch text-center">
+            <div className="min-w-0 flex-1 px-3">
               <p className="font-display text-[34px] font-bold leading-none text-teal">{streak}</p>
               <p className="mt-1.5 text-sm font-medium text-teal">{t('settings.dayStreak')}</p>
               <p className="mt-0.5 truncate text-xs text-muted">{streakSub}</p>
             </div>
             <div className="w-px self-stretch bg-teal/12" />
-            <div className="min-w-0 flex-1 pl-6">
+            <div className="min-w-0 flex-1 px-3">
               <p className="font-display text-[34px] font-bold leading-none text-teal">{totalPages}</p>
               <p className="mt-1.5 text-sm font-medium text-teal">{t('home.pagesRead')}</p>
               <p className="mt-0.5 text-xs text-muted">{t('home.lifetime')}</p>
             </div>
           </div>
 
-          {/* Verse of the day */}
+          {/* Verse of the day — a contained, understated daily grace note */}
           {verse && (
-            <section className="mt-9">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">
-                {t('reflection.verse')}
-              </p>
-              <div className="mt-4 flex gap-4">
-                <div className="flex flex-col items-center pt-1">
-                  <StarSmall className="h-4 w-4 shrink-0 text-gold" />
-                  <span className="mt-2 w-px flex-1 bg-gold/40" />
-                  <span className="mt-2 h-1 w-1 rounded-full bg-gold/50" />
-                </div>
-                <div className="min-w-0">
-                  {verse.arabic && (
-                    <p dir="rtl" lang="ar" className="mb-2 font-quran text-xl leading-loose text-teal">
-                      {verse.arabic}
-                    </p>
-                  )}
-                  <blockquote className="font-display text-[21px] font-medium leading-snug text-teal">
-                    {verse.text}
-                  </blockquote>
-                  <figcaption className="mt-3 text-sm text-muted">
-                    {verseSource(verse.source)}
-                  </figcaption>
-                </div>
+            <section className="mt-8 rounded-2xl border border-gold/15 bg-gold/[0.045] px-5 py-4">
+              <div className="flex items-center gap-2">
+                <StarSmall className="h-3.5 w-3.5 shrink-0 text-gold" />
+                <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">
+                  {t('reflection.verse')}
+                </span>
               </div>
+              {verse.arabic && (
+                <p dir="rtl" lang="ar" className="mt-3 font-quran text-lg leading-loose text-teal">
+                  {verse.arabic}
+                </p>
+              )}
+              <blockquote className="mt-2.5 font-display text-[17px] leading-relaxed text-teal">
+                {verse.text}
+              </blockquote>
+              <figcaption className="mt-2 text-[13px] text-muted">
+                {verseSource(verse.source)}
+              </figcaption>
             </section>
           )}
 
