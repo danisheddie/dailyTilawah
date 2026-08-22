@@ -74,7 +74,7 @@ export default function Home() {
           : t('home.lastReadDaysAgo', { n: days })
   }
   // Surface the grace to keep the sub-line encouraging even after a missed day.
-  if (!completedToday && isStreakOnGrace()) lastReadRel = t('home.streakKept')
+  if (!completedToday && isStreakOnGrace()) lastReadRel = t('home.streakKeptShort')
 
   // Verse of the day — always a Qur'an verse here (hadith live in Reflection).
   const verse = getDailyReflection('quran')
@@ -159,7 +159,7 @@ export default function Home() {
         onClick={() => navigate('/journey')}
         className="card mt-6 flex w-full items-stretch px-2 py-4 text-left transition active:scale-[0.99]"
       >
-        <div className="flex flex-1 items-center gap-3 px-3">
+        <div className="flex min-w-0 flex-1 items-center gap-3 px-3">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-gold" aria-hidden="true">
             <path d="M12 3c1.5 3 4 4.5 4 7.5a4 4 0 0 1-8 0c0-1 .5-2 1-2.5C9 10 8 8 8 6c1.5.5 3 1 4-3z" />
           </svg>
@@ -172,7 +172,7 @@ export default function Home() {
           </div>
         </div>
         <div className="w-px self-stretch bg-teal/10" />
-        <div className="flex flex-1 items-center gap-3 px-3">
+        <div className="flex min-w-0 flex-1 items-center gap-3 px-3">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-teal/70" aria-hidden="true">
             <path d="M3 20h18M7 20v-7M12 20V5M17 20v-10" />
           </svg>
