@@ -79,7 +79,6 @@ export default function Home() {
         {/* ---- Deep navy header ---- */}
         <header className="relative overflow-hidden rounded-b-[28px] bg-ink px-6 pb-5 pt-[calc(env(safe-area-inset-top)+1.25rem)] text-cream">
           <Pattern id="hp" className="absolute inset-0 h-full w-full text-cream opacity-[0.05]" />
-          <MihrabArch className="pointer-events-none absolute inset-0 h-full w-full text-gold/70" />
 
           <div className="relative flex items-start justify-between">
             <div>
@@ -178,29 +177,29 @@ export default function Home() {
 
           {/* Verse of the day — a contained, understated daily grace note */}
           {verse && (
-            <section className="mt-8 rounded-2xl border border-gold/15 bg-gold/[0.045] px-5 py-4">
+            <section className="mt-8 rounded-2xl border border-gold/15 bg-gold/[0.045] px-4 py-3.5">
               <div className="flex items-center gap-2">
-                <StarSmall className="h-3.5 w-3.5 shrink-0 text-gold" />
-                <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">
+                <StarSmall className="h-3 w-3 shrink-0 text-gold" />
+                <span className="text-[10.5px] font-semibold uppercase tracking-[0.15em] text-gold">
                   {t('reflection.verse')}
                 </span>
               </div>
               {verse.arabic && (
-                <p dir="rtl" lang="ar" className="mt-3 font-quran text-lg leading-loose text-teal">
+                <p dir="rtl" lang="ar" className="mt-2 font-quran text-base leading-loose text-teal">
                   {verse.arabic}
                 </p>
               )}
-              <blockquote className="mt-2.5 font-display text-[17px] leading-relaxed text-teal">
+              <blockquote className="mt-2 font-display text-[15px] leading-snug text-teal">
                 {verse.text}
               </blockquote>
-              <figcaption className="mt-2 text-[13px] text-muted">
+              <figcaption className="mt-2 text-xs text-muted">
                 {verseSource(verse.source)}
               </figcaption>
             </section>
           )}
 
           {/* Continue reading */}
-          <div className="mt-auto pt-9">
+          <div className="mt-8">
             <button
               onClick={() => navigate('/read')}
               className="relative flex w-full items-center gap-4 overflow-hidden rounded-2xl bg-ink px-5 py-5 text-left shadow-[0_10px_30px_rgb(var(--c-ink)/0.25)] transition active:scale-[0.99]"
@@ -270,24 +269,3 @@ function Pattern({ id, className = '' }) {
   )
 }
 
-// A mosque silhouette, gold, rising behind the header title: a large central
-// onion dome with a smaller secondary dome stepping down to the right, traced
-// as a single line with a faint glow — following the reference artwork.
-function MihrabArch({ className = '' }) {
-  return (
-    <svg
-      viewBox="0 -16 340 166"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      preserveAspectRatio="xMidYMin slice"
-      className={className}
-      style={{ filter: 'drop-shadow(0 0 5px rgb(var(--c-gold) / 0.3))' }}
-      aria-hidden="true"
-    >
-      <path d="M110 150 C110 108 74 106 74 66 C72 38 144 26 152 12 C160 26 244 40 242 66 C240 90 246 103 254 110 C264 92 280 74 296 72 C312 76 320 98 324 118 C330 132 332 141 332 150" />
-    </svg>
-  )
-}
