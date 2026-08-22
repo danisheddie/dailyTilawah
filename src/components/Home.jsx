@@ -150,20 +150,31 @@ export default function Home() {
             )}
           </section>
 
-          {/* Streak | lifetime — each column centered around the divider */}
-          <div className="mt-7 flex items-stretch text-center">
-            <div className="min-w-0 flex-1 px-3">
-              <p className="font-display text-[34px] font-bold leading-none text-teal">{streak}</p>
-              <p className="mt-1.5 text-sm font-medium text-teal">{t('settings.dayStreak')}</p>
-              <p className="mt-0.5 truncate text-xs text-muted">{streakSub}</p>
+          {/* Streak | lifetime — tap to open the full journey/streak view */}
+          <button
+            onClick={() => navigate('/journey')}
+            className="mt-7 w-full text-left transition active:opacity-70"
+          >
+            <div className="mb-3 flex items-center justify-between px-1">
+              <span className="t-eyebrow">{t('journey.title')}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted" aria-hidden="true">
+                <path d="M9 6l6 6-6 6" />
+              </svg>
             </div>
-            <div className="w-px self-stretch bg-teal/12" />
-            <div className="min-w-0 flex-1 px-3">
-              <p className="font-display text-[34px] font-bold leading-none text-teal">{totalPages}</p>
-              <p className="mt-1.5 text-sm font-medium text-teal">{t('home.pagesRead')}</p>
-              <p className="mt-0.5 text-xs text-muted">{t('home.lifetime')}</p>
+            <div className="flex items-stretch text-center">
+              <div className="min-w-0 flex-1 px-3">
+                <p className="font-display text-[34px] font-bold leading-none text-teal">{streak}</p>
+                <p className="mt-1.5 text-sm font-medium text-teal">{t('settings.dayStreak')}</p>
+                <p className="mt-0.5 truncate text-xs text-muted">{streakSub}</p>
+              </div>
+              <div className="w-px self-stretch bg-teal/12" />
+              <div className="min-w-0 flex-1 px-3">
+                <p className="font-display text-[34px] font-bold leading-none text-teal">{totalPages}</p>
+                <p className="mt-1.5 text-sm font-medium text-teal">{t('home.pagesRead')}</p>
+                <p className="mt-0.5 text-xs text-muted">{t('home.lifetime')}</p>
+              </div>
             </div>
-          </div>
+          </button>
 
           {/* Verse of the day — a contained, understated daily grace note */}
           {verse && (
