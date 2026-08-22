@@ -11,6 +11,8 @@ import {
   getSettings,
   setSetting,
   recordPageRead,
+  snapshotProgress,
+  restoreProgress,
   isBookmarked,
   toggleBookmark,
 } from '../utils/storage'
@@ -48,6 +50,7 @@ export default function Reader() {
   const [playingIndex, setPlayingIndex] = useState(null)
   const [loadingAudio, setLoadingAudio] = useState(null) // index buffering
   const [completion, setCompletion] = useState(null) // null | {justCompleted}
+  const [undo, setUndo] = useState(null) // null | {snapshot, page} — reverse a mark
   const [glyphPages, setGlyphPages] = useState(() => new Set()) // QCF fonts ready
   const [showJump, setShowJump] = useState(false)
   const [showOptions, setShowOptions] = useState(false)
@@ -276,24 +279,54 @@ export default function Reader() {
     return result
   }
 
-  // "Mark as read": record the page, then move on (or celebrate a completion).
+  // "Mark as read": snapshot first so the mark can be reversed, record the
+  // page, then move on (or celebrate a completion). The undo affordance shows
+  // as a toast (normal marks) or on the completion screen (goal reached).
   function finishPage() {
+    const snapshot = snapshotProgress()
+    const markedPage = page
     const result = recordCurrent()
     stopAudio()
+    if (!result.alreadyRead) setUndo({ snapshot, page: markedPage })
     if (result.justCompleted || result.khatmCompleted) setCompletion(result)
-    else goToNext()
+    else advance()
   }
 
-  function goToNext() {
+  // Reverse the most recent mark: restore the exact prior state and return to
+  // the page that was marked.
+  function undoMark() {
+    if (!undo) return
+    restoreProgress(undo.snapshot)
     setCompletion(null)
-    // Finishing the last page wraps to page 1 to begin a new khatm.
+    setPage(undo.page)
+    setUndo(null)
+    schedulePush() // sync the reverted state if cloud sync is on
+  }
+
+  // Move to the next page (wraps after the last). Used after a mark.
+  function advance() {
     if (page < TOTAL_PAGES) setPage(page + 1)
     else setPage(1)
+  }
+
+  // Arrow / "read another": navigate on and dismiss any pending undo.
+  function goToNext() {
+    setUndo(null)
+    setCompletion(null)
+    advance()
   }
 
   function goToPrev() {
     if (page > 1) setPage(page - 1)
   }
+
+  // Auto-dismiss the undo toast after a few seconds — but keep it while the
+  // completion screen (which carries its own Undo) is showing.
+  useEffect(() => {
+    if (!undo || completion) return
+    const id = setTimeout(() => setUndo(null), 6000)
+    return () => clearTimeout(id)
+  }, [undo, completion])
 
   // --- render --------------------------------------------------------------
   return (
@@ -450,6 +483,21 @@ export default function Reader() {
         </div>
       )}
 
+      {/* Undo toast — reverse an accidental mark (non-completion path) */}
+      {undo && !completion && (
+        <div className="pointer-events-none fixed inset-x-0 z-30 mx-auto flex max-w-2xl justify-center px-5 bottom-[calc(env(safe-area-inset-bottom)+6rem)]">
+          <div className="animate-fade-in pointer-events-auto flex items-center gap-4 rounded-full bg-teal py-2.5 pl-5 pr-2.5 text-sm text-paper shadow-lg">
+            <span>{t('reader.marked')}</span>
+            <button
+              onClick={undoMark}
+              className="rounded-full bg-paper/15 px-3 py-1 font-semibold text-paper transition active:scale-95"
+            >
+              {t('reader.undo')}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Jump-to panel: bookmarks, juz, surah */}
       {showJump && <JumpSheet onJump={jumpTo} onClose={() => setShowJump(false)} />}
 
@@ -556,9 +604,17 @@ export default function Reader() {
               <button className="btn-primary" onClick={goToNext}>
                 {t('reader.readAnother')}
               </button>
-              <button className="btn-ghost" onClick={() => navigate('/')}>
+              <button className="btn-ghost" onClick={() => { setUndo(null); navigate('/') }}>
                 {t('reader.doneToday')}
               </button>
+              {undo && (
+                <button
+                  className="mt-1 text-xs text-muted underline underline-offset-2 transition active:opacity-70"
+                  onClick={undoMark}
+                >
+                  {t('reader.undoMistake')}
+                </button>
+              )}
             </div>
           </div>
         </div>

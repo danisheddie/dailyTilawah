@@ -459,6 +459,47 @@ function bumpStreak() {
   if (streak > read(KEYS.longestStreak, 0)) write(KEYS.longestStreak, streak)
 }
 
+// --- undo a mark-as-read ---------------------------------------------------
+// Marking a page touches several keys (counts, streak, history, position). To
+// reverse an accidental mark exactly, snapshot those keys' raw values before
+// the mark and write them back on undo — simpler and safer than computing an
+// inverse of the streak/goal logic.
+const PROGRESS_KEYS = [
+  KEYS.totalPagesRead,
+  KEYS.khatmCount,
+  KEYS.lastPage,
+  KEYS.streak,
+  KEYS.lastCompletedDate,
+  KEYS.longestStreak,
+  KEYS.readHistory,
+  KEYS.todayProgress,
+  KEYS.completedToday,
+  KEYS.progressDate,
+]
+
+export function snapshotProgress() {
+  const snap = {}
+  try {
+    for (const k of PROGRESS_KEYS) snap[k] = localStorage.getItem(k)
+  } catch {
+    /* storage unavailable — snapshot stays empty, undo becomes a no-op */
+  }
+  return snap
+}
+
+export function restoreProgress(snap) {
+  if (!snap) return
+  try {
+    for (const k of PROGRESS_KEYS) {
+      const v = snap[k]
+      if (v == null) localStorage.removeItem(k)
+      else localStorage.setItem(k, v)
+    }
+  } catch {
+    /* ignore */
+  }
+}
+
 // --- reset -----------------------------------------------------------------
 
 export function resetProgress() {
