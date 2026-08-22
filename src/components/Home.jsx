@@ -79,7 +79,7 @@ export default function Home() {
         {/* ---- Deep navy header ---- */}
         <header className="relative overflow-hidden rounded-b-[28px] bg-ink px-6 pb-5 pt-[calc(env(safe-area-inset-top)+1.25rem)] text-cream">
           <Pattern id="hp" className="absolute inset-0 h-full w-full text-cream opacity-[0.05]" />
-          <MihrabArch className="pointer-events-none absolute top-0 left-1/2 h-40 w-80 -translate-x-1/2 text-gold/45" />
+          <MihrabArch className="pointer-events-none absolute inset-0 h-full w-full text-gold/70" />
 
           <div className="relative flex items-start justify-between">
             <div>
@@ -270,13 +270,24 @@ function Pattern({ id, className = '' }) {
   )
 }
 
-// A mihrab / onion-dome arch outline, gold, rising behind the header title.
-// Two nested outlines give the double-line look of a printed arch.
+// A mosque silhouette, gold, rising behind the header title: a large central
+// onion dome with a smaller secondary dome stepping down to the right, traced
+// as a single line with a faint glow — following the reference artwork.
 function MihrabArch({ className = '' }) {
   return (
-    <svg viewBox="0 0 300 160" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className={className} aria-hidden="true" preserveAspectRatio="xMidYMin meet">
-      <path d="M14 160 C14 84 74 78 108 62 C132 51 120 22 150 3 C180 22 168 51 192 62 C226 78 286 84 286 160" />
-      <path d="M30 160 C30 96 84 90 114 76 C134 66 124 34 150 18 C176 34 166 66 186 76 C216 90 270 96 270 160" opacity="0.55" />
+    <svg
+      viewBox="0 -16 340 166"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      preserveAspectRatio="xMidYMin slice"
+      className={className}
+      style={{ filter: 'drop-shadow(0 0 5px rgb(var(--c-gold) / 0.3))' }}
+      aria-hidden="true"
+    >
+      <path d="M110 150 C110 108 74 106 74 66 C72 38 144 26 152 12 C160 26 244 40 242 66 C240 90 246 103 254 110 C264 92 280 74 296 72 C312 76 320 98 324 118 C330 132 332 141 332 150" />
     </svg>
   )
 }
