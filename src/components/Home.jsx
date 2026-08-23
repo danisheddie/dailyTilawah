@@ -10,6 +10,7 @@ import {
   getReminders,
   getSettings,
   getTotalPagesRead,
+  getName,
   isStreakOnGrace,
 } from '../utils/storage'
 import { SURAH_PAGES, SURAH_NAMES } from '../utils/api'
@@ -47,6 +48,7 @@ export default function Home() {
   const navigate = useNavigate()
   const { t } = useLang()
   const [showSearch, setShowSearch] = useState(false)
+  const name = getName()
   const { goal, todayProgress, completedToday, streak, lastPage } = getProgressSummary()
   const totalPages = getTotalPagesRead()
   const readToday = completedToday || todayProgress > 0
@@ -79,6 +81,9 @@ export default function Home() {
 
           <div className="relative flex items-start justify-between">
             <div>
+              <p className="mb-0.5 text-[13px] font-medium text-cream/80">
+                {name ? `${t('home.salam')}, ${name}` : t('home.salam')}
+              </p>
               <h1 className="font-display text-[22px] font-semibold leading-tight text-cream">
                 {formatHijriLong(new Date(), getSettings().hijriOffset)}
               </h1>
