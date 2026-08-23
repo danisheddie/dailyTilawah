@@ -27,6 +27,13 @@ import { ensurePageFont } from '../utils/fonts'
 import { useWakeLock } from '../utils/useWakeLock.jsx'
 import { useLang } from '../utils/i18n.jsx'
 
+// Distance between the first two active touch points (for pinch scaling).
+function touchDist(touches) {
+  const dx = touches[0].clientX - touches[1].clientX
+  const dy = touches[0].clientY - touches[1].clientY
+  return Math.hypot(dx, dy) || 1
+}
+
 function Spinner() {
   const { t } = useLang()
   return (
@@ -64,6 +71,11 @@ export default function Reader() {
   const audioRef = useRef(null)
   const scrollRef = useRef(null)
   const touchStart = useRef(null)
+  // Pinch-to-zoom the reading area (transient, per reading session).
+  const [zoom, setZoom] = useState(1)
+  const zoomRef = useRef(1)
+  const pinchRef = useRef(null) // { startDist, startZoom } while two fingers down
+  const multiTouchRef = useRef(false)
   const playlistRef = useRef([]) // global ayah numbers for the current page
   const pageAyahsRef = useRef({ page: null, numbers: null }) // cache for mushaf
   const pageRef = useRef(page) // live page, for guards after awaits
@@ -77,10 +89,23 @@ export default function Reader() {
   // right advances to the next page, swiping left goes back. Only horizontal,
   // deliberate swipes count — vertical scrolling and taps are left alone.
   function onTouchStart(e) {
+    if (e.touches.length === 2) {
+      // Two fingers → begin a pinch; suppress swipe paging for this gesture.
+      multiTouchRef.current = true
+      pinchRef.current = { startDist: touchDist(e.touches), startZoom: zoomRef.current }
+      return
+    }
     const t = e.changedTouches[0]
     touchStart.current = { x: t.clientX, y: t.clientY, t: Date.now() }
   }
   function onTouchEnd(e) {
+    // While (or just after) a pinch, don't treat the lift as a page swipe.
+    if (multiTouchRef.current) {
+      pinchRef.current = null
+      if (e.touches.length === 0) multiTouchRef.current = false
+      touchStart.current = null
+      return
+    }
     const s = touchStart.current
     touchStart.current = null
     if (!s || !data || loading || error || showJump || showOptions || completion) return
@@ -93,6 +118,24 @@ export default function Reader() {
     if (dx > 0) goToNext()
     else goToPrev()
   }
+
+  // Live pinch handling needs a non-passive listener so it can preventDefault
+  // (native page pinch-zoom is disabled, but this stops the container scrolling
+  // mid-pinch). Between MIN and MAX, the reading area scales via CSS zoom.
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    function onMove(ev) {
+      if (ev.touches.length !== 2 || !pinchRef.current) return
+      const ratio = touchDist(ev.touches) / pinchRef.current.startDist
+      const z = Math.max(1, Math.min(3, pinchRef.current.startZoom * ratio))
+      zoomRef.current = z
+      setZoom(z)
+      ev.preventDefault()
+    }
+    el.addEventListener('touchmove', onMove, { passive: false })
+    return () => el.removeEventListener('touchmove', onMove)
+  }, [])
 
   // --- data loading --------------------------------------------------------
   const load = useCallback(
@@ -336,7 +379,7 @@ export default function Reader() {
   return (
     <div
       ref={scrollRef}
-      className="mx-auto h-screen max-w-2xl overflow-y-auto"
+      className="mx-auto h-screen max-w-2xl touch-pan-y overflow-auto"
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
@@ -385,8 +428,11 @@ export default function Reader() {
         </button>
       </header>
 
-      {/* Body */}
-      <main className={mode === 'mushaf' ? 'px-2 pb-28 pt-2' : 'px-5 pb-32 pt-4'}>
+      {/* Body — pinch to zoom scales this region via CSS zoom */}
+      <main
+        className={mode === 'mushaf' ? 'px-2 pb-28 pt-2' : 'px-5 pb-32 pt-4'}
+        style={zoom !== 1 ? { zoom } : undefined}
+      >
         {(loading || (!error && !dataReady)) && <Spinner />}
 
         {!loading && error && (
@@ -446,6 +492,23 @@ export default function Reader() {
           </>
         )}
       </main>
+
+      {/* Reset-zoom pill — only while pinched in */}
+      {zoom !== 1 && (
+        <button
+          onClick={() => {
+            zoomRef.current = 1
+            setZoom(1)
+          }}
+          className="fixed left-4 top-[4.5rem] z-20 flex items-center gap-1.5 rounded-full bg-teal px-3 py-1.5 text-xs font-semibold text-paper shadow-lg transition active:scale-95"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+            <path d="M3 3v5h5" />
+          </svg>
+          {Math.round(zoom * 100)}%
+        </button>
+      )}
 
       {/* Bottom bar: prev · Mark as read · next. The arrows only navigate; the
           centre button marks the page read (and moves on). Floats over a fade. */}
