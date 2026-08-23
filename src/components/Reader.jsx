@@ -4,7 +4,7 @@
 // Records progress on finish either way.
 
 import { useEffect, useRef, useState, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { getPage, getMushafPage, TOTAL_PAGES } from '../utils/api'
 import {
   getLastPage,
@@ -39,11 +39,15 @@ function Spinner() {
 
 export default function Reader() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { t } = useLang()
   const [settings, setSettings] = useState(() => getSettings())
   const mode = settings.readingView === 'list' ? 'list' : 'mushaf'
 
-  const [page, setPage] = useState(() => getLastPage())
+  // Open to an explicit target page when one is passed via navigation (search /
+  // Saved / a jump), otherwise resume at the saved reading position. A jump
+  // target only changes what we *view* — it never rewrites reading progress.
+  const [page, setPage] = useState(() => location.state?.page ?? getLastPage())
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)

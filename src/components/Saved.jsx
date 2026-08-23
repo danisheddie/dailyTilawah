@@ -2,7 +2,7 @@
 // the reader. Empty by default — a gentle prompt points to how to save.
 
 import { useNavigate } from 'react-router-dom'
-import { getBookmarks, setLastPage } from '../utils/storage'
+import { getBookmarks } from '../utils/storage'
 import { SURAH_PAGES, SURAH_NAMES } from '../utils/api'
 import { useLang } from '../utils/i18n.jsx'
 
@@ -21,8 +21,7 @@ export default function Saved() {
   const bookmarks = getBookmarks()
 
   const open = (page) => {
-    setLastPage(page)
-    navigate('/read')
+    navigate('/read', { state: { page } })
   }
 
   return (

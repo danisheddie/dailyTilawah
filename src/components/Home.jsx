@@ -10,9 +10,7 @@ import {
   getReminders,
   getSettings,
   getTotalPagesRead,
-  getLastReadDate,
   isStreakOnGrace,
-  setLastPage,
 } from '../utils/storage'
 import { SURAH_PAGES, SURAH_NAMES } from '../utils/api'
 import { formatGregorian, formatHijriLong } from '../utils/dateUtils'
@@ -232,9 +230,8 @@ export default function Home() {
           initialTab="surah"
           onClose={() => setShowSearch(false)}
           onJump={(page) => {
-            setLastPage(page)
             setShowSearch(false)
-            navigate('/read')
+            navigate('/read', { state: { page } })
           }}
         />
       )}
