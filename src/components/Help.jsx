@@ -62,6 +62,10 @@ export default function Help() {
           <p>{t('help.readingBody')}</p>
         </Section>
 
+        <Section title={t('help.findTitle')}>
+          <p>{t('help.findBody')}</p>
+        </Section>
+
         <Section title={t('help.syncTitle')}>
           <p>{t('help.syncBody')}</p>
         </Section>

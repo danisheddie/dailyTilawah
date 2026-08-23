@@ -99,7 +99,10 @@ const en = {
     'Opened from Instagram, WhatsApp or similar? Open the link in Safari or Chrome first.',
   'help.readingTitle': 'Reading your way',
   'help.readingBody':
-    'Tap “Aa” in the reader to switch between the mushaf page and a line-by-line view, change text size, and turn on translation, transliteration or audio. Swipe left or right to turn pages.',
+    'Tap “Aa” in the reader to switch between the mushaf page and a line-by-line view, change text size, and turn on translation, transliteration or audio. Swipe left or right to turn pages, and pinch with two fingers to zoom the text. Marked a page by mistake? Tap Undo to reverse it.',
+  'help.findTitle': 'Finding your place',
+  'help.findBody':
+    'The bar along the bottom moves between Home, the Qur’an, your Saved pages, and More. On Home, tap Search to jump straight to any surah or page — by name or number. Reading something you’ll want again? Bookmark it from the reader’s ⋯ menu to keep it under Saved.',
   'help.syncTitle': 'Sync across devices',
   'help.syncBody':
     'In Settings → Sync, sign in with Google or create a sync code to carry your progress and bookmarks to another phone.',
@@ -108,7 +111,7 @@ const en = {
     'In Settings → Reminders, turn on gentle nudges at prayer times if you haven’t read yet. On iPhone, add the app to your Home Screen first.',
   'help.progressTitle': 'Tracking your progress',
   'help.progressBody':
-    'Your streak grows each day you read. Tap it to open your Journey — your reading calendar, pages read, and khatm progress.',
+    'Your streak grows each day you read — and it quietly survives one missed day, so a single busy day won’t undo your consistency. Tap “Your journey” on Home to see pages read, your best streak, and khatm progress.',
   'help.pointer': 'New here? See how it works',
   'backup.title': 'Back up your progress',
   'backup.body':
@@ -403,7 +406,10 @@ const ms = {
     'Dibuka dari Instagram, WhatsApp atau seumpamanya? Buka pautan dalam Safari atau Chrome dahulu.',
   'help.readingTitle': 'Membaca ikut cara anda',
   'help.readingBody':
-    'Ketik “Aa” dalam pembaca untuk bertukar antara halaman mushaf dan paparan baris demi baris, ubah saiz teks, dan hidupkan terjemahan, transliterasi atau audio. Leret kiri atau kanan untuk menyelak halaman.',
+    'Ketik “Aa” dalam pembaca untuk bertukar antara halaman mushaf dan paparan baris demi baris, ubah saiz teks, dan hidupkan terjemahan, transliterasi atau audio. Leret kiri atau kanan untuk menyelak halaman, dan cubit dengan dua jari untuk zum teks. Tersilap tanda halaman? Ketik Buat asal untuk membalikkannya.',
+  'help.findTitle': 'Mencari tempat anda',
+  'help.findBody':
+    'Bar di bahagian bawah beralih antara Utama, al-Quran, halaman Disimpan anda, dan Lagi. Di Utama, ketik Cari untuk terus melompat ke mana-mana surah atau halaman — mengikut nama atau nombor. Membaca sesuatu yang anda mahu semula? Tandakannya dari menu ⋯ pembaca untuk menyimpannya di bawah Disimpan.',
   'help.syncTitle': 'Segerak merentas peranti',
   'help.syncBody':
     'Dalam Tetapan → Segerak, log masuk dengan Google atau cipta kod segerak untuk membawa kemajuan dan penanda anda ke telefon lain.',
@@ -412,7 +418,7 @@ const ms = {
     'Dalam Tetapan → Peringatan, hidupkan peringatan lembut pada waktu solat jika anda belum membaca. Pada iPhone, tambah apl ke Skrin Utama dahulu.',
   'help.progressTitle': 'Menjejak kemajuan anda',
   'help.progressBody':
-    'Rentetan anda bertambah setiap hari anda membaca. Ketik ia untuk membuka Perjalanan anda — kalendar bacaan, halaman dibaca, dan kemajuan khatam.',
+    'Rentetan anda bertambah setiap hari anda membaca — dan ia diam-diam bertahan satu hari terlepas, jadi satu hari sibuk tidak akan merosakkan ketekalan anda. Ketik “Perjalanan anda” di Utama untuk melihat halaman dibaca, rentetan terbaik anda, dan kemajuan khatam.',
   'help.pointer': 'Baru di sini? Lihat cara ia berfungsi',
   'backup.title': 'Sandarkan kemajuan anda',
   'backup.body':
@@ -710,7 +716,10 @@ const id = {
     'Dibuka dari Instagram, WhatsApp, atau sejenisnya? Buka tautan di Safari atau Chrome dulu.',
   'help.readingTitle': 'Membaca sesuai cara Anda',
   'help.readingBody':
-    'Ketuk “Aa” di pembaca untuk beralih antara halaman mushaf dan tampilan baris demi baris, mengubah ukuran teks, dan mengaktifkan terjemahan, transliterasi, atau audio. Geser kiri atau kanan untuk membalik halaman.',
+    'Ketuk “Aa” di pembaca untuk beralih antara halaman mushaf dan tampilan baris demi baris, mengubah ukuran teks, dan mengaktifkan terjemahan, transliterasi, atau audio. Geser kiri atau kanan untuk membalik halaman, dan cubit dengan dua jari untuk memperbesar teks. Salah menandai halaman? Ketuk Urungkan untuk membatalkannya.',
+  'help.findTitle': 'Menemukan tempat Anda',
+  'help.findBody':
+    'Bilah di bagian bawah berpindah antara Beranda, Al-Qur’an, halaman Tersimpan Anda, dan Lainnya. Di Beranda, ketuk Cari untuk langsung melompat ke surah atau halaman mana pun — berdasarkan nama atau nomor. Membaca sesuatu yang ingin Anda buka lagi? Tandai dari menu ⋯ pembaca untuk menyimpannya di Tersimpan.',
   'help.syncTitle': 'Sinkronkan antar perangkat',
   'help.syncBody':
     'Di Pengaturan → Sinkron, masuk dengan Google atau buat kode sinkron untuk membawa kemajuan dan markah Anda ke ponsel lain.',
@@ -719,7 +728,7 @@ const id = {
     'Di Pengaturan → Pengingat, aktifkan pengingat lembut pada waktu salat jika Anda belum membaca. Di iPhone, tambahkan aplikasi ke Layar Utama dulu.',
   'help.progressTitle': 'Melacak kemajuan Anda',
   'help.progressBody':
-    'Rentetan Anda bertambah setiap hari Anda membaca. Ketuk untuk membuka Perjalanan Anda — kalender bacaan, halaman dibaca, dan kemajuan khatam.',
+    'Rentetan Anda bertambah setiap hari Anda membaca — dan diam-diam bertahan satu hari terlewat, jadi satu hari sibuk tidak akan merusak konsistensi Anda. Ketuk “Perjalanan Anda” di Beranda untuk melihat halaman dibaca, rentetan terbaik Anda, dan kemajuan khatam.',
   'help.pointer': 'Baru di sini? Lihat cara kerjanya',
   'backup.title': 'Cadangkan kemajuan Anda',
   'backup.body':
