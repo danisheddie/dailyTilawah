@@ -66,9 +66,8 @@ export default function Home() {
   const pct = Math.min(100, Math.round((todayProgress / goal.pages) * 100))
   const fmt = (n) => (Number.isInteger(n) ? n : n.toFixed(1))
 
-  // Streak sub-label — normally "Current streak", but reassure on grace.
+  // Only surface a streak sub-line when the grace day is holding the streak.
   const graceOn = !completedToday && isStreakOnGrace()
-  const streakSub = graceOn ? t('home.streakKeptShort') : t('home.currentStreak')
 
   const verse = getDailyReflection('quran')
   const resumeSurah = surahForPage(lastPage)
@@ -164,13 +163,14 @@ export default function Home() {
               <div className="min-w-0 flex-1 px-3">
                 <p className="font-display text-[34px] font-bold leading-none text-teal">{streak}</p>
                 <p className="mt-1.5 text-sm font-medium text-teal">{t('settings.dayStreak')}</p>
-                <p className="mt-0.5 truncate text-xs text-muted">{streakSub}</p>
+                {graceOn && (
+                  <p className="mt-0.5 truncate text-xs text-muted">{t('home.streakKeptShort')}</p>
+                )}
               </div>
               <div className="w-px self-stretch bg-teal/12" />
               <div className="min-w-0 flex-1 px-3">
                 <p className="font-display text-[34px] font-bold leading-none text-teal">{totalPages}</p>
                 <p className="mt-1.5 text-sm font-medium text-teal">{t('home.pagesRead')}</p>
-                <p className="mt-0.5 text-xs text-muted">{t('home.lifetime')}</p>
               </div>
             </div>
           </button>
