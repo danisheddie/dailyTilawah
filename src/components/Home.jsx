@@ -69,7 +69,10 @@ export default function Home() {
   // Only surface a streak sub-line when the grace day is holding the streak.
   const graceOn = !completedToday && isStreakOnGrace()
 
-  const verse = getDailyReflection('quran')
+  // Today's reflection — honours the Daily Reflection setting (verses, hadith,
+  // both, or off). Null when 'off', which hides the card.
+  const reflection = getDailyReflection(getSettings().reflectionMode)
+  const reflectionIsVerse = reflection?.type === "Qur'an"
   const resumeSurah = surahForPage(lastPage)
 
   return (
@@ -178,25 +181,25 @@ export default function Home() {
             </div>
           </button>
 
-          {/* Verse of the day — a contained, understated daily grace note */}
-          {verse && (
+          {/* Daily reflection — a Qur'an verse or hadith per the setting */}
+          {reflection && (
             <section className="mt-8 rounded-2xl border border-gold/15 bg-gold/[0.045] px-4 py-3.5">
               <div className="flex items-center gap-2">
                 <StarSmall className="h-3 w-3 shrink-0 text-gold" />
                 <span className="text-[10.5px] font-semibold uppercase tracking-[0.15em] text-gold">
-                  {t('reflection.verse')}
+                  {reflectionIsVerse ? t('reflection.verse') : t('reflection.hadith')}
                 </span>
               </div>
-              {verse.arabic && (
+              {reflection.arabic && (
                 <p dir="rtl" lang="ar" className="mt-2 font-quran text-base leading-loose text-teal">
-                  {verse.arabic}
+                  {reflection.arabic}
                 </p>
               )}
               <blockquote className="mt-2 font-display text-[15px] leading-snug text-teal">
-                {verse.text}
+                {reflection.text}
               </blockquote>
               <figcaption className="mt-2 text-xs text-muted">
-                {verseSource(verse.source)}
+                {reflectionIsVerse ? verseSource(reflection.source) : reflection.source}
               </figcaption>
             </section>
           )}
